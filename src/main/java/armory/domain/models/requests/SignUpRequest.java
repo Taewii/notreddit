@@ -1,4 +1,4 @@
-package armory.domain.models;
+package armory.domain.models.requests;
 
 import armory.domain.validations.annotations.MatchingFieldsConstraint;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @MatchingFieldsConstraint(fields = {"password", "confirmPassword"})
-public class RegisterAccountBindingModel {
+public class SignUpRequest {
 
     @NotBlank
     @Length(min = 4)

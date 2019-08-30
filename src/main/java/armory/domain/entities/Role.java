@@ -2,6 +2,7 @@ package armory.domain.entities;
 
 import armory.domain.enums.Authority;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "roles")
 public class Role extends BaseLongEntity implements GrantedAuthority {
