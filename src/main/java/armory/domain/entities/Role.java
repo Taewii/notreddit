@@ -2,8 +2,8 @@ package armory.domain.entities;
 
 import armory.domain.enums.Authority;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -13,22 +13,18 @@ import java.util.Set;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "roles")
 public class Role extends BaseLongEntity implements GrantedAuthority {
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @NaturalId
     @Column(nullable = false)
     private Authority authority;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<Account> accounts = new HashSet<>();
-
-    public Role(Authority authority) {
-        this.authority = authority;
-    }
 
     @Override
     public String getAuthority() {

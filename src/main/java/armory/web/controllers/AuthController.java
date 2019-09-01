@@ -1,9 +1,9 @@
 package armory.web.controllers;
 
 import armory.auth.JwtTokenProvider;
-import armory.domain.models.responses.JwtAuthenticationResponse;
 import armory.domain.models.requests.SignInRequest;
 import armory.domain.models.requests.SignUpRequest;
+import armory.domain.models.responses.JwtAuthenticationResponse;
 import armory.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

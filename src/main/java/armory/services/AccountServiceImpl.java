@@ -2,8 +2,8 @@ package armory.services;
 
 import armory.domain.entities.Account;
 import armory.domain.entities.Role;
-import armory.domain.models.responses.ApiResponse;
 import armory.domain.models.requests.SignUpRequest;
+import armory.domain.models.responses.ApiResponse;
 import armory.repositories.AccountRepository;
 import armory.repositories.RoleRepository;
 import org.modelmapper.ModelMapper;

@@ -1,0 +1,4 @@
+INSERT INTO roles(authority) VALUES('ROOT') ON CONFLICT(authority) DO NOTHING;
+INSERT INTO roles(authority) VALUES('ADMIN') ON CONFLICT(authority) DO NOTHING;
+INSERT INTO roles(authority) VALUES('MODERATOR') ON CONFLICT(authority) DO NOTHING;
+INSERT INTO roles(authority) VALUES('USER') ON CONFLICT(authority) DO NOTHING;
