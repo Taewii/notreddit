@@ -11,9 +11,9 @@ import javax.persistence.*;
 @Table(name = "characters")
 public class Character extends BaseUUIDEntity {
 
-    @JoinColumn(name = "owner_account_id")
+    @JoinColumn(name = "owner_user_id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Account account;
+    private User user;
 
     @Column
     private String characterClass;

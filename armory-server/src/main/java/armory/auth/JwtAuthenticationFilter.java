@@ -1,6 +1,6 @@
 package armory.auth;
 
-import armory.services.AccountService;
+import armory.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,13 +23,13 @@ import java.util.UUID;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
-    private final AccountService accountService;
+    private final UserService userService;
 
     @Autowired
     public JwtAuthenticationFilter(JwtTokenProvider tokenProvider,
-                                   AccountService accountService) {
+                                   UserService userService) {
         this.tokenProvider = tokenProvider;
-        this.accountService = accountService;
+        this.userService = userService;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     and create the UserDetails object by parsing those claims from the JWT.
                     That would avoid the following database hit. It's completely up to you.
                  */
-                UserDetails userDetails = accountService.loadUserById(userId);
+                UserDetails userDetails = userService.loadUserById(userId);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

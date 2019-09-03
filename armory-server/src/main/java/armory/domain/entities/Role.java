@@ -24,7 +24,7 @@ public class Role extends BaseLongEntity implements GrantedAuthority {
     private Authority authority;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    private Set<Account> accounts = new HashSet<>();
+    private Set<User> users = new HashSet<>();
 
     @Override
     public String getAuthority() {

@@ -1,5 +1,8 @@
 package armory.config;
 
+import armory.domain.entities.Role;
+import org.modelmapper.AbstractConverter;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +14,17 @@ public class BeanConfig {
 
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        ModelMapper mapper = new ModelMapper();
+
+        Converter<Role, String> toAuthorityString = new AbstractConverter<>() {
+            @Override
+            protected String convert(Role role) {
+                return role == null ? null : role.getAuthority().substring("ROLE_".length());
+            }
+        };
+
+        mapper.addConverter(toAuthorityString);
+        return mapper;
     }
 
     @Bean

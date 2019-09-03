@@ -18,7 +18,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "users")
-public class Account extends BaseUUIDEntity implements UserDetails {
+public class User extends BaseUUIDEntity implements UserDetails {
 
     @NotBlank
     @Length
@@ -42,7 +42,7 @@ public class Account extends BaseUUIDEntity implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Character> characters = new HashSet<>();
 
     @Override

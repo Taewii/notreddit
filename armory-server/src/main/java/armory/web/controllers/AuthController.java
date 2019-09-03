@@ -4,7 +4,7 @@ import armory.auth.JwtTokenProvider;
 import armory.domain.models.requests.SignInRequest;
 import armory.domain.models.requests.SignUpRequest;
 import armory.domain.models.responses.JwtAuthenticationResponse;
-import armory.services.AccountService;
+import armory.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,22 +23,22 @@ import javax.validation.Valid;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AccountService accountService;
+    private final UserService userService;
     private final JwtTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public AuthController(AccountService accountService,
+    public AuthController(UserService userService,
                           JwtTokenProvider tokenProvider,
                           AuthenticationManager authenticationManager) {
-        this.accountService = accountService;
+        this.userService = userService;
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody SignUpRequest model) {
-        return accountService.register(model);
+        return userService.register(model);
     }
 
     @Transactional

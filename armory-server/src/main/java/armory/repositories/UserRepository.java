@@ -1,6 +1,6 @@
 package armory.repositories;
 
-import armory.domain.entities.Account;
+import armory.domain.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,12 +12,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, UUID> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-    @Query("SELECT a FROM Account a JOIN FETCH a.roles WHERE a.id = :id")
-    Optional<Account> findByIdWithRoles(@Param("id") UUID id);
+    @Query("SELECT a FROM User a JOIN FETCH a.roles WHERE a.id = :id")
+    Optional<User> findByIdWithRoles(@Param("id") UUID id);
 
-    Optional<Account> findByUsernameOrEmail(@NotBlank String username, @Email @NotBlank String email);
+    Optional<User> findByUsernameOrEmail(@NotBlank String username, @Email @NotBlank String email);
 
     Boolean existsByUsername(@NotBlank String username);
 

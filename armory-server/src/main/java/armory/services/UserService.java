@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.UUID;
 
-public interface AccountService extends UserDetailsService {
+public interface UserService extends UserDetailsService {
 
     UserDetails loadUserById(UUID id);
 

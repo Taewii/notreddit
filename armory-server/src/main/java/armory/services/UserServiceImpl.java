@@ -1,11 +1,11 @@
 package armory.services;
 
-import armory.domain.entities.Account;
 import armory.domain.entities.Role;
+import armory.domain.entities.User;
 import armory.domain.models.requests.SignUpRequest;
 import armory.domain.models.responses.ApiResponse;
-import armory.repositories.AccountRepository;
 import armory.repositories.RoleRepository;
+import armory.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.*;
 
 @Service
-public class AccountServiceImpl implements AccountService {
+public class UserServiceImpl implements UserService {
 
     private static final List<String> ROLES = new ArrayList<>() {{
         add("ROOT");
@@ -29,17 +29,17 @@ public class AccountServiceImpl implements AccountService {
         add("USER");
     }};
 
-    private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final ModelMapper mapper;
 
     @Autowired
-    public AccountServiceImpl(AccountRepository accountRepository,
-                              RoleRepository roleRepository,
-                              PasswordEncoder encoder,
-                              ModelMapper mapper) {
-        this.accountRepository = accountRepository;
+    public UserServiceImpl(UserRepository userRepository,
+                           RoleRepository roleRepository,
+                           PasswordEncoder encoder,
+                           ModelMapper mapper) {
+        this.userRepository = userRepository;
 
         this.roleRepository = roleRepository;
         this.encoder = encoder;
@@ -49,7 +49,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        return accountRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+        return userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail)
                 );
@@ -58,30 +58,30 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public UserDetails loadUserById(UUID id) {
-//        return accountRepository.findById(id).orElseThrow(); // TODO: 30.8.2019 г. check which one is necessary
-        return accountRepository.findByIdWithRoles(id).orElseThrow();
+//        return userRepository.findById(id).orElseThrow(); // TODO: 30.8.2019 г. check which one is necessary
+        return userRepository.findByIdWithRoles(id).orElseThrow();
     }
 
     @Override
     public ResponseEntity<?> register(SignUpRequest model) {
-        if (accountRepository.existsByUsername(model.getUsername())) {
+        if (userRepository.existsByUsername(model.getUsername())) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Username is already taken!"));
         }
 
-        if (accountRepository.existsByEmail(model.getEmail())) {
+        if (userRepository.existsByEmail(model.getEmail())) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Email Address already in use!"));
         }
 
-        Account account = mapper.map(model, Account.class);
-        account.setPassword(encoder.encode(model.getPassword()));
+        User user = mapper.map(model, User.class);
+        user.setPassword(encoder.encode(model.getPassword()));
 
-        if (accountRepository.count() == 0) {
-            account.setRoles(this.getInheritedRolesFromRole("ROOT"));
+        if (userRepository.count() == 0) {
+            user.setRoles(this.getInheritedRolesFromRole("ROOT"));
         } else {
-            account.setRoles(this.getInheritedRolesFromRole("USER"));
+            user.setRoles(this.getInheritedRolesFromRole("USER"));
         }
 
-        accountRepository.saveAndFlush(account);
+        userRepository.saveAndFlush(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/home")
                 .buildAndExpand().toUri();
