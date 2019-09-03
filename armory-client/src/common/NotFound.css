@@ -7,15 +7,9 @@
   text-align: center;   
 }
 
-.page-not-found .title {
-  font-size: 50px;
-  letter-spacing: 10px;
-  margin-bottom: 10px;
-}
-
 .page-not-found .desc {
   font-size: 20px;
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 
 .go-back-btn {

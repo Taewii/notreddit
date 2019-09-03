@@ -62,12 +62,18 @@
   margin: -10px -12px;
 }
 
-.nav-icon {
-  font-size: 20px;
+button {
+  background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
 }
 
-.poll-icon {
-  margin-top: -4px;
+.nav-icon {
+  font-size: 20px;
 }
 
 @media (max-width: 768px) {

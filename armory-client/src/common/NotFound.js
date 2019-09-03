@@ -7,9 +7,7 @@ class NotFound extends Component {
   render() {
     return (
       <div className="page-not-found">
-        <h1 className="title">
-          404
-                </h1>
+        <img src="https://www.nicepng.com/png/full/225-2255762_error404-error-404-icono-png.png" alt="404" width="350px" />
         <div className="desc">
           The Page you're looking for was not found.
                 </div>

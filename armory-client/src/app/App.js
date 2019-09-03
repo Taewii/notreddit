@@ -6,9 +6,11 @@ import {
   Switch
 } from 'react-router-dom';
 
+import { getCurrentUser } from '../util/APIUtils';
 import { ACCESS_TOKEN } from '../util/constants';
 
-
+import Login from '../user/Login'
+import Signup from '../user/Signup'
 import AppHeader from '../common/AppHeader';
 import NotFound from '../common/NotFound';
 import LoadingIndicator from '../common/LoadingIndicator';
@@ -32,13 +34,31 @@ class App extends Component {
     notification.config({
       placement: 'topRight',
       top: 70,
-      duration: 3,
+      duration: 2,
     });
   }
 
-  // componentDidMount() {
-  //   this.loadCurrentUser();
-  // }
+  componentDidMount() {
+    this.loadCurrentUser();
+  }
+
+  loadCurrentUser() {
+    this.setState({
+      isLoading: true
+    });
+    getCurrentUser()
+      .then(response => {
+        this.setState({
+          currentUser: response,
+          isAuthenticated: true,
+          isLoading: false
+        });
+      }).catch(error => {
+        this.setState({
+          isLoading: false
+        });
+      });
+  }
 
   handleLogout(redirectTo = "/", notificationType = "success", description = "You're successfully logged out.") {
     localStorage.removeItem(ACCESS_TOKEN);
@@ -51,17 +71,17 @@ class App extends Component {
     this.props.history.push(redirectTo);
 
     notification[notificationType]({
-      message: 'Polling App',
+      message: 'WoW Armory',
       description: description,
     });
   }
 
   handleLogin() {
     notification.success({
-      message: 'Polling App',
+      message: 'WoW Armory',
       description: "You're successfully logged in.",
     });
-    // this.loadCurrentUser();
+    this.loadCurrentUser();
     this.props.history.push("/");
   }
 
@@ -77,7 +97,11 @@ class App extends Component {
 
         <Content className="app-content" style={{ textAlign: "center" }}>
           <div className="container">
-            <h1>Welcome</h1>
+            <Switch>
+              <Route path="/login" render={(props) => <Login onLogin={this.handleLogin} {...props} />}></Route>
+              <Route path="/signup" component={Signup}></Route>
+              <Route component={NotFound}></Route>
+            </Switch>
           </div>
         </Content>
       </Layout>
