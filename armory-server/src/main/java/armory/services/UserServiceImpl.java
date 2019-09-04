@@ -40,7 +40,6 @@ public class UserServiceImpl implements UserService {
                            PasswordEncoder encoder,
                            ModelMapper mapper) {
         this.userRepository = userRepository;
-
         this.roleRepository = roleRepository;
         this.encoder = encoder;
         this.mapper = mapper;
@@ -65,11 +64,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<?> register(SignUpRequest model) {
         if (userRepository.existsByUsername(model.getUsername())) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Username is already taken!"));
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Username is already taken!"));
         }
 
         if (userRepository.existsByEmail(model.getEmail())) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Email Address already in use!"));
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Email Address already in use!"));
         }
 
         User user = mapper.map(model, User.class);
@@ -86,7 +89,9 @@ public class UserServiceImpl implements UserService {
                 .fromCurrentContextPath().path("/home")
                 .buildAndExpand().toUri();
 
-        return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+        return ResponseEntity
+                .created(location)
+                .body(new ApiResponse(true, "User registered successfully"));
     }
 
     private Set<Role> getInheritedRolesFromRole(String role) {

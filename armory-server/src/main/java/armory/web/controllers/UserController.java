@@ -3,6 +3,7 @@ package armory.web.controllers;
 import armory.domain.entities.User;
 import armory.domain.models.responses.UserIdentityAvailabilityResponse;
 import armory.domain.models.responses.UserSummaryResponse;
+import armory.domain.models.responses.UsersResponse;
 import armory.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user")
@@ -43,5 +47,15 @@ public class UserController {
     @GetMapping("/me")
     public UserSummaryResponse getCurrentUser(@AuthenticationPrincipal User user) {
         return mapper.map(user, UserSummaryResponse.class);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public UsersResponse getAllUsers() {
+        List<UserSummaryResponse> users = userRepository.findAllWithRoles()
+                .stream()
+                .map(u -> mapper.map(u, UserSummaryResponse.class))
+                .collect(Collectors.toUnmodifiableList());
+        return new UsersResponse(users);
     }
 }
