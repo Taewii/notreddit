@@ -1,0 +1,13 @@
+.user-list {
+  min-height: 100px;
+  max-width: 650px;
+  margin: 20px auto;
+}
+
+.users-dropdown {
+  min-width: 150px;
+}
+
+button {
+  color: #1890ff !important;
+}
