@@ -27,6 +27,7 @@
 
 .app-menu > li {
   padding: 0 20px;
+  max-width: 60px;
 }
 
 .app-menu > li > a {

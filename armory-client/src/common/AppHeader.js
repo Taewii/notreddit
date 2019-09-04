@@ -21,7 +21,8 @@ class AppHeader extends Component {
 
   render() {
     let menuItems;
-    if (this.props.currentUser) {
+    const currentUser = this.props.currentUser;
+    if (currentUser) {
       menuItems = [
         <Menu.Item key="/">
           <Link to="/">
@@ -34,6 +35,14 @@ class AppHeader extends Component {
             handleMenuClick={this.handleMenuClick} />
         </Menu.Item>
       ];
+
+      if (currentUser.roles.includes('ADMIN')) {
+        menuItems.splice(1, 0,
+          <Menu.Item key="/admin" className="profile-menu">
+            <AdminDropdownMenu />
+          </Menu.Item>
+        );
+      }
     } else {
       menuItems = [
         <Menu.Item key="/login">
@@ -64,7 +73,27 @@ class AppHeader extends Component {
   }
 }
 
-function ProfileDropdownMenu(props) {
+const AdminDropdownMenu = (props) => {
+  const dropdownMenu = (
+    <Menu onClick={props.handleMenuClick} className="profile-dropdown-menu">
+      <Menu.Item key="all-users" className="dropdown-item">
+        <Link to="/user/all">All Users</Link>
+      </Menu.Item>
+    </Menu>
+  );
+
+  return (
+    <Dropdown
+      overlay={dropdownMenu}
+      getPopupContainer={() => document.getElementsByClassName('profile-menu')[0]}>
+      <button className="ant-dropdown-link">
+        <Icon type="security-scan" className="nav-icon" style={{ marginRight: 0 }} /> <Icon type="down" />
+      </button>
+    </Dropdown>
+  );
+}
+
+const ProfileDropdownMenu = (props) => {
   const dropdownMenu = (
     <Menu onClick={props.handleMenuClick} className="profile-dropdown-menu">
       <Menu.Item key="user-info" className="dropdown-item" disabled>
@@ -88,7 +117,6 @@ function ProfileDropdownMenu(props) {
   return (
     <Dropdown
       overlay={dropdownMenu}
-      trigger={['click']}
       getPopupContainer={() => document.getElementsByClassName('profile-menu')[0]}>
       <button className="ant-dropdown-link">
         <Icon type="user" className="nav-icon" style={{ marginRight: 0 }} /> <Icon type="down" />
