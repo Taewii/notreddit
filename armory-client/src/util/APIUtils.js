@@ -81,3 +81,11 @@ export function getAllUsersWithRoles() {
     method: 'GET'
   });
 }
+
+export function handleRoleChange(changeRoleRequest) {
+  return request({
+    url: API_BASE_URL + "/user/changeRole",
+    method: 'POST',
+    body: JSON.stringify(changeRoleRequest)
+  })
+}

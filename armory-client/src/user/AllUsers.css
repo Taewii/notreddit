@@ -1,6 +1,6 @@
 .user-list {
   min-height: 100px;
-  max-width: 650px;
+  max-width: 680px;
   margin: 20px auto;
 }
 
@@ -8,6 +8,7 @@
   min-width: 150px;
 }
 
-button {
-  color: #1890ff !important;
+.list-button {
+  margin-left: 19px;
+  color: #1890ff
 }

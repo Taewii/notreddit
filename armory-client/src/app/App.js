@@ -33,7 +33,7 @@ class App extends Component {
     this.handleLogin = this.handleLogin.bind(this);
 
     notification.config({
-      placement: 'topRight',
+      placement: 'topLeft',
       top: 70,
       duration: 2,
     });

@@ -1,18 +1,28 @@
 import React, { Component } from 'react';
 import './AllUsers.css';
 
-import { getAllUsersWithRoles } from '../util/APIUtils'
+import { getAllUsersWithRoles, handleRoleChange, getCurrentUser } from '../util/APIUtils'
 
-import { List, Icon, Menu, Button, Dropdown, Skeleton, message } from 'antd';
+import { List, Select, Skeleton, Button, notification } from 'antd';
 
 class AllUsers extends Component {
-  _isMounted = false;
+  constructor(props) {
+    super(props)
+    this._isMounted = false;
+    this.roles = [];
+    this.currentUserId = '';
+    this.state = {
+      initLoading: true,
+      loading: false,
+      data: [],
+    };
 
-  state = {
-    initLoading: true,
-    loading: false,
-    data: [],
-  };
+    getCurrentUser()
+      .then(res => this.currentUserId = res.id);
+
+    this.handleChange = this.handleChange.bind(this);
+    this.getUserRoleOptions = this.getUserRoleOptions.bind(this);
+  }
 
   componentDidMount() {
     this._isMounted = true;
@@ -25,6 +35,12 @@ class AllUsers extends Component {
             data: res.users,
           });
         }
+      }).catch(error => {
+        this.props.history.push('/');
+        notification.error({
+          message: 'WoW Armory',
+          description: error.message || 'Sorry! Something went wrong. Please try again!'
+        });
       });
   }
 
@@ -32,34 +48,50 @@ class AllUsers extends Component {
     this._isMounted = false;
   }
 
-  handleMenuClick(e) {
-    message.info('Click on menu item.');
-    console.log('click', e);
+  handleChange(userId, currentRole, newRole) {
+    handleRoleChange({ userId, currentRole, newRole })
+      .then(res => {
+        if (res.success) {
+          notification.success({
+            message: 'WoW Armory',
+            description: res.message
+          });
+          this.props.history.push("/user/all"); // TODO: figure out how to reload the component
+        } else {
+          notification.error({
+            message: 'WoW Armory',
+            description: res.message
+          });
+        }
+      });
+  }
+
+  getUserRoleOptions(user) {
+    if (!this.roles.length) {
+      this.roles = user.roles;
+    }
+
+    const optionList = [];
+    const currentRole = user.roles[0];
+
+    this.roles.forEach(role => {
+      const shouldBeDisabled = role === currentRole || role === 'ROOT';
+      optionList.push(<Select.Option key={role} disabled={shouldBeDisabled}>{role}</Select.Option>)
+    })
+
+    return (
+      <Select
+        defaultValue={currentRole}
+        disabled={user.id === this.currentUserId}
+        className="users-dropdown"
+        onChange={e => this.handleChange(user.id, currentRole, e)}>
+        {optionList}
+      </Select>
+    )
   }
 
   render() {
     const { initLoading, data } = this.state;
-
-    const menu = (
-      <Menu onClick={this.handleMenuClick}>
-        <Menu.Item key="1">
-          <Icon type="user" />
-          ROOT
-        </Menu.Item>
-        <Menu.Item key="2">
-          <Icon type="user" />
-          ADMIN
-        </Menu.Item>
-        <Menu.Item key="3">
-          <Icon type="user" />
-          MODERATOR
-        </Menu.Item>
-        <Menu.Item key="3">
-          <Icon type="user" />
-          USER
-        </Menu.Item>
-      </Menu>
-    );
 
     return (
       <List
@@ -69,20 +101,14 @@ class AllUsers extends Component {
         bordered={true}
         dataSource={data}
         renderItem={user => (
-          <List.Item
-            actions={[<button key="user-edit">edit</button>, <button key="user-delete">delete</button>]}
-          >
+          <List.Item>
             <Skeleton avatar title={false} loading={user.loading} active>
               <List.Item.Meta
                 title={user.username}
-                description={user.id}
-              />
-              <Dropdown overlay={menu} className="users-dropdown">
-                <Button>
-                  Moderator <Icon type="down" />
-                </Button>
-              </Dropdown>
+                description={user.id} />
+              {this.getUserRoleOptions(user)}
             </Skeleton>
+            <Button className="list-button">delete</Button>
           </List.Item>
         )}
       />
