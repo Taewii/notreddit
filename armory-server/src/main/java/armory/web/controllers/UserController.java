@@ -1,19 +1,20 @@
 package armory.web.controllers;
 
 import armory.domain.entities.User;
+import armory.domain.models.requests.ChangeRoleRequest;
 import armory.domain.models.responses.UserIdentityAvailabilityResponse;
 import armory.domain.models.responses.UserSummaryResponse;
 import armory.domain.models.responses.UsersResponse;
 import armory.repositories.UserRepository;
+import armory.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,12 +22,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/user")
 public class UserController {
 
+    private final UserService userService;
     private final UserRepository userRepository;
     private final ModelMapper mapper;
 
     @Autowired
-    public UserController(UserRepository userRepository,
+    public UserController(UserService userService,
+                          UserRepository userRepository,
                           ModelMapper mapper) {
+        this.userService = userService;
         this.userRepository = userRepository;
         this.mapper = mapper;
     }
@@ -57,5 +61,12 @@ public class UserController {
                 .map(u -> mapper.map(u, UserSummaryResponse.class))
                 .collect(Collectors.toUnmodifiableList());
         return new UsersResponse(users);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/changeRole")
+    public ResponseEntity<?> changeUserRole(@Valid @RequestBody ChangeRoleRequest request,
+                                            @AuthenticationPrincipal User user) {
+        return userService.changeRole(request, user);
     }
 }

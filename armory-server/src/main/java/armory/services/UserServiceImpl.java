@@ -2,12 +2,14 @@ package armory.services;
 
 import armory.domain.entities.Role;
 import armory.domain.entities.User;
+import armory.domain.models.requests.ChangeRoleRequest;
 import armory.domain.models.requests.SignUpRequest;
 import armory.domain.models.responses.ApiResponse;
 import armory.repositories.RoleRepository;
 import armory.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -92,6 +94,35 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity
                 .created(location)
                 .body(new ApiResponse(true, "User registered successfully"));
+    }
+
+    @Override
+    public ResponseEntity<?> changeRole(ChangeRoleRequest request, User user) {
+        if (request.getNewRole().equalsIgnoreCase("root") ||
+                request.getCurrentRole().equalsIgnoreCase("root")) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Cannot change role form/to ROOT"));
+        }
+
+        boolean hasAdminRole = user.getAuthorities()
+                .stream()
+                .anyMatch(r -> r.getAuthority().equalsIgnoreCase("role_admin"));
+
+        if (!hasAdminRole) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponse(false, "You don't have permissions to do that."));
+        }
+
+        User affectedUser = userRepository.findByIdWithRoles(request.getUserId()).orElseThrow();
+        affectedUser.setRoles(this.getInheritedRolesFromRole(request.getNewRole()));
+        userRepository.saveAndFlush(affectedUser);
+
+        return ResponseEntity
+                .ok()
+                .body(new ApiResponse(true, String.format("Changed %s's role to %s",
+                        affectedUser.getUsername(), request.getNewRole())));
     }
 
     private Set<Role> getInheritedRolesFromRole(String role) {
