@@ -87,5 +87,19 @@ export function handleRoleChange(changeRoleRequest) {
     url: API_BASE_URL + "/user/changeRole",
     method: 'POST',
     body: JSON.stringify(changeRoleRequest)
+  });
+}
+
+export function getAllRoles() {
+  return request({
+    url: API_BASE_URL + "/role/all",
+    method: 'GET'
+  });
+}
+
+export function deleteUser(userId) {
+  return request({
+    url: API_BASE_URL + "/user/delete?id=" + userId,
+    method: 'DELETE'
   })
 }

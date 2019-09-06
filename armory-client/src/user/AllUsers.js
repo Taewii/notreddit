@@ -1,16 +1,22 @@
 import React, { Component } from 'react';
 import './AllUsers.css';
 
-import { getAllUsersWithRoles, handleRoleChange, getCurrentUser } from '../util/APIUtils'
+import {
+  getAllUsersWithRoles,
+  handleRoleChange,
+  getCurrentUser,
+  getAllRoles,
+  deleteUser
+} from '../util/APIUtils'
 
-import { List, Select, Skeleton, Button, notification } from 'antd';
+import { List, Select, Skeleton, Popconfirm, Button, notification } from 'antd';
 
 class AllUsers extends Component {
   constructor(props) {
     super(props)
     this._isMounted = false;
     this.roles = [];
-    this.currentUserId = '';
+    this.currentUser = {};
     this.state = {
       initLoading: true,
       loading: false,
@@ -18,7 +24,10 @@ class AllUsers extends Component {
     };
 
     getCurrentUser()
-      .then(res => this.currentUserId = res.id);
+      .then(res => this.currentUser = res);
+
+    getAllRoles()
+      .then(res => this.roles = res.roles);
 
     this.handleChange = this.handleChange.bind(this);
     this.getUserRoleOptions = this.getUserRoleOptions.bind(this);
@@ -51,26 +60,20 @@ class AllUsers extends Component {
   handleChange(userId, currentRole, newRole) {
     handleRoleChange({ userId, currentRole, newRole })
       .then(res => {
-        if (res.success) {
-          notification.success({
-            message: 'WoW Armory',
-            description: res.message
-          });
-          this.props.history.push("/user/all"); // TODO: figure out how to reload the component
-        } else {
-          notification.error({
-            message: 'WoW Armory',
-            description: res.message
-          });
-        }
+        notification.success({
+          message: 'WoW Armory',
+          description: res.message
+        });
+        this.componentDidMount(); //reload component
+      }).catch(error => {
+        notification.error({
+          message: 'WoW Armory',
+          description: error.message
+        });
       });
   }
 
   getUserRoleOptions(user) {
-    if (!this.roles.length) {
-      this.roles = user.roles;
-    }
-
     const optionList = [];
     const currentRole = user.roles[0];
 
@@ -82,12 +85,28 @@ class AllUsers extends Component {
     return (
       <Select
         defaultValue={currentRole}
-        disabled={user.id === this.currentUserId}
+        disabled={user.id === this.currentUser.id || user.roles[0] === 'ROOT'}
         className="users-dropdown"
         onChange={e => this.handleChange(user.id, currentRole, e)}>
         {optionList}
       </Select>
     )
+  }
+
+  handleDeleteConfirm(userId) {
+    deleteUser(userId)
+      .then(res => {
+        notification.success({
+          message: 'WoW Armory',
+          description: res.message
+        });
+        this.componentDidMount(); //reload component
+      }).catch(error => {
+        notification.error({
+          message: 'WoW Armory',
+          description: error.message
+        });
+      })
   }
 
   render() {
@@ -108,7 +127,17 @@ class AllUsers extends Component {
                 description={user.id} />
               {this.getUserRoleOptions(user)}
             </Skeleton>
-            <Button className="list-button">delete</Button>
+            {this.currentUser.roles.includes('ROOT')
+              ? <Popconfirm
+                title="Are you sure you want to delete this user?"
+                placement="topRight"
+                onConfirm={e => this.handleDeleteConfirm(user.id)}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button className="list-button">delete</Button>
+              </Popconfirm>
+              : null}
           </List.Item>
         )}
       />
