@@ -59,7 +59,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDetails loadUserById(UUID id) {
-//        return userRepository.findById(id).orElseThrow(); // TODO: 30.8.2019 г. check which one is necessary
         return userRepository.findByIdWithRoles(id).orElseThrow();
     }
 
@@ -123,6 +122,33 @@ public class UserServiceImpl implements UserService {
                 .ok()
                 .body(new ApiResponse(true, String.format("Changed %s's role to %s",
                         affectedUser.getUsername(), request.getNewRole())));
+    }
+
+    @Override
+    public ResponseEntity<?> deleteUser(String userId, User user) {
+        boolean isRoot = user.getAuthorities()
+                .stream()
+                .anyMatch(r -> r.getAuthority().equalsIgnoreCase("role_root"));
+
+        if (!isRoot) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponse(false, "You don't have permissions to do that."));
+        }
+
+        User userToDelete = userRepository.findById(UUID.fromString(userId)).orElse(null);
+
+        if (userToDelete == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, String.format("User with id: %s doesn't exist", userId)));
+        }
+
+        userRepository.delete(userToDelete);
+        return ResponseEntity
+                .ok()
+                .body(new ApiResponse(true,
+                        String.format("User %s deleted successfully.", userToDelete.getUsername())));
     }
 
     private Set<Role> getInheritedRolesFromRole(String role) {

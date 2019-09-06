@@ -69,4 +69,11 @@ public class UserController {
                                             @AuthenticationPrincipal User user) {
         return userService.changeRole(request, user);
     }
+
+    @PreAuthorize("hasRole('ROOT')")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteUser(@RequestParam String id,
+                                        @AuthenticationPrincipal User user) {
+        return userService.deleteUser(id, user);
+    }
 }

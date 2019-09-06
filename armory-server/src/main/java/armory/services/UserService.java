@@ -16,4 +16,6 @@ public interface UserService extends UserDetailsService {
     ResponseEntity<?> register(SignUpRequest model);
 
     ResponseEntity<?> changeRole(ChangeRoleRequest request, User user);
+
+    ResponseEntity<?> deleteUser(String userId, User user);
 }
