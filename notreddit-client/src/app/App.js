@@ -71,14 +71,14 @@ class App extends Component {
     this.props.history.push(redirectTo);
 
     notification[notificationType]({
-      message: 'WoW Armory',
+      message: 'notreddit',
       description: description,
     });
   }
 
   handleLogin() {
     notification.success({
-      message: 'WoW Armory',
+      message: 'notreddit',
       description: "You're successfully logged in.",
     });
     this.loadCurrentUser();

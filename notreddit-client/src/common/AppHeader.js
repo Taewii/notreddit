@@ -58,7 +58,7 @@ class AppHeader extends Component {
       <Header className="app-header">
         <div className="container">
           <div className="app-title" >
-            <Link to="/">WoW Armory</Link>
+            <Link to="/">notreddit</Link>
           </div>
           <Menu
             className="app-menu"

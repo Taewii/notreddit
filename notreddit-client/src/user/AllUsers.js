@@ -47,7 +47,7 @@ class AllUsers extends Component {
       }).catch(error => {
         this.props.history.push('/');
         notification.error({
-          message: 'WoW Armory',
+          message: 'notreddit',
           description: error.message || 'Sorry! Something went wrong. Please try again!'
         });
       });
@@ -61,13 +61,13 @@ class AllUsers extends Component {
     handleRoleChange({ userId, currentRole, newRole })
       .then(res => {
         notification.success({
-          message: 'WoW Armory',
+          message: 'notreddit',
           description: res.message
         });
         this.componentDidMount(); //reload component
       }).catch(error => {
         notification.error({
-          message: 'WoW Armory',
+          message: 'notreddit',
           description: error.message
         });
       });
@@ -97,13 +97,13 @@ class AllUsers extends Component {
     deleteUser(userId)
       .then(res => {
         notification.success({
-          message: 'WoW Armory',
+          message: 'notreddit',
           description: res.message
         });
         this.componentDidMount(); //reload component
       }).catch(error => {
         notification.error({
-          message: 'WoW Armory',
+          message: 'notreddit',
           description: error.message
         });
       })
