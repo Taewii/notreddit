@@ -1,8 +1,8 @@
 package notreddit.domain.entities;
 
-import notreddit.domain.enums.Authority;
 import lombok.Getter;
 import lombok.Setter;
+import notreddit.domain.enums.Authority;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.security.core.GrantedAuthority;
 
