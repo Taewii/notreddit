@@ -15,6 +15,7 @@ import AllUsers from '../user/AllUsers';
 import AppHeader from '../common/AppHeader';
 import NotFound from '../common/NotFound';
 import LoadingIndicator from '../common/LoadingIndicator';
+import SubredditCreate from '../subreddit/SubredditCreate';
 
 import { Layout, notification } from 'antd';
 const { Content } = Layout;
@@ -89,6 +90,7 @@ class App extends Component {
     if (this.state.isLoading) {
       return <LoadingIndicator />
     }
+
     return (
       <Layout className="app-container">
         <AppHeader isAuthenticated={this.state.isAuthenticated}
@@ -101,6 +103,7 @@ class App extends Component {
               <Route path="/login" render={(props) => <Login onLogin={this.handleLogin} {...props} />}></Route>
               <Route path="/signup" component={Signup}></Route>
               <Route path="/user/all" component={AllUsers}></Route>
+              <Route path="/subreddit/create" component={SubredditCreate}></Route>
               <Route component={NotFound}></Route>
             </Switch>
           </div>

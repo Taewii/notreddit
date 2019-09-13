@@ -103,3 +103,18 @@ export function deleteUser(userId) {
     method: 'DELETE'
   })
 }
+
+export function checkSubredditAvailability(subreddit) {
+  return request({
+    url: API_BASE_URL + "/user/checkSubredditAvailability?subreddit=" + subreddit,
+    method: 'GET'
+  });
+}
+
+export function createSubreddit(subredditRequest) {
+  return request({
+    url: API_BASE_URL + "/subreddit/create",
+    method: 'POST',
+    body: JSON.stringify(subredditRequest)
+  });
+}
