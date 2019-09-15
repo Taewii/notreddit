@@ -24,6 +24,6 @@ public class Comment extends BaseUUIDEntity {
     @Column(nullable = false, columnDefinition = "NUMERIC DEFAULT 0")
     private int rating;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Comment parent;
 }

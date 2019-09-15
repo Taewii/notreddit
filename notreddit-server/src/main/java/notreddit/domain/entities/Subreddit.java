@@ -15,6 +15,9 @@ import java.util.Set;
 @Table(name = "subreddits")
 public class Subreddit extends BaseLongEntity {
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private User creator;
+
     @Length(min = 4)
     @NotBlank
     @Column(nullable = false)
