@@ -106,7 +106,7 @@ export function deleteUser(userId) {
 
 export function checkSubredditAvailability(subreddit) {
   return request({
-    url: API_BASE_URL + "/user/checkSubredditAvailability?subreddit=" + subreddit,
+    url: API_BASE_URL + "/subreddit/checkSubredditAvailability?title=" + subreddit,
     method: 'GET'
   });
 }

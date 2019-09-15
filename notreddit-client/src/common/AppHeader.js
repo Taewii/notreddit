@@ -29,6 +29,9 @@ class AppHeader extends Component {
             <Icon type="home" className="nav-icon" />
           </Link>
         </Menu.Item>,
+        <Menu.Item key="subreddit">
+          <SubredditDropdownMenu />
+        </Menu.Item>,
         <Menu.Item key="/profile" className="profile-menu">
           <ProfileDropdownMenu
             currentUser={this.props.currentUser}
@@ -37,7 +40,7 @@ class AppHeader extends Component {
       ];
 
       if (currentUser.roles.includes('ADMIN')) {
-        menuItems.splice(1, 0,
+        menuItems.splice(menuItems.length - 1, 0,
           <Menu.Item key="/admin" className="profile-menu">
             <AdminDropdownMenu />
           </Menu.Item>
@@ -88,6 +91,26 @@ const AdminDropdownMenu = (props) => {
       getPopupContainer={() => document.getElementsByClassName('profile-menu')[0]}>
       <button className="ant-dropdown-link">
         <Icon type="security-scan" className="nav-icon" style={{ marginRight: 0 }} /> <Icon type="down" />
+      </button>
+    </Dropdown>
+  );
+}
+
+const SubredditDropdownMenu = (props) => {
+  const dropdownMenu = (
+    <Menu onClick={props.handleMenuClick} className="profile-dropdown-menu">
+      <Menu.Item key="all-users" className="dropdown-item">
+        <Link to="/subreddit/create">Create</Link>
+      </Menu.Item>
+    </Menu>
+  );
+
+  return (
+    <Dropdown
+      overlay={dropdownMenu}
+      getPopupContainer={() => document.getElementsByClassName('profile-menu')[0]}>
+      <button className="ant-dropdown-link">
+        Subreddit <Icon type="down" />
       </button>
     </Dropdown>
   );

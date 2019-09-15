@@ -10,7 +10,7 @@ class SubredditCreate extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: {
+      title: {
         value: ''
       },
     }
@@ -38,7 +38,7 @@ class SubredditCreate extends Component {
     event.preventDefault();
 
     const signupRequest = {
-      name: this.state.name.value,
+      title: this.state.title.value,
     };
 
     createSubreddit(signupRequest)
@@ -57,7 +57,7 @@ class SubredditCreate extends Component {
   }
 
   isFormInvalid() {
-    return !this.state.name.validateStatus === 'success';
+    return !this.state.title.validateStatus === 'success';
   }
 
   render() {
@@ -68,17 +68,17 @@ class SubredditCreate extends Component {
           <Form onSubmit={this.handleSubmit} className="subreddit-form">
             <FormItem label="Name"
               hasFeedback
-              validateStatus={this.state.name.validateStatus}
-              help={this.state.name.errorMsg}>
+              validateStatus={this.state.title.validateStatus}
+              help={this.state.title.errorMsg}>
               <Input
                 prefix={<Icon type="smile" />}
                 size="large"
-                name="name"
+                name="title"
                 autoComplete="off"
                 placeholder="A unique subreddit name"
-                value={this.state.name.value}
+                value={this.state.title.value}
                 onBlur={this.validateSubredditAvailability}
-                onChange={(event) => this.handleInputChange(event, this.validateName)} />
+                onChange={(event) => this.handleInputChange(event, this.validateTitle)} />
             </FormItem>
             <FormItem>
               <Button type="primary"
@@ -94,11 +94,11 @@ class SubredditCreate extends Component {
   }
 
   // Validation Functions
-  validateName = (name) => {
-    if (name.length < SUBREDDIT_MIN_LENGTH) {
+  validateTitle = (title) => {
+    if (title.length < SUBREDDIT_MIN_LENGTH) {
       return {
         validateStatus: 'error',
-        errorMsg: `Subreddit name is too short (Minimum ${SUBREDDIT_MIN_LENGTH} characters needed.)`
+        errorMsg: `Subreddit title is too short (Minimum ${SUBREDDIT_MIN_LENGTH} characters needed.)`
       }
     }
 
@@ -109,50 +109,50 @@ class SubredditCreate extends Component {
   }
 
   validateSubredditAvailability() {
-    const nameValue = this.state.name.value;
-    const nameValidation = this.validateName(nameValue);
+    const titleValue = this.state.title.value;
+    const titleValidation = this.validateTitle(titleValue);
 
-    if (nameValidation.validateStatus === 'error') {
+    if (titleValidation.validateStatus === 'error') {
       this.setState({
-        username: {
-          value: nameValue,
-          ...nameValidation
+        title: {
+          value: titleValue,
+          ...titleValidation
         }
       });
       return;
     }
 
     this.setState({
-      name: {
-        value: nameValue,
+      title: {
+        value: titleValue,
         validateStatus: 'validating',
         errorMsg: null
       }
     });
 
-    checkSubredditAvailability(nameValue)
+    checkSubredditAvailability(titleValue)
       .then(response => {
         if (response.available) {
           this.setState({
-            username: {
-              value: nameValue,
+            title: {
+              value: titleValue,
               validateStatus: 'success',
               errorMsg: null
             }
           });
         } else {
           this.setState({
-            username: {
-              value: nameValue,
+            title: {
+              value: titleValue,
               validateStatus: 'error',
-              errorMsg: 'This username is already taken'
+              errorMsg: 'This subreddit is already taken.'
             }
           });
         }
       }).catch(error => {
         this.setState({
-          username: {
-            value: nameValue,
+          title: {
+            value: titleValue,
             validateStatus: 'success',
             errorMsg: null
           }
