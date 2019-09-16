@@ -24,7 +24,7 @@ public class RoleController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public RolesResponse getAllRoles() {
-        List<String> roles = roleService.getAll();
+        List<String> roles = roleService.getAllAsStrings();
         return new RolesResponse(roles);
     }
 }

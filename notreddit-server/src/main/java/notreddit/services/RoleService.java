@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface RoleService {
 
-    List<String> getAll();
+    List<String> getAllAsStrings();
 }

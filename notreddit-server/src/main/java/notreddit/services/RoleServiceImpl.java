@@ -1,7 +1,6 @@
 package notreddit.services;
 
 import notreddit.repositories.RoleRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,16 +11,14 @@ import java.util.stream.Collectors;
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
-    private final ModelMapper mapper;
 
     @Autowired
-    public RoleServiceImpl(RoleRepository roleRepository, ModelMapper mapper) {
+    public RoleServiceImpl(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
-        this.mapper = mapper;
     }
 
     @Override
-    public List<String> getAll() {
+    public List<String> getAllAsStrings() {
         return roleRepository
                 .findAll()
                 .stream()

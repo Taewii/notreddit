@@ -1,8 +1,8 @@
 package notreddit.domain.models.requests;
 
-import notreddit.domain.validations.annotations.MatchingFieldsConstraint;
 import lombok.Getter;
 import lombok.Setter;
+import notreddit.domain.validations.annotations.MatchingFieldsConstraint;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;

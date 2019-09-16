@@ -1,13 +1,13 @@
 package notreddit.services;
 
 import notreddit.domain.entities.Subreddit;
+import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.SubredditCreateRequest;
 import notreddit.domain.models.responses.ApiResponse;
 import notreddit.repositories.SubredditRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import notreddit.domain.entities.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -45,5 +45,10 @@ public class SubredditServiceImpl implements SubredditService {
         return ResponseEntity
                 .created(location)
                 .body(new ApiResponse(true, "Subreddit created successfully."));
+    }
+
+    @Override
+    public Boolean existsByTitle(String title) {
+        return subredditRepository.existsByTitle(title);
     }
 }

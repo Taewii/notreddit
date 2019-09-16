@@ -1,9 +1,11 @@
 package notreddit.auth;
 
-import notreddit.domain.entities.User;
 import io.jsonwebtoken.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import notreddit.domain.entities.User;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -11,13 +13,13 @@ import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
+@Setter
+@Getter
+@ConfigurationProperties(prefix = "app.jwt")
 @Component
 public class JwtTokenProvider {
 
-    @Value("${app.jwtSecret}")
     private String jwtSecret;
-
-    @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
 
     public String generateToken(Authentication authentication) {

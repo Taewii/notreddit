@@ -7,4 +7,6 @@ import org.springframework.http.ResponseEntity;
 public interface SubredditService {
 
     ResponseEntity<?> create(SubredditCreateRequest request, User creator);
+
+    Boolean existsByTitle(String title);
 }

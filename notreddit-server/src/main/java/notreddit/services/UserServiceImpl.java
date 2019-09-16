@@ -5,6 +5,7 @@ import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.ChangeRoleRequest;
 import notreddit.domain.models.requests.SignUpRequest;
 import notreddit.domain.models.responses.ApiResponse;
+import notreddit.domain.models.responses.UserSummaryResponse;
 import notreddit.repositories.RoleRepository;
 import notreddit.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -19,17 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-
-    private static final List<String> ROLES = new ArrayList<>() {{
-        add("ROOT");
-        add("ADMIN");
-        add("MODERATOR");
-        add("USER");
-    }};
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -87,7 +85,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.saveAndFlush(user);
         URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/home")
+                .fromCurrentContextPath().path("/api/user/register")
                 .buildAndExpand().toUri();
 
         return ResponseEntity
@@ -105,7 +103,7 @@ public class UserServiceImpl implements UserService {
         }
 
         boolean hasAdminRole = user.getAuthorities()
-                .stream()
+                .parallelStream()
                 .anyMatch(r -> r.getAuthority().equalsIgnoreCase("role_admin"));
 
         if (!hasAdminRole) {
@@ -127,7 +125,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<?> deleteUser(String userId, User user) {
         boolean isRoot = user.getAuthorities()
-                .stream()
+                .parallelStream()
                 .anyMatch(r -> r.getAuthority().equalsIgnoreCase("role_root"));
 
         if (!isRoot) {
@@ -151,9 +149,33 @@ public class UserServiceImpl implements UserService {
                         String.format("User %s deleted successfully.", userToDelete.getUsername())));
     }
 
+    @Override
+    public Boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    public Boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public List<UserSummaryResponse> findAllWithRoles() {
+        return userRepository.findAllWithRoles()
+                .stream()
+                .map(u -> mapper.map(u, UserSummaryResponse.class))
+                .collect(Collectors.toUnmodifiableList());
+    }
+
     private Set<Role> getInheritedRolesFromRole(String role) {
         Set<Role> roles = new HashSet<>();
-        for (int i = ROLES.indexOf(role.toUpperCase()); i < ROLES.size(); i++) {
+        List<String> allRoles = roleRepository
+                .findAll()
+                .stream()
+                .map(r -> r.getAuthority().substring("ROLE_".length()))
+                .collect(Collectors.toUnmodifiableList());
+
+        for (int i = allRoles.indexOf(role.toUpperCase()); i < allRoles.size(); i++) {
             roles.add(roleRepository.findById(i + 1L).orElseThrow());
         }
 
