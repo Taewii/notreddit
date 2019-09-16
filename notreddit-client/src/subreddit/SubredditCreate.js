@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { checkSubredditAvailability, createSubreddit } from '../util/APIUtils';
 import './SubredditCreate.css';
+
 import { SUBREDDIT_MIN_LENGTH } from '../util/constants';
+import { checkSubredditAvailability, createSubreddit } from '../services/subredditService';
+
 
 import { Form, Input, Button, notification, Icon } from 'antd';
 const FormItem = Form.Item;

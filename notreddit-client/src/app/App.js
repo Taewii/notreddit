@@ -6,7 +6,7 @@ import {
   Switch
 } from 'react-router-dom';
 
-import { getCurrentUser } from '../util/APIUtils';
+import { getCurrentUser } from '../services/userService';
 import { ACCESS_TOKEN } from '../util/constants';
 
 import Login from '../user/Login'

@@ -1,13 +1,19 @@
 import React, { Component } from 'react';
-import { signup, checkUsernameAvailability, checkEmailAvailability } from '../util/APIUtils';
 import './Signup.css';
 import { Link } from 'react-router-dom';
+import { Form, Input, Button, notification } from 'antd';
+
 import {
   USERNAME_MIN_LENGTH,
   PASSWORD_MIN_LENGTH
 } from '../util/constants.js';
 
-import { Form, Input, Button, notification } from 'antd';
+import {
+  signup,
+  checkUsernameAvailability,
+  checkEmailAvailability
+} from '../services/userService';
+
 const FormItem = Form.Item;
 
 class Signup extends Component {

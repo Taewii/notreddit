@@ -7,7 +7,7 @@ import {
   getCurrentUser,
   getAllRoles,
   deleteUser
-} from '../util/APIUtils'
+} from '../services/userService'
 
 import { List, Select, Skeleton, Popconfirm, Button, notification } from 'antd';
 
@@ -134,8 +134,11 @@ class AllUsers extends Component {
                 onConfirm={e => this.handleDeleteConfirm(user.id)}
                 okText="Yes"
                 cancelText="No"
+                disabled={user.roles.includes('ROOT') ? true : false}
               >
-                <Button className="list-button">delete</Button>
+                <Button
+                  className="list-button"
+                  disabled={user.roles.includes('ROOT') ? true : false}>delete</Button>
               </Popconfirm>
               : null}
           </List.Item>
