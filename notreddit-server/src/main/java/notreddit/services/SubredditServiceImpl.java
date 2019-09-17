@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SubredditServiceImpl implements SubredditService {
@@ -50,5 +52,14 @@ public class SubredditServiceImpl implements SubredditService {
     @Override
     public Boolean existsByTitle(String title) {
         return subredditRepository.existsByTitle(title);
+    }
+
+    @Override
+    public List<String> getAllAsStrings() {
+        return subredditRepository
+                .findAll()
+                .stream()
+                .map(subreddit -> mapper.map(subreddit, String.class))
+                .collect(Collectors.toUnmodifiableList());
     }
 }

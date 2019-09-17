@@ -1,6 +1,7 @@
 package notreddit.config;
 
 import notreddit.domain.entities.Role;
+import notreddit.domain.entities.Subreddit;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -16,6 +17,13 @@ public class BeanConfig {
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
 
+        Converter<Subreddit, String> toSubredditTitle = new AbstractConverter<>() {
+            @Override
+            protected String convert(Subreddit role) {
+                return role == null ? null : role.getTitle();
+            }
+        };
+
         Converter<Role, String> toAuthorityString = new AbstractConverter<>() {
             @Override
             protected String convert(Role role) {
@@ -23,6 +31,7 @@ public class BeanConfig {
             }
         };
 
+        mapper.addConverter(toSubredditTitle);
         mapper.addConverter(toAuthorityString);
         return mapper;
     }

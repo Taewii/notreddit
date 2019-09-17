@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/subreddit")
@@ -35,5 +36,11 @@ public class SubredditController {
     public ResponseEntity<?> create(@RequestBody @Valid SubredditCreateRequest request,
                                     @AuthenticationPrincipal User creator) {
         return subredditService.create(request, creator);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/all")
+    public List<String> getAllSubredditNames() {
+        return subredditService.getAllAsStrings();
     }
 }
