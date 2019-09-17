@@ -1,5 +1,5 @@
-import { request} from "../util/APIUtils";
-import { API_BASE_URL} from "../util/constants";
+import { request } from "../util/APIUtils";
+import { API_BASE_URL } from "../util/constants";
 
 export function checkSubredditAvailability(subreddit) {
   return request({
@@ -14,4 +14,11 @@ export function createSubreddit(subredditRequest) {
     method: 'POST',
     body: JSON.stringify(subredditRequest)
   });
+}
+
+export function getAllSubreddits() {
+  return request({
+    url: API_BASE_URL + "/subreddit/all",
+    method: 'GET'
+  })
 }
