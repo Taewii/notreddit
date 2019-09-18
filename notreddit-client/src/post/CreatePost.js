@@ -4,6 +4,7 @@ import { Form, Input, Button, notification, Select, Upload, Icon } from 'antd';
 
 import { TITLE_MIN_LENGTH } from '../util/constants.js';
 import { getAllSubreddits } from '../services/subredditService';
+import { create } from '../services/postService';
 
 const { Dragger } = Upload;
 const { Option } = Select;
@@ -13,6 +14,7 @@ const FormItem = Form.Item;
 class CreatePost extends Component {
   constructor(props) {
     super(props);
+    this.options = [];
     this.state = {
       title: {
         value: ''
@@ -31,9 +33,17 @@ class CreatePost extends Component {
       }
     }
 
+    getAllSubreddits()
+      .then(res => {
+        res.forEach(subreddit => {
+          this.options.push(<Option value={subreddit.toLowerCase()}>{subreddit}</Option>)
+        })
+      })
+
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.isFormInvalid = this.isFormInvalid.bind(this);
+    this.handleSelectionChange = this.handleSelectionChange.bind(this);
   }
 
   handleInputChange(event, validationFun) {
@@ -52,12 +62,14 @@ class CreatePost extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    const postRequest = {
-      title: this.state.title.value,
-      content: this.state.content.value,
-    };
+    const data = new FormData()
+    data.append('title', this.state.title.value);
+    data.append('url', this.state.url.value);
+    data.append('content', this.state.content.value);
+    data.append('subreddit', this.state.subreddit.value);
+    data.append('file', this.state.file);
 
-    fetch(postRequest)
+    create(data)
       .then(response => {
         notification.success({
           message: 'notreddit',
@@ -72,49 +84,39 @@ class CreatePost extends Component {
       });
   }
 
-  isFormInvalid() {
-    return !(this.state.title.validateStatus === 'success' &&
-      this.state.email.validateStatus === 'success' &&
-      this.state.content.validateStatus === 'success' &&
-      this.state.confirmPassword.validateStatus === 'success'
-    );
+  handleSelectionChange(selectedValue) {
+    this.setState({
+      subreddit: {
+        value: selectedValue
+      }
+    })
   }
 
   handleFileUpload = ({ file, onSuccess, onError }) => {
-    this.setState({ file: file })
-    const sizeInMb = file.size / 1024 / 102
+    const sizeInMb = file.size / 1024 / 1024
 
+    // Simulating Ant-Design action responses with setTimeout.
     if (sizeInMb > 10) {
       setTimeout(() => {
         onError("file too big");
       }, 0);
-      return;
+      return
     }
 
-    //TODO: MOVE ALL THIS SHIT ELSEWARE
-    const data = new FormData()
-    data.append('file', file)
-
-    fetch('http://localhost:8000/api/role/idk', {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.     
-      body: data, // body data type must match "Content-Type" header
-    })
-
+    this.setState({ file: file })
     setTimeout(() => {
       onSuccess("ok");
     }, 0);
   };
 
+
+  isFormInvalid() {
+    return !(this.state.title.validateStatus === 'success' &&
+      this.state.url.validateStatus === 'success'
+    );
+  }
+
   render() {
-    const options = [];
-
-    getAllSubreddits()
-      .then(res => {
-        res.forEach(subreddit => {
-          options.push(<Option value={subreddit.toLowerCase()}>{subreddit}</Option>)
-        })
-      })
-
     return (
       <div className="post-container">
         <h1 className="page-title">Create a Post</h1>
@@ -122,6 +124,7 @@ class CreatePost extends Component {
           <Form onSubmit={this.handleSubmit} className="post-form">
             <FormItem label="Title"
               hasFeedback
+              required
               validateStatus={this.state.title.validateStatus}
               help={this.state.title.errorMsg}>
               <Input
@@ -133,6 +136,7 @@ class CreatePost extends Component {
                 onChange={(event) => this.handleInputChange(event, this.validateTitle)} />
             </FormItem>
             <FormItem label="url"
+              required
               hasFeedback
               validateStatus={this.state.url.validateStatus}
               help={this.state.url.errorMsg}>
@@ -144,29 +148,27 @@ class CreatePost extends Component {
                 value={this.state.url.value}
                 onChange={(event) => this.handleInputChange(event, this.validateUrl)} />
             </FormItem>
-            <FormItem
-              label="Content"
-              validateStatus={this.state.content.validateStatus}
-              help={this.state.content.errorMsg}>
+            <FormItem label="Content">
               <TextArea
                 name="content"
                 autosize={{ minRows: 6 }}
                 placeholder="Content"
-                value={this.state.content.value} />
+                onChange={(event) => this.handleInputChange(event, () => void 0)} />
             </FormItem>
             <FormItem
-              label="Subreddit">
+              label="Subreddit"
+              required>
               <Select showSearch
                 placeholder="Select a subreddit"
                 optionFilterProp="children"
+                onChange={this.handleSelectionChange}
                 filterOption={(input, option) =>
                   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                 }>
-                {options}
+                {this.options}
               </Select>
             </FormItem>
-            <FormItem
-              label="File/Image">
+            <FormItem label="File/Image">
               <Dragger
                 name="file"
                 customRequest={this.handleFileUpload}>
@@ -199,7 +201,7 @@ class CreatePost extends Component {
     }
 
     return {
-      validateStatus: null,
+      validateStatus: 'success',
       errorMsg: null
     }
   }
@@ -214,7 +216,7 @@ class CreatePost extends Component {
     }
 
     return {
-      validateStatus: null,
+      validateStatus: 'success',
       errorMsg: null
     }
   }
