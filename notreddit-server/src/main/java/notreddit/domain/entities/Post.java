@@ -35,9 +35,6 @@ public class Post extends BaseUUIDEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column
-    private String imageUrl;
-
     @Column(nullable = false, columnDefinition = "NUMERIC DEFAULT 0")
     private int rating;
 
