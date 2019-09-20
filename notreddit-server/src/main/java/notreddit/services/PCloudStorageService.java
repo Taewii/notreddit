@@ -2,7 +2,7 @@ package notreddit.services;
 
 import com.pcloud.sdk.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,15 +13,13 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@ConfigurationProperties(prefix = "app.pcloud")
 public class PCloudStorageService implements CloudStorage {
 
-    private String accessToken;
     private final ApiClient api;
 
-    public PCloudStorageService() {
+    public PCloudStorageService(@Value("${app.pcloud.accessToken}") String accessToken) {
         this.api = PCloudSdk.newClientBuilder()
-                .authenticator(Authenticators.newOAuthAuthenticator(getAccessToken()))
+                .authenticator(Authenticators.newOAuthAuthenticator(accessToken))
                 .create();
     }
 
@@ -42,7 +40,7 @@ public class PCloudStorageService implements CloudStorage {
             String urlPath = uploadedFile
                     .createFileLink()
                     .bestUrl()
-                    .getPath();
+                    .toExternalForm();
 
             params.put("id", uploadedFile.fileId());
             params.put("url", urlPath);
@@ -77,16 +75,8 @@ public class PCloudStorageService implements CloudStorage {
 
         return api.createFile(
                 RemoteFolder.ROOT_FOLDER_ID,
-                file.getName(),
+                multipartFile.getOriginalFilename(),
                 DataSource.create(file))
                 .execute();
-    }
-
-    public String getAccessToken() {
-        return this.accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
     }
 }
