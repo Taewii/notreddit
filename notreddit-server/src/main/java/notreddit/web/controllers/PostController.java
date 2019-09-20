@@ -1,9 +1,12 @@
 package notreddit.web.controllers;
 
+import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.PostCreateRequest;
 import notreddit.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +25,10 @@ public class PostController {
         this.postService = postService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
-    public ResponseEntity<?> create(@Valid @ModelAttribute PostCreateRequest request) {
-        return postService.create(request);
+    public ResponseEntity<?> create(@Valid @ModelAttribute PostCreateRequest request,
+                                    @AuthenticationPrincipal User creator) {
+        return postService.create(request, creator);
     }
 }

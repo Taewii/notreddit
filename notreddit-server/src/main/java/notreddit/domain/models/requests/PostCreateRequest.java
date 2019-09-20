@@ -16,7 +16,11 @@ public class PostCreateRequest {
     private String title;
 
     private String url;
+
     private String content;
+
+    @NotBlank
     private String subreddit;
+
     private MultipartFile file;
 }
