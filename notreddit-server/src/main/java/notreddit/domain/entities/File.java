@@ -13,13 +13,14 @@ import javax.validation.constraints.NotNull;
 public class File extends BaseUUIDEntity {
 
     @NotNull
-    @Column(nullable = false, unique = true)
-    private long fileId;
+    @Column(unique = true, nullable = false)
+    private Long fileId;
 
-    @Column(nullable = false, unique = true)
+    @NotNull
+    @Column(nullable = false)
     private String url;
 
-    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     private Post post;
 }
