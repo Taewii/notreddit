@@ -65,17 +65,19 @@ class LoginForm extends Component {
             rules: [{ required: true, message: 'Please enter your username or email!' }],
           })(
             <Input
+              className='login-form-item'
               prefix={<Icon type="user" />}
               size="large"
               name="usernameOrEmail"
               placeholder="Username or Email" />
           )}
         </FormItem>
-        <FormItem>
+        <FormItem className='login-form-item'>
           {getFieldDecorator('password', {
             rules: [{ required: true, message: 'Please enter your Password!' }],
           })(
             <Input
+              className='login-form-item'
               prefix={<Icon type="lock" />}
               size="large"
               name="password"

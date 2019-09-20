@@ -29,14 +29,14 @@ class CreatePost extends Component {
         value: ''
       },
       file: {
-        value: ''
+        value: null
       }
     }
 
     getAllSubreddits()
       .then(res => {
         res.forEach(subreddit => {
-          this.options.push(<Option value={subreddit.toLowerCase()}>{subreddit}</Option>)
+          this.options.push(<Option value={subreddit} key={subreddit}>{subreddit}</Option>)
         })
       })
 
@@ -44,6 +44,7 @@ class CreatePost extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.isFormInvalid = this.isFormInvalid.bind(this);
     this.handleSelectionChange = this.handleSelectionChange.bind(this);
+    this.handleFileRemove = this.handleFileRemove.bind(this);
   }
 
   handleInputChange(event, validationFun) {
@@ -67,14 +68,24 @@ class CreatePost extends Component {
     data.append('url', this.state.url.value);
     data.append('content', this.state.content.value);
     data.append('subreddit', this.state.subreddit.value);
-    data.append('file', this.state.file);
+
+    if (this.state.file.value !== null) {
+      data.append('file', this.state.file.value);
+    }
 
     create(data)
       .then(response => {
-        notification.success({
-          message: 'notreddit',
-          description: "Post successfully created.",
-        });
+        if (response.success) {
+          notification.success({
+            message: 'notreddit',
+            description: "Post successfully created.",
+          });
+        } else {
+          notification.error({
+            message: 'notreddit',
+            description: response.message,
+          });
+        }
         this.props.history.push("/");
       }).catch(error => {
         notification.error({
@@ -87,7 +98,17 @@ class CreatePost extends Component {
   handleSelectionChange(selectedValue) {
     this.setState({
       subreddit: {
-        value: selectedValue
+        value: selectedValue,
+        validationStatus: 'success'
+      }
+    })
+  }
+
+  handleFileRemove() {
+    this.setState({
+      file: {
+        value: null,
+        validationStatus: ''
       }
     })
   }
@@ -100,10 +121,21 @@ class CreatePost extends Component {
       setTimeout(() => {
         onError("file too big");
       }, 0);
-      return
+      this.setState({
+        file: {
+          value: null,
+          validationStatus: 'error'
+        }
+      })
+      return;
     }
 
-    this.setState({ file: file })
+    this.setState({
+      file: {
+        value: file,
+        validationStatus: 'success'
+      }
+    })
     setTimeout(() => {
       onSuccess("ok");
     }, 0);
@@ -112,7 +144,9 @@ class CreatePost extends Component {
 
   isFormInvalid() {
     return !(this.state.title.validateStatus === 'success' &&
-      this.state.url.validateStatus === 'success'
+      this.state.url.validateStatus !== 'error' &&
+      this.state.file.validationStatus !== 'error' &&
+      this.state.subreddit.validationStatus === 'success'
     );
   }
 
@@ -135,19 +169,6 @@ class CreatePost extends Component {
                 value={this.state.title.value}
                 onChange={(event) => this.handleInputChange(event, this.validateTitle)} />
             </FormItem>
-            <FormItem label="url"
-              required
-              hasFeedback
-              validateStatus={this.state.url.validateStatus}
-              help={this.state.url.errorMsg}>
-              <Input
-                size="large"
-                name="url"
-                autoComplete="off"
-                placeholder="URL"
-                value={this.state.url.value}
-                onChange={(event) => this.handleInputChange(event, this.validateUrl)} />
-            </FormItem>
             <FormItem label="Content">
               <TextArea
                 name="content"
@@ -168,9 +189,24 @@ class CreatePost extends Component {
                 {this.options}
               </Select>
             </FormItem>
+            <FormItem label="url"
+              hasFeedback
+              validateStatus={this.state.url.validateStatus}
+              help={this.state.url.errorMsg}>
+              <Input
+                size="large"
+                name="url"
+                autoComplete="off"
+                placeholder="URL"
+                disabled={this.state.file.value !== null}
+                value={this.state.url.value}
+                onChange={(event) => this.handleInputChange(event, this.validateUrl)} />
+            </FormItem>
             <FormItem label="File/Image">
               <Dragger
                 name="file"
+                disabled={this.state.url.value.length > 0}
+                onRemove={this.handleFileRemove}
                 customRequest={this.handleFileUpload}>
                 <p className="ant-upload-drag-icon">
                   <Icon type="inbox" />
@@ -208,6 +244,14 @@ class CreatePost extends Component {
 
   validateUrl = (url) => {
     const URL_REGEX = RegExp(/(http|https):\/\/.+/gm);
+
+    if (url.length === 0) {
+      return {
+        validateStatus: '',
+        errorMsg: null
+      }
+    }
+
     if (!URL_REGEX.test(url)) {
       return {
         validateStatus: 'error',
