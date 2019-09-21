@@ -30,10 +30,7 @@ services:
     restart: always
     depends_on: 
       - db # This service depends on mysql. Start that first.
-    environment: # Pass environment variables to the service
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/notreddit_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 1234     
+    env_file: server-variables.env
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - backend
       - frontend
