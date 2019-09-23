@@ -30,7 +30,7 @@ public class SubredditServiceImpl implements SubredditService {
 
     @Override
     public ResponseEntity<?> create(SubredditCreateRequest request, User creator) {
-        if (subredditRepository.existsByTitle(request.getTitle())) {
+        if (existsByTitle(request.getTitle())) {
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, "Subreddit name already exists."));
@@ -51,7 +51,7 @@ public class SubredditServiceImpl implements SubredditService {
 
     @Override
     public Boolean existsByTitle(String title) {
-        return subredditRepository.existsByTitle(title);
+        return subredditRepository.existsByTitleIgnoreCase(title);
     }
 
     @Override

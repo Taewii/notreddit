@@ -18,11 +18,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT a FROM User a JOIN FETCH a.roles WHERE a.id = :id")
     Optional<User> findByIdWithRoles(@Param("id") UUID id);
 
-    Optional<User> findByUsernameOrEmail(@NotBlank String username, @Email @NotBlank String email);
+    Optional<User> findByUsernameOrEmailIgnoreCase(@NotBlank String username, @Email @NotBlank String email);
 
-    Boolean existsByUsername(@NotBlank String username);
+    Boolean existsByUsernameIgnoreCase(@NotBlank String username);
 
-    Boolean existsByEmail(@Email @NotBlank String email);
+    Boolean existsByEmailIgnoreCase(@Email @NotBlank String email);
 
     @Query("SELECT DISTINCT u FROM User u JOIN FETCH u.roles r")
     List<User> findAllWithRoles();

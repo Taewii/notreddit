@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface SubredditRepository extends JpaRepository<Subreddit, Long> {
 
-    Boolean existsByTitle(String title);
+    Boolean existsByTitleIgnoreCase(@Length(min = 4) @NotBlank String title);
 
     Optional<Subreddit> findByTitleIgnoreCase(@Length(min = 4) @NotBlank String title);
 }

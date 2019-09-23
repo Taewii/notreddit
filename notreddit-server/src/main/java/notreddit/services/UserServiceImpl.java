@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        return userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+        return userRepository.findByUsernameOrEmailIgnoreCase(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail)
                 );
@@ -62,13 +62,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> register(SignUpRequest model) {
-        if (userRepository.existsByUsername(model.getUsername())) {
+        if (existsByUsername(model.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, "Username is already taken!"));
         }
 
-        if (userRepository.existsByEmail(model.getEmail())) {
+        if (existsByEmail(model.getEmail())) {
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, "Email Address already in use!"));
@@ -151,12 +151,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
+        return userRepository.existsByUsernameIgnoreCase(username);
     }
 
     @Override
     public Boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+        return userRepository.existsByEmailIgnoreCase(email);
     }
 
     @Override
