@@ -59,7 +59,7 @@ class SubredditCreate extends Component {
   }
 
   isFormInvalid() {
-    return !this.state.title.validateStatus === 'success';
+    return this.state.title.validateStatus !== 'success';
   }
 
   render() {

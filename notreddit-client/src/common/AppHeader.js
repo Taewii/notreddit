@@ -29,6 +29,9 @@ class AppHeader extends Component {
             <Icon type="home" className="nav-icon" />
           </Link>
         </Menu.Item>,
+        <Menu.Item key="/post/create">
+          <Link to="/post/create">Create Post</Link>
+        </Menu.Item>,
         <Menu.Item key="subreddit">
           <SubredditDropdownMenu />
         </Menu.Item>,
