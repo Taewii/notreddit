@@ -17,6 +17,7 @@ import NotFound from '../common/NotFound';
 import LoadingIndicator from '../common/LoadingIndicator';
 import SubredditCreate from '../subreddit/SubredditCreate';
 import CreatePost from '../post/CreatePost';
+import AllPosts from '../post/AllPosts';
 
 import { Layout, notification } from 'antd';
 const { Content } = Layout;
@@ -106,6 +107,7 @@ class App extends Component {
               <Route path="/user/all" component={AllUsers}></Route>
               <Route path="/subreddit/create" component={SubredditCreate}></Route>
               <Route path="/post/create" component={CreatePost}></Route>
+              <Route path="/" component={AllPosts}></Route>
               <Route component={NotFound}></Route>
             </Switch>
           </div>
