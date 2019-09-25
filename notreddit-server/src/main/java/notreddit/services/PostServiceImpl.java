@@ -6,6 +6,7 @@ import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.PostCreateRequest;
 import notreddit.domain.models.responses.ApiResponse;
+import notreddit.domain.models.responses.PostListResponseModel;
 import notreddit.repositories.FileRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.SubredditRepository;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,6 +43,11 @@ public class PostServiceImpl implements PostService {
         this.cloudStorage = cloudStorage;
         this.fileRepository = fileRepository;
         this.mapper = mapper;
+    }
+
+    @Override
+    public List<PostListResponseModel> allPosts() {
+        return postRepository.allPosts();
     }
 
     @Override

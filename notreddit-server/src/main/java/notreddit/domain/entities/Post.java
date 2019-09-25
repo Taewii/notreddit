@@ -43,6 +43,9 @@ public class Post extends BaseUUIDEntity {
     @Column(nullable = false)
     private LocalDateTime createdOn;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "post")
+    private File file;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 }
