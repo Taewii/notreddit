@@ -16,5 +16,75 @@
 .post-counter {
   font-size: 25px;
   font-weight: bold;
-  color: rgba(0, 0, 0, .25);
+}
+
+.ant-list-item {
+  padding: 10px 5px 10px 5px !important;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: minmax(auto, 19.5px) minmax(auto, 45.5px) minmax(auto, 82.5px);
+  grid-template-rows: auto 18px 31.5px;
+  grid-template-areas: "id votes picture title" "id votes picture description" "id votes picture actions";
+}
+
+.id {
+  grid-area: id;
+  margin: auto;
+  font-weight: bold;
+  font-size: 20px;
+  color: rgba(105, 105, 105, 0.178)
+}
+
+.votes {
+  grid-area: votes; 
+  font-size: 30px;
+  color: rgba(105, 105, 105, 0.459);
+  position: relative;
+  top: 5px;
+}
+
+.upvote, .downvote, .score {
+  text-align: center;
+  margin: -10px auto;
+}
+
+.upvote, .downvote {
+  cursor: pointer;
+}
+
+.score {
+  font-size: 15px !important;
+  font-weight: bold;
+}
+
+.picture {
+  grid-area: picture;
+}
+
+.pic {
+  max-width: 100%; 
+  max-height: 100%; 
+  width: 100%;
+}
+
+.title, .description, .actions {
+  margin-left: 10px;
+}
+
+.title {
+  grid-area: title; 
+  font-size: 1.3em;
+  line-height: 90%;
+}
+
+.description { 
+  grid-area: description;
+  font-size: 0.9em;
+}
+
+.actions {
+  grid-area: actions; 
+  font-size: 0.9em;
 }

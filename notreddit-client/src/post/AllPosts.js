@@ -3,13 +3,6 @@ import './AllPosts.css';
 
 import { List, Icon, notification } from 'antd';
 
-const IconText = ({ type, text }) => (
-  <span>
-    <Icon type={type} style={{ marginRight: 8 }} />
-    {text}
-  </span>
-);
-
 class AllPosts extends Component {
   constructor(props) {
     super(props)
@@ -21,9 +14,11 @@ class AllPosts extends Component {
 
     for (let i = 0; i < 23; i++) {
       this.state.data.push({
-        href: 'link to post',
+        href: 'https://i.redd.it/oadss15xhqo31.jpg',
         title: 'Title goes here',
-        content: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Facilis, soluta',
+        creator: 'creator?',
+        subreddit: 'subreddit?',
+        points: '1233'
       });
     }
   }
@@ -44,6 +39,14 @@ class AllPosts extends Component {
   //     });
   // }
 
+  upvote(event) {
+    console.log('upvote')
+  }
+
+  downvote(event) {
+    console.log('downvote')
+  }
+
   render() {
     const { data } = this.state;
 
@@ -59,27 +62,36 @@ class AllPosts extends Component {
           pageSize: 5,
         }}
         dataSource={data}
-        renderItem={item => (
-          <List.Item
-            key={item.title}
-            actions={[
-              <IconText type="arrow-up" key="list-vertical-star-o" />,
-              <span>123</span>,
-              <IconText type="arrow-down" key="list-vertical-like-o" />,
-              <IconText type="message" text="2" key="list-vertical-message" />,
-              <div>@creator</div>
-            ]}
-          >
-            <div className="post-counter-container">
-              <span className="post-counter">1</span>
+        renderItem={post => (
+          <List.Item>
+            <div className="grid-container">
+              <div className="id">1</div>
+              <div className="votes">
+                <p className="upvote" onClick={this.upvote}>
+                  <Icon type="caret-up" />
+                </p>
+                <p className="score">
+                  {post.points}
+                </p>
+                <p className="downvote" onClick={this.downvote}>
+                  <Icon type="caret-down" />
+                </p>
+              </div>
+              <div className="picture">
+                <a href="#">
+                  <img className="pic" src={post.href} alt="pic" />
+                </a>
+              </div>
+              <div className="title">
+                <a href="#">{post.title}</a>
+              </div>
+              <div className="description">
+                submitted 13 hours ago by <a href="#">{post.creator}</a> to <a href="#">{post.subreddit}</a>
+              </div>
+              <div className="actions">
+                <Icon type="message" /> <a href="#">609 comments</a>
+              </div>
             </div>
-            <div className="image">
-              <img src="https://image.cnbcfm.com/api/v1/image/105992231-1561667465295gettyimages-521697453.jpeg?v=1561667497&w=678&h=381" alt="asd" width="172" />
-            </div>
-            <List.Item.Meta
-              title={<a href={item.href}>{item.title}</a>}
-            />
-            {item.content}
           </List.Item>
         )}
       />
