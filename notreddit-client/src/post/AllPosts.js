@@ -1,54 +1,61 @@
 import React, { Component } from 'react';
 import './AllPosts.css';
 
-import { List, Icon, notification } from 'antd';
+import { List, Icon, notification, Tooltip } from 'antd';
+import { allPosts } from '../services/postService';
+import { timeSince } from '../util/APIUtils';
+
+const IconText = ({ type, text }) => (
+  <span>
+    <Icon type={type} style={{ marginRight: 8 }} />
+    {text}
+  </span>
+);
 
 class AllPosts extends Component {
   constructor(props) {
     super(props)
+    this._isMounted = false;
     this.state = {
       initLoading: true,
       loading: false,
       data: []
     };
+  }
 
-    for (let i = 0; i < 23; i++) {
-      this.state.data.push({
-        href: 'https://i.redd.it/oadss15xhqo31.jpg',
-        title: 'Title goes here',
-        creator: 'creator?',
-        subreddit: 'subreddit?',
-        points: '1233'
+  componentDidMount() {
+    this._isMounted = true;
+
+    allPosts()
+      .then(res => {
+        if (this._isMounted) {
+          this.setState({
+            initLoading: false,
+            data: res
+          });
+        }
+      }).catch(error => {
+        notification.error({
+          message: 'notreddit',
+          description: error.message || 'Sorry! Something went wrong. Please try again!'
+        });
       });
-    }
   }
 
-  // componentDidMount() {
-  //   fetch()
-  //     .then(res => {
-  //       this.setState({
-  //         initLoading: false,
-  //         data: res.users,
-  //       });
-  //     }).catch(error => {
-  //       this.props.history.push('/');
-  //       notification.error({
-  //         message: 'notreddit',
-  //         description: error.message || 'Sorry! Something went wrong. Please try again!'
-  //       });
-  //     });
-  // }
-
-  upvote(event) {
-    console.log('upvote')
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
-  downvote(event) {
-    console.log('downvote')
-  }
+  upvote = () => {
+    // TODO
+  };
+
+  downvote = () => {
+   // TODO
+  };
 
   render() {
-    const { data } = this.state;
+    const { data, action } = this.state;
 
     return (
       <List
@@ -63,35 +70,47 @@ class AllPosts extends Component {
         }}
         dataSource={data}
         renderItem={post => (
-          <List.Item>
-            <div className="grid-container">
-              <div className="id">1</div>
-              <div className="votes">
-                <p className="upvote" onClick={this.upvote}>
-                  <Icon type="caret-up" />
-                </p>
-                <p className="score">
-                  {post.points}
-                </p>
-                <p className="downvote" onClick={this.downvote}>
-                  <Icon type="caret-down" />
-                </p>
-              </div>
-              <div className="picture">
-                <a href="#">
-                  <img className="pic" src={post.href} alt="pic" />
+          <List.Item
+            key={post.id}
+            actions={[
+              <span key="comment-basic-upvote">
+                <Tooltip title="Upvote">
+                  <Icon
+                    type="like"
+                    theme={action === 'upvoted' ? 'filled' : 'outlined'}
+                    onClick={this.upvote}
+                  />
+                </Tooltip>
+                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.upvotes}</span>
+              </span>,
+              <span key="comment-basic-downvote">
+                <Tooltip title="Downvote">
+                  <Icon
+                    type="dislike"
+                    theme={action === 'downvoted' ? 'filled' : 'outlined'}
+                    onClick={this.downvote}
+                  />
+                </Tooltip>
+                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.downvotes}</span>
+              </span>,
+              <span key="comments">
+                <IconText type="message" text="2" />
+              </span>,
+            ]}
+          >
+            <List.Item.Meta
+              avatar={
+                <a href={'/post/' + post.id}>
+                  <img src={post.url} width="128px" alt="thumbnail" />
                 </a>
-              </div>
-              <div className="title">
-                <a href="#">{post.title}</a>
-              </div>
-              <div className="description">
-                submitted 13 hours ago by <a href="#">{post.creator}</a> to <a href="#">{post.subreddit}</a>
-              </div>
-              <div className="actions">
-                <Icon type="message" /> <a href="#">609 comments</a>
-              </div>
-            </div>
+              }
+              title={<a href={'/post/' + post.id}>{post.title}</a>}
+              description={
+                <span>
+                  submitted {timeSince(post.createdOn)} ago by <a href={'/user/' + post.creator}>{post.creator}</a> to <a href={'/subreddit/' + post.subreddit}>{'r/' + post.subreddit}</a>
+                </span>
+              }
+            />
           </List.Item>
         )}
       />
