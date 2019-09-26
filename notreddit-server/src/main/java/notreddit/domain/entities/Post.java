@@ -36,7 +36,10 @@ public class Post extends BaseUUIDEntity {
     private String content;
 
     @Column(nullable = false, columnDefinition = "NUMERIC DEFAULT 0")
-    private int rating;
+    private int upvotes;
+
+    @Column(nullable = false, columnDefinition = "NUMERIC DEFAULT 0")
+    private int downvotes;
 
     @NotNull
     @PastOrPresent

@@ -16,6 +16,9 @@ public class File extends BaseUUIDEntity {
     @Column(unique = true, nullable = false)
     private Long fileId;
 
+    @Column
+    private String thumbnailUrl;
+
     @NotNull
     @Column(nullable = false)
     private String url;

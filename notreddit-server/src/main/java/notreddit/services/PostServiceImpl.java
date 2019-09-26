@@ -93,7 +93,8 @@ public class PostServiceImpl implements PostService {
 
         File file = uploadFile(request.getFile());
         file.setPost(post);
-        fileRepository.saveAndFlush(file);
+        post.setFile(file);
+        postRepository.saveAndFlush(post);
 
         return getCreatedResponseEntityWithPath();
     }

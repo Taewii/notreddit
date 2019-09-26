@@ -18,7 +18,8 @@ public class PostListResponseModel {
     private String creator;
     private String title;
     private String url;
-    private int score;
+    private int upvotes;
+    private int downvotes;
     private LocalDateTime createdOn;
     private int commentCount;
 }

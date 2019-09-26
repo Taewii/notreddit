@@ -18,9 +18,10 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             "p.creator.username, " +
             "p.title, " +
             "p.file.url, " +
-            "p.rating, " +
+            "p.upvotes, " +
+            "p.downvotes, " +
             "p.createdOn, " +
-            "p.comments.size) " +
+            "size(p.comments)) " +
             "FROM Post p")
     List<PostListResponseModel> allPosts();
 }
