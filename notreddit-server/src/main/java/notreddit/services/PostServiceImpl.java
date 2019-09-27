@@ -12,6 +12,7 @@ import notreddit.repositories.PostRepository;
 import notreddit.repositories.SubredditRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,35 +20,49 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
 
     private final SubredditRepository subredditRepository;
     private final PostRepository postRepository;
-    private final CloudStorage cloudStorage;
     private final FileRepository fileRepository;
+    private final CloudStorage cloudStorage;
+    private final ThumbnailService thumbnailService;
     private final ModelMapper mapper;
 
     @Autowired
     public PostServiceImpl(SubredditRepository subredditRepository,
                            PostRepository postRepository,
-                           CloudStorage cloudStorage,
+                           @Qualifier("dropboxService") CloudStorage cloudStorage,
                            FileRepository fileRepository,
+                           ThumbnailService thumbnailService,
                            ModelMapper mapper) {
         this.subredditRepository = subredditRepository;
         this.postRepository = postRepository;
         this.cloudStorage = cloudStorage;
         this.fileRepository = fileRepository;
+        this.thumbnailService = thumbnailService;
         this.mapper = mapper;
     }
 
     @Override
     public List<PostListResponseModel> allPosts() {
-        return postRepository.allPosts();
+        return postRepository.findAll().stream()
+                .map(p -> {
+                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
+                    model.setCreatedAt(p.getCreatedOn()
+                            .atZone(ZoneId.of("Europe/Sofia"))
+                            .toInstant()
+                            .getEpochSecond());
+                    return model;
+                })
+                .collect(Collectors.toUnmodifiableList());
     }
 
     @Override
@@ -104,6 +119,7 @@ public class PostServiceImpl implements PostService {
         file.setFileId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
         file.setPost(post);
         file.setUrl(request.getUrl());
+        file.setThumbnailUrl(thumbnailService.generateThumbnailUrl(request.getUrl()));
         fileRepository.saveAndFlush(file);
 
         return getCreatedResponseEntityWithPath();
@@ -111,10 +127,22 @@ public class PostServiceImpl implements PostService {
 
     private File uploadFile(MultipartFile multipartFile) {
         Map<String, Object> params = cloudStorage.uploadFileAndGetParams(multipartFile);
-        File file = new File();
-        file.setFileId(Long.parseLong(params.get("id").toString()));
-        file.setUrl(params.get("url").toString());
+        String fileUrl = params.get("url").toString();
 
+        File file = new File();
+        if (params.containsKey("id")) {
+            file.setFileId(Long.parseLong(params.get("id").toString()));
+        } else {
+            file.setFileId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
+        }
+
+        if (params.get("contentType").toString().contains("image")) {
+            file.setThumbnailUrl(fileUrl);
+        } else {
+            file.setThumbnailUrl(thumbnailService.generateThumbnailUrl(fileUrl));
+        }
+
+        file.setUrl(fileUrl);
         return file;
     }
 

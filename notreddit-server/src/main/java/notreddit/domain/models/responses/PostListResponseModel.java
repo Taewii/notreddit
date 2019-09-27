@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -15,11 +14,12 @@ import java.util.UUID;
 public class PostListResponseModel {
 
     private UUID id;
-    private String creator;
+    private String creatorUsername;
     private String title;
-    private String url;
+    private String fileThumbnailUrl;
+    private String subredditTitle;
     private int upvotes;
     private int downvotes;
-    private LocalDateTime createdOn;
+    private long createdAt;
     private int commentCount;
 }
