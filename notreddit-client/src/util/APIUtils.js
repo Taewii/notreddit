@@ -47,6 +47,7 @@ export const requestMultipart = (options) => {
 export const timeSince = (time) => {
   switch (typeof time) {
     case 'number':
+      time = +new Date(time * 1000) // x1000 cus js Date expects milliseconds but java returns seconds
       break;
     case 'string':
       time = +new Date(time);

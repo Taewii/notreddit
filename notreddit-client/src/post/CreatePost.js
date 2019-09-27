@@ -16,6 +16,7 @@ class CreatePost extends Component {
     super(props);
     this.options = [];
     this.state = {
+      loading: false,
       title: {
         value: ''
       },
@@ -62,6 +63,7 @@ class CreatePost extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    this.setState({ loading: true })
 
     const data = new FormData()
     data.append('title', this.state.title.value);
@@ -219,6 +221,7 @@ class CreatePost extends Component {
               <Button type="primary"
                 htmlType="submit"
                 size="large"
+                loading={this.state.loading}
                 className="post-form-button"
                 disabled={this.isFormInvalid()}>Create</Button>
             </FormItem>

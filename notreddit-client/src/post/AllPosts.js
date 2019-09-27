@@ -51,7 +51,7 @@ class AllPosts extends Component {
   };
 
   downvote = () => {
-   // TODO
+    // TODO
   };
 
   render() {
@@ -101,13 +101,13 @@ class AllPosts extends Component {
             <List.Item.Meta
               avatar={
                 <a href={'/post/' + post.id}>
-                  <img src={post.url} width="128px" alt="thumbnail" />
+                  <img src={post.fileThumbnailUrl === null ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpuQW-Yaooyex01Istft3iPtUz5kSjb4UdtMrxjKp0b-JEWIMl' : post.fileThumbnailUrl} width="128px" alt="thumbnail" />
                 </a>
               }
               title={<a href={'/post/' + post.id}>{post.title}</a>}
               description={
                 <span>
-                  submitted {timeSince(post.createdOn)} ago by <a href={'/user/' + post.creator}>{post.creator}</a> to <a href={'/subreddit/' + post.subreddit}>{'r/' + post.subreddit}</a>
+                  submitted {timeSince(post.createdAt)} ago by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
                 </span>
               }
             />
