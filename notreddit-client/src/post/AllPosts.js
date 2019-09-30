@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './AllPosts.css';
 
 import { List, Icon, notification, Tooltip } from 'antd';
-import { allPosts } from '../services/postService';
+import { allPosts, vote } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
 
 const IconText = ({ type, text }) => (
@@ -21,6 +21,8 @@ class AllPosts extends Component {
       loading: false,
       data: []
     };
+
+    this.vote = this.vote.bind(this);
   }
 
   componentDidMount() {
@@ -46,12 +48,14 @@ class AllPosts extends Component {
     this._isMounted = false;
   }
 
-  upvote = () => {
-    // TODO
-  };
-
-  downvote = () => {
-    // TODO
+  vote = (choice, postId) => {
+    vote(choice, postId)
+      .catch(error => {
+        notification.error({
+          message: 'notreddit',
+          description: error.message || 'Sorry! Something went wrong. Please try again!'
+        });
+      });
   };
 
   render() {
@@ -78,7 +82,7 @@ class AllPosts extends Component {
                   <Icon
                     type="like"
                     theme={action === 'upvoted' ? 'filled' : 'outlined'}
-                    onClick={this.upvote}
+                    onClick={() => this.vote(1, post.id)}
                   />
                 </Tooltip>
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.upvotes}</span>
@@ -88,7 +92,7 @@ class AllPosts extends Component {
                   <Icon
                     type="dislike"
                     theme={action === 'downvoted' ? 'filled' : 'outlined'}
-                    onClick={this.downvote}
+                    onClick={() => this.vote(-1, post.id)}
                   />
                 </Tooltip>
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.downvotes}</span>

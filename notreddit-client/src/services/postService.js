@@ -15,3 +15,12 @@ export function allPosts() {
     method: 'GET'
   });
 }
+
+export function vote(choice, postId) {
+  const query = `?choice=${choice}&postId=${postId}`;
+
+  return request({
+    url: API_BASE_URL + '/post/vote' + query,
+    method: 'POST'
+  });
+}
