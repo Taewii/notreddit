@@ -51,4 +51,12 @@ public class Post extends BaseUUIDEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
+
+    public void upvote() {
+        this.setUpvotes(this.getUpvotes() + 1);
+    }
+
+    public void downvote() {
+        this.setDownvotes(this.getDownvotes() + 1);
+    }
 }

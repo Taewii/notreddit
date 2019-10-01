@@ -4,28 +4,38 @@ import notreddit.domain.entities.Post;
 import notreddit.domain.entities.User;
 import notreddit.domain.entities.Vote;
 import notreddit.domain.models.responses.ApiResponse;
+import notreddit.domain.models.responses.VoteResponseModel;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class VoteServiceImpl implements VoteService {
 
     private final PostRepository postRepository;
     private final VoteRepository voteRepository;
+    private final ModelMapper mapper;
 
     @Autowired
     public VoteServiceImpl(PostRepository postRepository,
-                           VoteRepository voteRepository) {
+                           VoteRepository voteRepository,
+                           ModelMapper mapper) {
         this.postRepository = postRepository;
         this.voteRepository = voteRepository;
+        this.mapper = mapper;
     }
 
+
+    @Transactional
     @Override
     public ResponseEntity<?> voteForPost(byte choice, UUID postId, User user) {
         Post post = postRepository.findById(postId).orElse(null);
@@ -38,12 +48,25 @@ public class VoteServiceImpl implements VoteService {
 
         Vote vote = voteRepository.findByPostIdAndUserId(postId, user.getId()).orElse(null);
 
+        // if the user clicked the same choice hes already voted for -> deselect the vote
+        if (vote != null && vote.getChoice() == choice) {
+            updatePostVotes(true, vote, post, (byte) 0);
+            voteRepository.delete(vote);
+
+            return ResponseEntity
+                    .ok()
+                    .body(new ApiResponse(true, "Vote deselected successfully."));
+        }
+
+        // if user hasn't yet voted for the post, create a new vote, else, update choice
         if (vote == null) {
             vote = new Vote();
             vote.setChoice(choice);
             vote.setPost(post);
             vote.setUser(user);
+            updatePostVotes(false, vote, post, choice);
         } else {
+            updatePostVotes(true, vote, post, choice);
             vote.setChoice(choice);
         }
 
@@ -53,5 +76,29 @@ public class VoteServiceImpl implements VoteService {
         return ResponseEntity
                 .ok()
                 .body(new ApiResponse(true, "Vote registered successfully."));
+    }
+
+    @Override
+    public List<VoteResponseModel> findVotesByUser(User user) {
+        return voteRepository.findByUser(user)
+                .stream()
+                .map(v -> mapper.map(v, VoteResponseModel.class))
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    private void updatePostVotes(boolean alreadyVoted, Vote vote, Post post, byte choice) {
+        if (alreadyVoted) {
+            if (vote.getChoice() < 0) {
+                post.setDownvotes(post.getDownvotes() - 1);
+            } else {
+                post.setUpvotes(post.getUpvotes() - 1);
+            }
+        }
+
+        if (choice == 1) {
+            post.upvote();
+        } else if (choice == -1) {
+            post.downvote();
+        }
     }
 }

@@ -25,7 +25,7 @@ public class Vote extends BaseUUIDEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment comment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Post post;
 
     @NotNull

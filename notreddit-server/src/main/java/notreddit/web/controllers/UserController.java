@@ -5,7 +5,9 @@ import notreddit.domain.models.requests.ChangeRoleRequest;
 import notreddit.domain.models.responses.UserIdentityAvailabilityResponse;
 import notreddit.domain.models.responses.UserSummaryResponse;
 import notreddit.domain.models.responses.UsersResponse;
+import notreddit.domain.models.responses.VoteResponseModel;
 import notreddit.services.UserService;
+import notreddit.services.VoteService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +23,15 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final VoteService voteService;
     private final ModelMapper mapper;
 
     @Autowired
     public UserController(UserService userService,
+                          VoteService voteService,
                           ModelMapper mapper) {
         this.userService = userService;
+        this.voteService = voteService;
         this.mapper = mapper;
     }
 
@@ -42,10 +47,16 @@ public class UserController {
         return new UserIdentityAvailabilityResponse(available);
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
     public UserSummaryResponse getCurrentUser(@AuthenticationPrincipal User user) {
         return mapper.map(user, UserSummaryResponse.class);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/votes")
+    public List<VoteResponseModel> getCurrentUserVotes(@AuthenticationPrincipal User user) {
+        return voteService.findVotesByUser(user);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
