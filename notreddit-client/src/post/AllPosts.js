@@ -4,6 +4,7 @@ import './AllPosts.css';
 import { List, Icon, notification, Tooltip } from 'antd';
 import { allPosts, vote } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
+import { getUserVotes } from '../services/userService';
 
 const IconText = ({ type, text }) => (
   <span>
@@ -16,6 +17,7 @@ class AllPosts extends Component {
   constructor(props) {
     super(props)
     this._isMounted = false;
+    this.votes = {};
     this.state = {
       initLoading: true,
       loading: false,
@@ -23,10 +25,14 @@ class AllPosts extends Component {
     };
 
     this.vote = this.vote.bind(this);
+    this.colorVote = this.colorVote.bind(this);
   }
 
   componentDidMount() {
     this._isMounted = true;
+
+    getUserVotes()
+      .then(res => this.votes = res);
 
     allPosts()
       .then(res => {
@@ -48,7 +54,48 @@ class AllPosts extends Component {
     this._isMounted = false;
   }
 
-  vote = (choice, postId) => {
+  handleVoteChange(event, choice) {
+    const targetUl = event.currentTarget.parentElement.parentElement.parentElement;
+    const spans = targetUl.querySelectorAll('span');
+    const upvoteLi = spans[0];
+    const downvoteLi = spans[2];
+
+    const upvoteSvg = upvoteLi.querySelector('svg');
+    const upvoteSpan = upvoteLi.querySelector('span');
+
+    const downvoteSvg = downvoteLi.querySelector('svg');
+    const downvoteSpan = downvoteLi.querySelector('span');
+
+    const isUpvoted = !!upvoteSvg.getAttribute('color');
+    const isDownvoted = !!downvoteSvg.getAttribute('color');
+
+    if (isUpvoted) {
+      upvoteSpan.textContent = +upvoteSpan.textContent - 1;
+    } else if (isDownvoted) {
+      downvoteSpan.textContent = +downvoteSpan.textContent - 1;
+    }
+
+    if (isUpvoted && choice === 1) {
+      upvoteSvg.setAttribute('color', '');
+      return;
+    } else if (isDownvoted && choice === -1) {
+      downvoteSvg.setAttribute('color', '');
+      return;
+    }
+
+    if (choice === 1) {
+      upvoteSpan.textContent = +upvoteSpan.textContent + 1;
+      upvoteSvg.setAttribute('color', 'green');
+      downvoteSvg.setAttribute('color', '');
+    } else {
+      upvoteSvg.setAttribute('color', '');
+      downvoteSvg.setAttribute('color', 'red');
+      downvoteSpan.textContent = +downvoteSpan.textContent + 1;
+    }
+  }
+
+  vote(event, choice, postId) {
+    this.handleVoteChange(event, choice)
     vote(choice, postId)
       .catch(error => {
         notification.error({
@@ -58,9 +105,19 @@ class AllPosts extends Component {
       });
   };
 
-  render() {
-    const { data, action } = this.state;
+  colorVote(event, postId) {
+    const icons = event.currentTarget.querySelectorAll('svg');
+    const vote = this.votes[postId];
 
+    if (vote === 1) {
+      icons[0].setAttribute('color', 'green');
+    } else if (vote === -1) {
+      icons[1].setAttribute('color', 'red');
+    }
+  }
+
+  render() {
+    const { data } = this.state;
     return (
       <List
         bordered
@@ -75,14 +132,15 @@ class AllPosts extends Component {
         dataSource={data}
         renderItem={post => (
           <List.Item
+            onLoad={(event) => this.colorVote(event, post.id)}
             key={post.id}
             actions={[
               <span key="comment-basic-upvote">
                 <Tooltip title="Upvote">
                   <Icon
                     type="like"
-                    theme={action === 'upvoted' ? 'filled' : 'outlined'}
-                    onClick={() => this.vote(1, post.id)}
+                    theme="outlined"
+                    onClick={(event) => this.vote(event, 1, post.id)}
                   />
                 </Tooltip>
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.upvotes}</span>
@@ -91,8 +149,8 @@ class AllPosts extends Component {
                 <Tooltip title="Downvote">
                   <Icon
                     type="dislike"
-                    theme={action === 'downvoted' ? 'filled' : 'outlined'}
-                    onClick={() => this.vote(-1, post.id)}
+                    theme="outlined"
+                    onClick={(event) => this.vote(event, -1, post.id)}
                   />
                 </Tooltip>
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.downvotes}</span>

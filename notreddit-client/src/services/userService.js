@@ -1,4 +1,4 @@
-import { request} from "../util/APIUtils";
+import { request } from "../util/APIUtils";
 import { API_BASE_URL, ACCESS_TOKEN } from "../util/constants";
 
 export function login(loginRequest) {
@@ -80,4 +80,11 @@ export function deleteUser(userId) {
     url: API_BASE_URL + "/user/delete?id=" + userId,
     method: 'DELETE'
   })
+}
+
+export function getUserVotes() {
+  return request({
+    url: API_BASE_URL + '/user/votes',
+    method: 'GET'
+  }); 
 }
