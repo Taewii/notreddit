@@ -8,5 +8,4 @@ import lombok.Setter;
 public class VoteResponseModel {
 
     private byte choice;
-    private String postId;
 }

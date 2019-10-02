@@ -4,17 +4,15 @@ import notreddit.domain.entities.Post;
 import notreddit.domain.entities.User;
 import notreddit.domain.entities.Vote;
 import notreddit.domain.models.responses.ApiResponse;
-import notreddit.domain.models.responses.VoteResponseModel;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,17 +21,13 @@ public class VoteServiceImpl implements VoteService {
 
     private final PostRepository postRepository;
     private final VoteRepository voteRepository;
-    private final ModelMapper mapper;
 
     @Autowired
     public VoteServiceImpl(PostRepository postRepository,
-                           VoteRepository voteRepository,
-                           ModelMapper mapper) {
+                           VoteRepository voteRepository) {
         this.postRepository = postRepository;
         this.voteRepository = voteRepository;
-        this.mapper = mapper;
     }
-
 
     @Transactional
     @Override
@@ -79,11 +73,12 @@ public class VoteServiceImpl implements VoteService {
     }
 
     @Override
-    public List<VoteResponseModel> findVotesByUser(User user) {
+    public Map<String, Byte> findVotesByUser(User user) {
         return voteRepository.findByUser(user)
                 .stream()
-                .map(v -> mapper.map(v, VoteResponseModel.class))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toUnmodifiableMap(
+                        v -> v.getPost().getId().toString(),
+                        Vote::getChoice));
     }
 
     private void updatePostVotes(boolean alreadyVoted, Vote vote, Post post, byte choice) {

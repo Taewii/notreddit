@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -55,7 +56,7 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/votes")
-    public List<VoteResponseModel> getCurrentUserVotes(@AuthenticationPrincipal User user) {
+    public Map<String, Byte> getCurrentUserVotes(@AuthenticationPrincipal User user) {
         return voteService.findVotesByUser(user);
     }
 
