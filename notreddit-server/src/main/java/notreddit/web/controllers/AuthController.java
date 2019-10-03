@@ -7,6 +7,7 @@ import notreddit.domain.models.responses.JwtAuthenticationResponse;
 import notreddit.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,12 +37,14 @@ public class AuthController {
         this.authenticationManager = authenticationManager;
     }
 
+    @PreAuthorize("isAnonymous()")
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody SignUpRequest model) {
         return userService.register(model);
     }
 
     @Transactional
+    @PreAuthorize("isAnonymous()")
     @PostMapping("/signin")
     public ResponseEntity<?> login(@Valid @RequestBody SignInRequest model) {
         Authentication authentication = authenticationManager.authenticate(
