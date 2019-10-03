@@ -290,7 +290,7 @@ class Signup extends Component {
             email: {
               value: emailValue,
               validateStatus: 'error',
-              errorMsg: 'This Email is already registered'
+              errorMsg: 'This email is already in use'
             }
           });
         }

@@ -54,9 +54,8 @@ class AllPosts extends Component {
     this._isMounted = false;
   }
 
-  handleVoteChange(event, choice) {
-    const targetUl = event.currentTarget.parentElement.parentElement.parentElement;
-    const spans = targetUl.querySelectorAll('span');
+  handleVoteChange(target, choice) {
+    const spans = target.querySelectorAll('span');
     const upvoteLi = spans[0];
     const downvoteLi = spans[2];
 
@@ -95,12 +94,18 @@ class AllPosts extends Component {
   }
 
   vote(event, choice, postId) {
-    this.handleVoteChange(event, choice)
+    const target = event.currentTarget.parentElement.parentElement.parentElement;
+
     vote(choice, postId)
+      .then(res => {
+        this.handleVoteChange(target, choice)
+      })
       .catch(error => {
+        let message = error.message || 'Sorry! Something went wrong. Please try again!';
+        message = error.status === 401 ? 'You need to be logged in to vote.' : message;
         notification.error({
           message: 'notreddit',
-          description: error.message || 'Sorry! Something went wrong. Please try again!'
+          description: message
         });
       });
   };

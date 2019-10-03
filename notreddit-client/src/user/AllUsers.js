@@ -45,7 +45,6 @@ class AllUsers extends Component {
           });
         }
       }).catch(error => {
-        this.props.history.push('/');
         notification.error({
           message: 'notreddit',
           description: error.message || 'Sorry! Something went wrong. Please try again!'

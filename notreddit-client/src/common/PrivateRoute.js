@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 
 
-const PrivateRoute = ({ component: Component, authenticated, ...rest }) => (
+const PrivateRoute = ({ component: Component, authenticated, redirectPath, ...rest }) => (
   <Route
     {...rest}
     render={props =>
@@ -14,7 +14,7 @@ const PrivateRoute = ({ component: Component, authenticated, ...rest }) => (
       ) : (
           <Redirect
             to={{
-              pathname: '/login',
+              pathname: redirectPath ? redirectPath : '/login',
               state: { from: props.location }
             }}
           />

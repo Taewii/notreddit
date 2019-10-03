@@ -8,6 +8,7 @@ import {
 
 import { getCurrentUser } from '../services/userService';
 import { ACCESS_TOKEN } from '../util/constants';
+import PrivateRoute from '../common/PrivateRoute';
 
 import Login from '../user/Login'
 import Signup from '../user/Signup'
@@ -88,6 +89,10 @@ class App extends Component {
     this.props.history.push("/");
   }
 
+  hasRole(role) {
+    return this.state.isAuthenticated && this.state.currentUser.roles.includes(role);
+  }
+
   render() {
     if (this.state.isLoading) {
       return <LoadingIndicator />
@@ -102,13 +107,36 @@ class App extends Component {
         <Content className="app-content" style={{ textAlign: "center" }}>
           <div className="container">
             <Switch>
-              <Route path="/login" render={(props) => <Login onLogin={this.handleLogin} {...props} />}></Route>
-              <Route path="/signup" component={Signup}></Route>
-              <Route path="/user/all" component={AllUsers}></Route>
-              <Route path="/subreddit/create" component={SubredditCreate}></Route>
-              <Route path="/post/create" component={CreatePost}></Route>
-              <Route path="/" component={AllPosts}></Route>
-              <Route component={NotFound}></Route>
+              <PrivateRoute
+                path="/login"
+                component={(props) => <Login onLogin={this.handleLogin} {...props} />}
+                authenticated={!this.state.isAuthenticated}
+                redirectPath="/"
+              />
+              <PrivateRoute
+                path="/signup"
+                component={Signup}
+                authenticated={!this.state.isAuthenticated}
+                redirectPath="/"
+              />
+              <PrivateRoute
+                path="/user/all"
+                component={AllUsers}
+                authenticated={this.hasRole('ADMIN')}
+                redirectPath="/"
+              />
+              <PrivateRoute
+                path="/subreddit/create"
+                component={SubredditCreate}
+                authenticated={this.state.isAuthenticated}
+              />
+              <PrivateRoute
+                path="/post/create"
+                component={CreatePost}
+                authenticated={this.state.isAuthenticated}
+              />
+              <Route path="/" component={AllPosts} />
+              <Route component={NotFound} />
             </Switch>
           </div>
         </Content>
