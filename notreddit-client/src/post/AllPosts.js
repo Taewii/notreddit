@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './AllPosts.css';
 
+import { Link } from 'react-router-dom';
 import { List, Icon, notification, Tooltip } from 'antd';
 import { allPosts, vote } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
@@ -161,15 +162,17 @@ class AllPosts extends Component {
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.downvotes}</span>
               </span>,
               <span key="comments">
-                <IconText type="message" text="2" />
+                <Link to={'/post/' + post.id} style={{ color: 'gray' }}>
+                  <IconText type="message" text={post.commentCount} />
+                </Link>
               </span>,
             ]}
           >
             <List.Item.Meta
               avatar={
-                <a href={'/post/' + post.id}>
+                <Link to={'/post/' + post.id}>
                   <img src={post.fileThumbnailUrl === null ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpuQW-Yaooyex01Istft3iPtUz5kSjb4UdtMrxjKp0b-JEWIMl' : post.fileThumbnailUrl} width="128px" alt="thumbnail" />
-                </a>
+                </Link>
               }
               title={<a href={'/post/' + post.id}>{post.title}</a>}
               description={

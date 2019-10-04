@@ -9,6 +9,13 @@ export function create(createRequest) {
   });
 }
 
+export function findById(id) {
+  return request({
+    url: API_BASE_URL + '/post/' + id,
+    method: 'GET'
+  });
+}
+
 export function allPosts() {
   return request({
     url: API_BASE_URL + '/post/all',

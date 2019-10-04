@@ -19,6 +19,7 @@ import LoadingIndicator from '../common/LoadingIndicator';
 import SubredditCreate from '../subreddit/SubredditCreate';
 import CreatePost from '../post/CreatePost';
 import AllPosts from '../post/AllPosts';
+import PostDetails from '../post/PostDetails';
 
 import { Layout, notification } from 'antd';
 const { Content } = Layout;
@@ -135,6 +136,7 @@ class App extends Component {
                 component={CreatePost}
                 authenticated={this.state.isAuthenticated}
               />
+              <Route path="/post/:id" component={PostDetails} />
               <Route path="/" component={AllPosts} />
               <Route component={NotFound} />
             </Switch>

@@ -19,10 +19,6 @@ class AppHeader extends Component {
     }
   }
 
-  refreshPage() {
-    window.location.reload();
-  }
-
   render() {
     let menuItems;
     const currentUser = this.props.currentUser;
@@ -68,7 +64,7 @@ class AppHeader extends Component {
       <Header className="app-header">
         <div className="container">
           <div className="app-title" >
-            <Link onClick={this.refreshPage} to="/">notreddit</Link>
+            <Link to="/">notreddit</Link>
           </div>
           <Menu
             className="app-menu"
