@@ -6,6 +6,7 @@ import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.PostCreateRequest;
 import notreddit.domain.models.responses.ApiResponse;
+import notreddit.domain.models.responses.PostDetailsResponseModel;
 import notreddit.domain.models.responses.PostListResponseModel;
 import notreddit.repositories.FileRepository;
 import notreddit.repositories.PostRepository;
@@ -91,6 +92,17 @@ public class PostServiceImpl implements PostService {
                     .badRequest()
                     .body(new ApiResponse(false, "You can't have both url and uploaded image."));
         }
+    }
+
+    @Override
+    public PostDetailsResponseModel findById(UUID id) {
+        Post post = postRepository.findById(id).orElseThrow();
+        PostDetailsResponseModel model = mapper.map(post, PostDetailsResponseModel.class);
+        model.setCreatedAt(post.getCreatedOn()
+                .atZone(ZoneId.of("Europe/Sofia"))
+                .toInstant()
+                .getEpochSecond());
+        return model;
     }
 
     private ResponseEntity<?> createPostWithoutFiles(Post post) {

@@ -2,6 +2,7 @@ package notreddit.web.controllers;
 
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.PostCreateRequest;
+import notreddit.domain.models.responses.PostDetailsResponseModel;
 import notreddit.domain.models.responses.PostListResponseModel;
 import notreddit.services.PostService;
 import notreddit.services.VoteService;
@@ -40,6 +41,12 @@ public class PostController {
     @GetMapping("/all")
     public List<PostListResponseModel> all() {
         return postService.allPosts();
+    }
+
+    @PreAuthorize("permitAll()")
+    @GetMapping("/{id}")
+    public PostDetailsResponseModel findById(@PathVariable UUID id) {
+        return postService.findById(id);
     }
 
     @PreAuthorize("isAuthenticated()")

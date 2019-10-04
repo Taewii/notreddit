@@ -4,6 +4,7 @@ import notreddit.domain.entities.Post;
 import notreddit.domain.entities.User;
 import notreddit.domain.entities.Vote;
 import notreddit.domain.models.responses.ApiResponse;
+import notreddit.domain.models.responses.PostVoteUserChoiceResponse;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,17 @@ public class VoteServiceImpl implements VoteService {
                 .collect(Collectors.toUnmodifiableMap(
                         v -> v.getPost().getId().toString(),
                         Vote::getChoice));
+    }
+
+    @Override
+    public PostVoteUserChoiceResponse getUserChoiceForPost(User user, UUID postId) {
+        Vote vote = voteRepository.findByUserAndPostId(user, postId).orElse(null);
+
+        if (vote == null) {
+            return new PostVoteUserChoiceResponse(false, null);
+        }
+
+        return new PostVoteUserChoiceResponse(true, vote.getChoice());
     }
 
     private void updatePostVotes(boolean alreadyVoted, Vote vote, Post post, byte choice) {

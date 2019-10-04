@@ -2,10 +2,10 @@ package notreddit.web.controllers;
 
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.ChangeRoleRequest;
+import notreddit.domain.models.responses.PostVoteUserChoiceResponse;
 import notreddit.domain.models.responses.UserIdentityAvailabilityResponse;
 import notreddit.domain.models.responses.UserSummaryResponse;
 import notreddit.domain.models.responses.UsersResponse;
-import notreddit.domain.models.responses.VoteResponseModel;
 import notreddit.services.UserService;
 import notreddit.services.VoteService;
 import org.modelmapper.ModelMapper;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user")
@@ -58,6 +59,13 @@ public class UserController {
     @GetMapping("/votes")
     public Map<String, Byte> getCurrentUserVotes(@AuthenticationPrincipal User user) {
         return voteService.findVotesByUser(user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/vote/{postId}")
+    public PostVoteUserChoiceResponse getUserVoteForPost(@PathVariable UUID postId,
+                                                         @AuthenticationPrincipal User user) {
+        return voteService.getUserChoiceForPost(user, postId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
