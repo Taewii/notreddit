@@ -7,7 +7,7 @@ import { findById } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
 import { getVoteForPost } from '../services/voteService';
 
-const Content = ({ fileUrl }) => {
+const FileContent = ({ fileUrl }) => {
   return (
     <div className="file-content">
       <iframe src={fileUrl}
@@ -37,6 +37,19 @@ class PostDetails extends Component {
       .then(res => {
         if (this._isMounted) {
           this.setState({ post: res })
+
+          getVoteForPost(id)
+            .then(res => {
+              if (res.hasVoted) {
+                this.colorVote(res.choice)
+              }
+            })
+            .catch(error => {
+              notification.error({
+                message: 'notreddit',
+                description: error.message || 'Sorry! Something went wrong. Please try again!'
+              });
+            })
         }
       })
       .catch(error => {
@@ -45,13 +58,16 @@ class PostDetails extends Component {
           description: error.message || 'Sorry! Something went wrong. Please try again!'
         });
       })
+  }
 
-    getVoteForPost(id)
-      .then(res => {
-        if (res.hasVoted) {
-          // TODO
-        }
-      })
+  colorVote(choice) {
+    const icons = document.querySelectorAll('.post svg');
+
+    if (choice === 1) {
+      icons[0].setAttribute('color', 'green');
+    } else if (choice === -1) {
+      icons[1].setAttribute('color', 'red');
+    }
   }
 
   componentWillUnmount() {
@@ -62,7 +78,7 @@ class PostDetails extends Component {
     const { post } = this.state;
 
     return (
-      <div className="container">
+      <div className="post">
         <List
           itemLayout="vertical"
           size="large">
@@ -107,7 +123,7 @@ class PostDetails extends Component {
             />
           </List.Item>
         </List>
-        <Content fileUrl={post.fileUrl} />
+        <FileContent fileUrl={post.fileUrl} />
       </div >
     )
   }
