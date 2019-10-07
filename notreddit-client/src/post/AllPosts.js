@@ -3,7 +3,8 @@ import './AllPosts.css';
 
 import { Link } from 'react-router-dom';
 import { List, Icon, notification, Tooltip } from 'antd';
-import { allPosts, vote } from '../services/postService';
+import { allPosts } from '../services/postService';
+import { voteForPost } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
 import { getUserVotes } from '../services/userService';
 
@@ -25,7 +26,6 @@ class AllPosts extends Component {
       data: []
     };
 
-    this.vote = this.vote.bind(this);
     this.colorVote = this.colorVote.bind(this);
   }
 
@@ -54,62 +54,6 @@ class AllPosts extends Component {
   componentWillUnmount() {
     this._isMounted = false;
   }
-
-  handleVoteChange(target, choice) {
-    const spans = target.querySelectorAll('span');
-    const upvoteLi = spans[0];
-    const downvoteLi = spans[2];
-
-    const upvoteSvg = upvoteLi.querySelector('svg');
-    const upvoteSpan = upvoteLi.querySelector('span');
-
-    const downvoteSvg = downvoteLi.querySelector('svg');
-    const downvoteSpan = downvoteLi.querySelector('span');
-
-    const isUpvoted = !!upvoteSvg.getAttribute('color');
-    const isDownvoted = !!downvoteSvg.getAttribute('color');
-
-    if (isUpvoted) {
-      upvoteSpan.textContent = +upvoteSpan.textContent - 1;
-    } else if (isDownvoted) {
-      downvoteSpan.textContent = +downvoteSpan.textContent - 1;
-    }
-
-    if (isUpvoted && choice === 1) {
-      upvoteSvg.setAttribute('color', '');
-      return;
-    } else if (isDownvoted && choice === -1) {
-      downvoteSvg.setAttribute('color', '');
-      return;
-    }
-
-    if (choice === 1) {
-      upvoteSpan.textContent = +upvoteSpan.textContent + 1;
-      upvoteSvg.setAttribute('color', 'green');
-      downvoteSvg.setAttribute('color', '');
-    } else {
-      upvoteSvg.setAttribute('color', '');
-      downvoteSvg.setAttribute('color', 'red');
-      downvoteSpan.textContent = +downvoteSpan.textContent + 1;
-    }
-  }
-
-  vote(event, choice, postId) {
-    const target = event.currentTarget.parentElement.parentElement.parentElement;
-
-    vote(choice, postId)
-      .then(res => {
-        this.handleVoteChange(target, choice)
-      })
-      .catch(error => {
-        let message = error.message || 'Sorry! Something went wrong. Please try again!';
-        message = error.status === 401 ? 'You need to be logged in to vote.' : message;
-        notification.error({
-          message: 'notreddit',
-          description: message
-        });
-      });
-  };
 
   colorVote(event, postId) {
     const icons = event.currentTarget.querySelectorAll('svg');
@@ -146,7 +90,7 @@ class AllPosts extends Component {
                   <Icon
                     type="like"
                     theme="outlined"
-                    onClick={(event) => this.vote(event, 1, post.id)}
+                    onClick={(event) => voteForPost(event, 1, post.id)}
                   />
                 </Tooltip>
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.upvotes}</span>
@@ -156,7 +100,7 @@ class AllPosts extends Component {
                   <Icon
                     type="dislike"
                     theme="outlined"
-                    onClick={(event) => this.vote(event, -1, post.id)}
+                    onClick={(event) => voteForPost(event, -1, post.id)}
                   />
                 </Tooltip>
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.downvotes}</span>
