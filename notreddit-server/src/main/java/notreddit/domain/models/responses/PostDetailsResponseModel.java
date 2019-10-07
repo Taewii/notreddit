@@ -10,6 +10,7 @@ public class PostDetailsResponseModel {
     private String creatorUsername;
     private String title;
     private String fileThumbnailUrl;
+    private String content;
     private String fileUrl;
     private String subredditTitle;
     private int upvotes;

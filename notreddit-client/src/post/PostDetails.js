@@ -1,11 +1,24 @@
 import React, { Component } from 'react';
 import './PostDetails.css';
 
-import { Link } from 'react-router-dom';
-import { List, Icon, notification, Tooltip } from 'antd';
+import { List, Icon, notification, Tooltip, Button, Form, Input } from 'antd';
+
 import { findById } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
-import { getVoteForPost } from '../services/voteService';
+import { getVoteForPost, voteForPost } from '../services/voteService';
+
+const changeFileContentDisplay = () => {
+  const div = document.querySelector('.file-content');
+  const btn = document.querySelector('.show-btn');
+
+  if (!div.style.display || div.style.display === 'none') {
+    div.style.display = 'block';
+    btn.textContent = 'Hide File';
+  } else {
+    div.style.display = 'none';
+    btn.textContent = 'Show File';
+  }
+}
 
 const FileContent = ({ fileUrl }) => {
   return (
@@ -17,7 +30,40 @@ const FileContent = ({ fileUrl }) => {
         frameBorder="0"
       />
     </div>
-  )
+  );
+}
+
+const CommentForm = (props) => {
+  return (
+    <List.Item>
+      <Form onSubmit={handleSubmit}>
+        <Form.Item hasFeedback>
+          <Input.TextArea
+            size="large"
+            name="comment"
+            placeholder="Write your comment here." />
+        </Form.Item>
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+          >Submit comment</Button>
+        </Form.Item>
+      </Form>
+    </List.Item>
+  );
+}
+
+const handleSubmit = (event) => {
+  // TDDO:
+}
+
+const Content = ({ content }) => {
+  return (
+    <List.Item>
+      {content}
+    </List.Item>
+  );
 }
 
 class PostDetails extends Component {
@@ -25,7 +71,8 @@ class PostDetails extends Component {
     super(props);
     this._isMounted = false;
     this.state = {
-      post: {}
+      post: {},
+      postId: ''
     }
   }
 
@@ -36,7 +83,7 @@ class PostDetails extends Component {
     findById(id)
       .then(res => {
         if (this._isMounted) {
-          this.setState({ post: res })
+          this.setState({ post: res, postId: id })
 
           getVoteForPost(id)
             .then(res => {
@@ -75,15 +122,15 @@ class PostDetails extends Component {
   }
 
   render() {
-    const { post } = this.state;
+    const { post, postId } = this.state;
 
     return (
       <div className="post">
-        <List
+        <List key="asd"
+          bordered
           itemLayout="vertical"
           size="large">
           <List.Item
-            // onLoad={(event) => this.colorVote(event, post.id)}
             key={post.id}
             actions={[
               <span key="comment-basic-upvote">
@@ -91,7 +138,7 @@ class PostDetails extends Component {
                   <Icon
                     type="like"
                     theme="outlined"
-                  // onClick={(event) => this.vote(event, 1, post.id)}
+                    onClick={(event) => voteForPost(event, 1, postId)}
                   />
                 </Tooltip>
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.upvotes}</span>
@@ -101,20 +148,27 @@ class PostDetails extends Component {
                   <Icon
                     type="dislike"
                     theme="outlined"
-                  // onClick={(event) => this.vote(event, -1, post.id)}
+                    onClick={(event) => voteForPost(event, -1, postId)}
                   />
                 </Tooltip>
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.downvotes}</span>
-              </span>
+              </span>,
+              <span>
+                {
+                  post.fileUrl
+                    ? <Button className="show-btn" onClick={changeFileContentDisplay}>Show File</Button>
+                    : null
+                }
+              </span>,
             ]}
           >
             <List.Item.Meta
               avatar={
-                <Link to={'/post/' + post.id}>
-                  <img src={post.fileThumbnailUrl === null ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpuQW-Yaooyex01Istft3iPtUz5kSjb4UdtMrxjKp0b-JEWIMl' : post.fileThumbnailUrl} width="128px" alt="thumbnail" />
-                </Link>
+                <a href={post.fileUrl}>
+                  <img src={post.fileThumbnailUrl === null ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpuQW-Yaooyex01Istft3iPtUz5kSjb4UdtMrxjKp0b-JEWIMl' : post.fileThumbnailUrl} width="64px" alt="thumbnail" />
+                </a>
               }
-              title={<a href={'/post/' + post.id}>{post.title}</a>}
+              title={post.title}
               description={
                 <span>
                   submitted {timeSince(post.createdAt)} ago by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
@@ -122,8 +176,11 @@ class PostDetails extends Component {
               }
             />
           </List.Item>
+          {post.content ? <Content content={post.content} /> : null}
+          <CommentForm />
         </List>
-        <FileContent fileUrl={post.fileUrl} />
+        {post.fileUrl ? <FileContent fileUrl={post.fileUrl} /> : null}
+
       </div >
     )
   }

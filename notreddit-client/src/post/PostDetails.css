@@ -1,4 +1,4 @@
-.post, .container {
+.post, .container, .file-content-wrapper {
   height:100%;
   width:100%;
 }
@@ -11,4 +11,5 @@
 .file-content {
   height: 100%;
   width:100%;
+  display: none;
 }
