@@ -6,65 +6,7 @@ import { List, Icon, notification, Tooltip, Button, Form, Input } from 'antd';
 import { findById } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
 import { getVoteForPost, voteForPost } from '../services/voteService';
-
-const changeFileContentDisplay = () => {
-  const div = document.querySelector('.file-content');
-  const btn = document.querySelector('.show-btn');
-
-  if (!div.style.display || div.style.display === 'none') {
-    div.style.display = 'block';
-    btn.textContent = 'Hide File';
-  } else {
-    div.style.display = 'none';
-    btn.textContent = 'Show File';
-  }
-}
-
-const FileContent = ({ fileUrl }) => {
-  return (
-    <div className="file-content">
-      <iframe src={fileUrl}
-        title="unique?"
-        allowFullScreen="yes"
-        scrolling="no"
-        frameBorder="0"
-      />
-    </div>
-  );
-}
-
-const CommentForm = (props) => {
-  return (
-    <List.Item>
-      <Form onSubmit={handleSubmit}>
-        <Form.Item hasFeedback>
-          <Input.TextArea
-            size="large"
-            name="comment"
-            placeholder="Write your comment here." />
-        </Form.Item>
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-          >Submit comment</Button>
-        </Form.Item>
-      </Form>
-    </List.Item>
-  );
-}
-
-const handleSubmit = (event) => {
-  // TDDO:
-}
-
-const Content = ({ content }) => {
-  return (
-    <List.Item>
-      {content}
-    </List.Item>
-  );
-}
+import { comment } from '../services/commentService';
 
 class PostDetails extends Component {
   constructor(props) {
@@ -72,8 +14,12 @@ class PostDetails extends Component {
     this._isMounted = false;
     this.state = {
       post: {},
-      postId: ''
+      postId: '',
+      commentContent: ''
     }
+
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
@@ -115,6 +61,42 @@ class PostDetails extends Component {
     } else if (choice === -1) {
       icons[1].setAttribute('color', 'red');
     }
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    const commentData = {
+      postId: this.state.postId,
+      content: this.state.commentContent,
+      parentId: 'c2e35210-bd10-4618-b502-f66595e4b44a'
+    };
+    event.target.reset();
+
+    comment(commentData)
+      .then(res => {
+        if (res.success) {
+          notification.success({
+            message: 'notreddit',
+            description: res.message
+          })
+        }
+      })
+      .catch(error => {
+        notification.error({
+          message: 'notreddit',
+          description: error.message || 'Sorry! Something went wrong. Please try again!'
+        });
+      })
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const inputName = target.name;
+    const inputValue = target.value;
+
+    this.setState({
+      [inputName]: inputValue
+    });
   }
 
   componentWillUnmount() {
@@ -177,13 +159,65 @@ class PostDetails extends Component {
             />
           </List.Item>
           {post.content ? <Content content={post.content} /> : null}
-          <CommentForm />
+          <List.Item>
+            <Form onSubmit={this.handleSubmit}>
+              <Form.Item hasFeedback>
+                <Input.TextArea
+                  size="large"
+                  name="commentContent"
+                  placeholder="Write your comment here."
+                  onChange={this.handleInputChange}
+                />
+              </Form.Item>
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={this.state.commentContent.trim().length === 0}
+                >Submit comment</Button>
+              </Form.Item>
+            </Form>
+          </List.Item>
         </List>
         {post.fileUrl ? <FileContent fileUrl={post.fileUrl} /> : null}
-
       </div >
     )
   }
 }
 
+const changeFileContentDisplay = () => {
+  const div = document.querySelector('.file-content');
+  const btn = document.querySelector('.show-btn');
+
+  if (!div.style.display || div.style.display === 'none') {
+    div.style.display = 'block';
+    btn.textContent = 'Hide File';
+  } else {
+    div.style.display = 'none';
+    btn.textContent = 'Show File';
+  }
+}
+
+const FileContent = ({ fileUrl }) => {
+  return (
+    <div className="file-content">
+      <iframe src={fileUrl}
+        title="unique?"
+        allowFullScreen="yes"
+        scrolling="no"
+        frameBorder="0"
+      />
+    </div>
+  );
+}
+
+const Content = ({ content }) => {
+  return (
+    <List.Item>
+      {content}
+    </List.Item>
+  );
+}
+
 export default PostDetails;
+
