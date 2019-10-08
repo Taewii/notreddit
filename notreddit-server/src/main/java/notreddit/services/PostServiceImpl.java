@@ -57,6 +57,7 @@ public class PostServiceImpl implements PostService {
         return postRepository.findAll().stream()
                 .map(p -> {
                     PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
+                    model.setCommentCount(p.getComments().size());
                     model.setCreatedAt(p.getCreatedOn()
                             .atZone(ZoneId.of("Europe/Sofia"))
                             .toInstant()

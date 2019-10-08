@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface PostRepository extends JpaRepository<Post, UUID> {
 
-    @Query("SELECT p FROM Post p " +
+    @Query("SELECT DISTINCT p FROM Post p " +
             "JOIN FETCH p.creator " +
             "LEFT JOIN FETCH p.subreddit " +
             "LEFT JOIN FETCH p.comments ")

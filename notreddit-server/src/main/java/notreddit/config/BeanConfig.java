@@ -16,6 +16,7 @@ public class BeanConfig {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setAmbiguityIgnored(true);
 
         Converter<Subreddit, String> toSubredditTitle = new AbstractConverter<>() {
             @Override

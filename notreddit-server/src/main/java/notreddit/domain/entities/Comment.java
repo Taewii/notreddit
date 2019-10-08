@@ -6,6 +6,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -26,4 +28,8 @@ public class Comment extends BaseUUIDEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment parent;
+
+    @NotNull
+    @PastOrPresent
+    private LocalDateTime createdAt;
 }
