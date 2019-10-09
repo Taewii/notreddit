@@ -6,7 +6,7 @@ import { List, Icon, notification, Tooltip, Button, Form, Input } from 'antd';
 import { findById } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
 import { getVoteForPost, voteForPost } from '../services/voteService';
-import { comment } from '../services/commentService';
+import { comment, findCommentsForPost } from '../services/commentService';
 
 class PostDetails extends Component {
   constructor(props) {
@@ -14,6 +14,7 @@ class PostDetails extends Component {
     this._isMounted = false;
     this.state = {
       post: {},
+      comments: [],
       postId: '',
       commentContent: ''
     }
@@ -26,23 +27,22 @@ class PostDetails extends Component {
     this._isMounted = true;
     const { id } = this.props.match.params;
 
-    findById(id)
+    Promise.all([findById(id), findCommentsForPost(id), getVoteForPost(id)])
       .then(res => {
-        if (this._isMounted) {
-          this.setState({ post: res, postId: id })
+        const post = res[0];
+        const comments = res[1];
+        const vote = res[2];
 
-          getVoteForPost(id)
-            .then(res => {
-              if (res.hasVoted) {
-                this.colorVote(res.choice)
-              }
-            })
-            .catch(error => {
-              notification.error({
-                message: 'notreddit',
-                description: error.message || 'Sorry! Something went wrong. Please try again!'
-              });
-            })
+        if (vote.hasVoted) {
+          this.colorVote(vote.choice)
+        }
+
+        if (this._isMounted) {
+          this.setState({
+            post,
+            comments,
+            postId: id
+          })
         }
       })
       .catch(error => {
@@ -56,10 +56,12 @@ class PostDetails extends Component {
   colorVote(choice) {
     const icons = document.querySelectorAll('.post svg');
 
-    if (choice === 1) {
-      icons[0].setAttribute('color', 'green');
-    } else if (choice === -1) {
-      icons[1].setAttribute('color', 'red');
+    if (icons.length === 2) { // sometimes it the async function loads before the icons are rendered
+      if (choice === 1) {
+        icons[0].setAttribute('color', 'green');
+      } else if (choice === -1) {
+        icons[1].setAttribute('color', 'red');
+      }
     }
   }
 
@@ -68,7 +70,7 @@ class PostDetails extends Component {
     const commentData = {
       postId: this.state.postId,
       content: this.state.commentContent,
-      parentId: 'c2e35210-bd10-4618-b502-f66595e4b44a'
+      parentId: null, // TODO
     };
     event.target.reset();
 
@@ -153,7 +155,7 @@ class PostDetails extends Component {
               title={post.title}
               description={
                 <span>
-                  submitted {timeSince(post.createdAt)} ago by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
+                  submitted {timeSince(post.createdOn)} by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
                 </span>
               }
             />

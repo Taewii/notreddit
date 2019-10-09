@@ -6,5 +6,12 @@ export function comment(data) {
     url: API_BASE_URL + '/comment/post',
     method: 'POST',
     body: JSON.stringify(data)
-  })
+  });
+}
+
+export function findCommentsForPost(postId) {
+  return request({
+    url: API_BASE_URL + '/comment/post?postId=' + postId,
+    method: 'GET'
+  });
 }
