@@ -65,7 +65,7 @@ public class VoteServiceImpl implements VoteService {
             vote.setChoice(choice);
         }
 
-        vote.setCreatedAt(LocalDateTime.now());
+        vote.setCreatedOn(LocalDateTime.now());
         voteRepository.saveAndFlush(vote);
 
         return ResponseEntity

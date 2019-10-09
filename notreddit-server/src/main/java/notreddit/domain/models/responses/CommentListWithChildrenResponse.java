@@ -3,17 +3,17 @@ package notreddit.domain.models.responses;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
-public class PostDetailsResponseModel {
+public class CommentListWithChildrenResponse {
 
     private String creatorUsername;
-    private String title;
-    private String fileThumbnailUrl;
     private String content;
-    private String fileUrl;
-    private String subredditTitle;
     private int upvotes;
     private int downvotes;
     private long createdOn;
+    private List<CommentListWithChildrenResponse> children = new ArrayList<>();
 }

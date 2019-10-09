@@ -20,6 +20,6 @@ public class PostListResponseModel {
     private String subredditTitle;
     private int upvotes;
     private int downvotes;
-    private long createdAt;
+    private long createdOn;
     private int commentCount;
 }

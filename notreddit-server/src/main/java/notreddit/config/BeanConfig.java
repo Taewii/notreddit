@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 @Configuration
 public class BeanConfig {
 
@@ -17,6 +20,16 @@ public class BeanConfig {
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setAmbiguityIgnored(true);
+
+        Converter<LocalDateTime, Long> toInstant = new AbstractConverter<>() {
+            @Override
+            protected Long convert(LocalDateTime localDateTime) {
+                return localDateTime == null ? null : localDateTime
+                        .atZone(ZoneId.of("Europe/Sofia"))
+                        .toInstant()
+                        .getEpochSecond();
+            }
+        };
 
         Converter<Subreddit, String> toSubredditTitle = new AbstractConverter<>() {
             @Override
@@ -32,6 +45,7 @@ public class BeanConfig {
             }
         };
 
+        mapper.addConverter(toInstant);
         mapper.addConverter(toSubredditTitle);
         mapper.addConverter(toAuthorityString);
         return mapper;

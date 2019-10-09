@@ -31,5 +31,5 @@ public class Vote extends BaseUUIDEntity {
     @NotNull
     @PastOrPresent
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdOn;
 }

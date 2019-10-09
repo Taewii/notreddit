@@ -21,7 +21,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -58,10 +57,6 @@ public class PostServiceImpl implements PostService {
                 .map(p -> {
                     PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
                     model.setCommentCount(p.getComments().size());
-                    model.setCreatedAt(p.getCreatedOn()
-                            .atZone(ZoneId.of("Europe/Sofia"))
-                            .toInstant()
-                            .getEpochSecond());
                     return model;
                 })
                 .collect(Collectors.toUnmodifiableList());
@@ -98,12 +93,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDetailsResponseModel findById(UUID id) {
         Post post = postRepository.findById(id).orElseThrow();
-        PostDetailsResponseModel model = mapper.map(post, PostDetailsResponseModel.class);
-        model.setCreatedAt(post.getCreatedOn()
-                .atZone(ZoneId.of("Europe/Sofia"))
-                .toInstant()
-                .getEpochSecond());
-        return model;
+        return mapper.map(post, PostDetailsResponseModel.class);
     }
 
     private ResponseEntity<?> createPostWithoutFiles(Post post) {

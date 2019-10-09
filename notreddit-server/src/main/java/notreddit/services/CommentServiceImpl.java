@@ -5,6 +5,7 @@ import notreddit.domain.entities.Post;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
 import notreddit.domain.models.responses.ApiResponse;
+import notreddit.domain.models.responses.CommentListWithChildrenResponse;
 import notreddit.repositories.CommentRepository;
 import notreddit.repositories.PostRepository;
 import org.modelmapper.ModelMapper;
@@ -15,6 +16,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -43,16 +47,24 @@ public class CommentServiceImpl implements CommentService {
                     .body(new ApiResponse(false, "Post doesn't exist."));
         }
 
+        Comment comment = mapper.map(commentModel, Comment.class);
+        comment.setCreator(creator);
+        comment.setPost(post);
+        comment.setCreatedOn(LocalDateTime.now());
+
         if (commentModel.getParentId() != null) {
-            parent = commentRepository.findById(commentModel.getParentId()).orElse(null);
+            parent = commentRepository.findByIdWithChildren(commentModel.getParentId()).orElse(null);
+            comment.setParent(parent);
+
+            if (parent != null) {
+                parent.addChild(comment);
+                commentRepository.saveAndFlush(parent);
+            }
         }
 
-        Comment comment = mapper.map(commentModel, Comment.class);
-        comment.setParent(parent);
-        comment.setPost(post);
-        comment.setCreatedAt(LocalDateTime.now());
-
-        commentRepository.saveAndFlush(comment);
+        if (parent == null) {
+            commentRepository.saveAndFlush(comment);
+        }
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/comment/post")
@@ -61,5 +73,14 @@ public class CommentServiceImpl implements CommentService {
         return ResponseEntity
                 .created(location)
                 .body(new ApiResponse(true, "Comment created successfully."));
+    }
+
+    @Override
+    public List<CommentListWithChildrenResponse> findAllFromPost(UUID postId) {
+        return commentRepository
+                .findByPostIdWithChildren(postId)
+                .parallelStream()
+                .map(c -> mapper.map(c, CommentListWithChildrenResponse.class))
+                .collect(Collectors.toUnmodifiableList());
     }
 }
