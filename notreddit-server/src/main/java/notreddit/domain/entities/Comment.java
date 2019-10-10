@@ -51,4 +51,12 @@ public class Comment extends BaseUUIDEntity {
     public void addChild(Comment comment) {
         this.getChildren().add(comment);
     }
+
+    public void upvote() {
+        this.setUpvotes(this.getUpvotes() + 1);
+    }
+
+    public void downvote() {
+        this.setDownvotes(this.getDownvotes() + 1);
+    }
 }

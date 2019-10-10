@@ -4,6 +4,7 @@ import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
 import notreddit.domain.models.responses.CommentListWithChildrenResponse;
 import notreddit.services.CommentService;
+import notreddit.services.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,10 +20,13 @@ import java.util.UUID;
 public class CommentController {
 
     private final CommentService commentService;
+    private final VoteService voteService;
 
     @Autowired
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService,
+                             VoteService voteService) {
         this.commentService = commentService;
+        this.voteService = voteService;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -35,5 +39,13 @@ public class CommentController {
     @GetMapping("/post")
     public List<CommentListWithChildrenResponse> findAllFromPost(@RequestParam UUID postId) {
         return commentService.findAllFromPost(postId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/vote")
+    public ResponseEntity<?> vote(@RequestParam byte choice,
+                                  @RequestParam UUID commentId,
+                                  @AuthenticationPrincipal User user) {
+        return voteService.voteForPostOrComment(choice, null, commentId, user);
     }
 }

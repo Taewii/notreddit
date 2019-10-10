@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface VoteService {
 
-    ResponseEntity<?> voteForPost(byte choice, UUID postId, User user);
+    ResponseEntity<?> voteForPostOrComment(byte choice, UUID postId, UUID commentId, User user);
 
     Map<String, Byte> findVotesByUser(User user);
 

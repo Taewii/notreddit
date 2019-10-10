@@ -13,6 +13,8 @@ import java.util.UUID;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
+    // TODO: 9.10.2019 г. probably wont need the fetches here since im eagerly fetching them
+
     @Query("SELECT c FROM Comment c " +
             "LEFT JOIN FETCH c.children " +
             "WHERE c.parent IS NULL " +

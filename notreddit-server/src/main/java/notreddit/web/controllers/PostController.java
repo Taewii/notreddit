@@ -54,6 +54,6 @@ public class PostController {
     public ResponseEntity<?> vote(@RequestParam byte choice,
                                   @RequestParam UUID postId,
                                   @AuthenticationPrincipal User user) {
-        return voteService.voteForPost(choice, postId, user);
+        return voteService.voteForPostOrComment(choice, postId, null, user);
     }
 }

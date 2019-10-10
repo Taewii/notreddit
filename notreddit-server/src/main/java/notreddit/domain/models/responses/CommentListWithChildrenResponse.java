@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 public class CommentListWithChildrenResponse {
 
+    private String id;
     private String creatorUsername;
     private String content;
     private int upvotes;
