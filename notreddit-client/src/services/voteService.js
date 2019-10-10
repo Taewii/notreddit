@@ -1,9 +1,10 @@
 import { request } from "../util/APIUtils";
 import { API_BASE_URL } from "../util/constants";
 
-import { vote } from '../services/postService';
-
 import { notification } from 'antd';
+
+import { voteForCommentAPI } from "./commentService";
+import { voteForPostAPI } from '../services/postService';
 
 export function getVoteForPost(postId) {
   return request({
@@ -54,7 +55,24 @@ function handleVoteChange(target, choice) {
 export function voteForPost(event, choice, postId) {
   const target = event.currentTarget.parentElement.parentElement.parentElement;
 
-  vote(choice, postId)
+  voteForPostAPI(choice, postId)
+    .then(res => {
+      handleVoteChange(target, choice)
+    })
+    .catch(error => {
+      let message = error.message || 'Sorry! Something went wrong. Please try again!';
+      message = error.status === 401 ? 'You need to be logged in to vote.' : message;
+      notification.error({
+        message: 'notreddit',
+        description: message
+      });
+    });
+};
+
+export function voteForComment(event, choice, commentId) {
+  const target = event.currentTarget.parentElement.parentElement.parentElement;
+
+  voteForCommentAPI(choice, commentId)
     .then(res => {
       handleVoteChange(target, choice)
     })

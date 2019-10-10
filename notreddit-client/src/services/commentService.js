@@ -15,3 +15,12 @@ export function findCommentsForPost(postId) {
     method: 'GET'
   });
 }
+
+export function voteForCommentAPI(choice, commentId) {
+  const query = `?choice=${choice}&commentId=${commentId}`;
+
+  return request({
+    url: API_BASE_URL + '/comment/vote' + query,
+    method: 'POST'
+  });
+}

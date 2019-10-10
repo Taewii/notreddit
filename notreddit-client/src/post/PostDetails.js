@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import './PostDetails.css';
 
-import { List, Icon, notification, Tooltip, Button, Form, Input } from 'antd';
+import { List, Icon, notification, Tooltip, Button, Form, Input, Comment, Avatar } from 'antd';
 
 import { findById } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
-import { getVoteForPost, voteForPost } from '../services/voteService';
+import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
 import { comment, findCommentsForPost } from '../services/commentService';
 
 class PostDetails extends Component {
@@ -182,10 +182,72 @@ class PostDetails extends Component {
           </List.Item>
         </List>
         {post.fileUrl ? <FileContent fileUrl={post.fileUrl} /> : null}
+        {this.state.comments.map(comment => <CommentComponent key={comment.id} comment={comment} />)}
       </div >
     )
   }
 }
+
+const CommentComponent = ({ comment }) => {
+  const actions = [
+    <span key="comment-basic-upvote">
+      <Tooltip title="Upvote">
+        <Icon
+          type="like"
+          theme="outlined"
+          onClick={(event) => voteForComment(event, 1, comment.id)}
+        />
+      </Tooltip>
+      <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.upvotes}</span>
+    </span>,
+    <span key="comment-basic-downvote">
+      <Tooltip title="Downvote">
+        <Icon
+          type="dislike"
+          theme="outlined"
+          onClick={(event) => voteForComment(event, -1, comment.id)}
+        />
+      </Tooltip>
+      <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.downvotes}</span>
+    </span>,
+    <span key="comment-basic-reply-to">Reply to</span>,
+  ];
+
+  return (
+    <Comment key={comment.id}
+      author={comment.creatorUsername}
+      content={comment.content}
+      datetime={timeSince(comment.createdOn).replace('ago', '')}
+      actions={actions}
+      avatar={
+        <Avatar style={{ backgroundColor: '#1890ff', verticalAlign: 'middle' }}>
+          {comment.creatorUsername[0].toUpperCase()}
+        </Avatar>
+      }
+    >
+      {comment.children.length > 0 && comment.children.map(child => {
+        return <CommentComponent key={child.id} comment={child} />
+      })}
+    </Comment>
+  )
+}
+
+const Content = ({ content }) => (
+  <List.Item>
+    {content}
+  </List.Item>
+);
+
+const FileContent = ({ fileUrl }) => (
+  <div className="file-content">
+    <iframe src={fileUrl}
+      title="unique?"
+      allowFullScreen="yes"
+      scrolling="no"
+      frameBorder="0"
+    />
+  </div>
+);
 
 const changeFileContentDisplay = () => {
   const div = document.querySelector('.file-content');
@@ -198,27 +260,6 @@ const changeFileContentDisplay = () => {
     div.style.display = 'none';
     btn.textContent = 'Show File';
   }
-}
-
-const FileContent = ({ fileUrl }) => {
-  return (
-    <div className="file-content">
-      <iframe src={fileUrl}
-        title="unique?"
-        allowFullScreen="yes"
-        scrolling="no"
-        frameBorder="0"
-      />
-    </div>
-  );
-}
-
-const Content = ({ content }) => {
-  return (
-    <List.Item>
-      {content}
-    </List.Item>
-  );
 }
 
 export default PostDetails;

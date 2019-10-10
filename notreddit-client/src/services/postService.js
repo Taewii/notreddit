@@ -23,7 +23,7 @@ export function allPosts() {
   });
 }
 
-export function vote(choice, postId) {
+export function voteForPostAPI(choice, postId) {
   const query = `?choice=${choice}&postId=${postId}`;
 
   return request({
