@@ -18,6 +18,9 @@ public interface VoteRepository extends JpaRepository<Vote, UUID> {
 
     Optional<Vote> findByCommentIdAndUserId(UUID postId, UUID userId);
 
-    @Query("SELECT v FROM Vote v JOIN FETCH v.post WHERE v.user = :user")
-    List<Vote> findByUser(@Param("user") User user);
+    @Query("SELECT v FROM Vote v JOIN FETCH v.post WHERE v.user = :user AND v.comment IS NULL ")
+    List<Vote> findPostVotesByUser(@Param("user") User user);
+
+    @Query("SELECT v FROM Vote v JOIN FETCH v.comment WHERE v.user = :user AND v.post IS NULL ")
+    List<Vote> findCommentVotesByUser(@Param("user") User user);
 }

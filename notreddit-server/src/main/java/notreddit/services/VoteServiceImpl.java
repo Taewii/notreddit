@@ -106,11 +106,20 @@ public class VoteServiceImpl implements VoteService {
     }
 
     @Override
-    public Map<String, Byte> findVotesByUser(User user) {
-        return voteRepository.findByUser(user)
+    public Map<String, Byte> findPostVotesByUser(User user) {
+        return voteRepository.findPostVotesByUser(user)
                 .parallelStream()
                 .collect(Collectors.toUnmodifiableMap(
                         v -> v.getPost().getId().toString(),
+                        Vote::getChoice));
+    }
+
+    @Override
+    public Map<String, Byte> findCommentVotesByUser(User user) {
+        return voteRepository.findCommentVotesByUser(user)
+                .parallelStream()
+                .collect(Collectors.toUnmodifiableMap(
+                        v -> v.getComment().getId().toString(),
                         Vote::getChoice));
     }
 

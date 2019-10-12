@@ -56,9 +56,15 @@ public class UserController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/votes")
-    public Map<String, Byte> getCurrentUserVotes(@AuthenticationPrincipal User user) {
-        return voteService.findVotesByUser(user);
+    @GetMapping("/votes-posts")
+    public Map<String, Byte> getCurrentUserVotesForPosts(@AuthenticationPrincipal User user) {
+        return voteService.findPostVotesByUser(user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/votes-comments")
+    public Map<String, Byte> getCurrentUserVotesForComments(@AuthenticationPrincipal User user) {
+        return voteService.findCommentVotesByUser(user);
     }
 
     @PreAuthorize("isAuthenticated()")

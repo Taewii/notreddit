@@ -11,7 +11,9 @@ public interface VoteService {
 
     ResponseEntity<?> voteForPostOrComment(byte choice, UUID postId, UUID commentId, User user);
 
-    Map<String, Byte> findVotesByUser(User user);
+    Map<String, Byte> findPostVotesByUser(User user);
+
+    Map<String, Byte> findCommentVotesByUser(User user);
 
     PostVoteUserChoiceResponse getUserChoiceForPost(User user, UUID postId);
 }
