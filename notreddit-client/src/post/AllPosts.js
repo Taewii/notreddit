@@ -6,7 +6,7 @@ import { List, Icon, notification, Tooltip } from 'antd';
 import { allPosts } from '../services/postService';
 import { voteForPost } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
-import { getUserVotes } from '../services/userService';
+import { getUserVotesForPosts } from '../services/userService';
 
 const IconText = ({ type, text }) => (
   <span>
@@ -32,7 +32,7 @@ class AllPosts extends Component {
   componentDidMount() {
     this._isMounted = true;
 
-    getUserVotes()
+    getUserVotesForPosts()
       .then(res => this.votes = res);
 
     allPosts()

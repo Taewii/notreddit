@@ -82,9 +82,16 @@ export function deleteUser(userId) {
   })
 }
 
-export function getUserVotes() {
+export function getUserVotesForPosts() {
   return request({
-    url: API_BASE_URL + '/user/votes',
+    url: API_BASE_URL + '/user/votes-posts',
     method: 'GET'
-  }); 
+  });
+}
+
+export function getUserVotesForComments() {
+  return request({
+    url: API_BASE_URL + '/user/votes-comments',
+    method: 'GET'
+  });
 }

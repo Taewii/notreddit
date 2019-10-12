@@ -7,11 +7,13 @@ import { findById } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
 import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
 import { comment, findCommentsForPost } from '../services/commentService';
+import { getUserVotesForComments } from '../services/userService';
 
 class PostDetails extends Component {
   constructor(props) {
     super(props);
     this._isMounted = false;
+    this.commentVotes = {};
     this.state = {
       post: {},
       comments: [],
@@ -27,11 +29,12 @@ class PostDetails extends Component {
     this._isMounted = true;
     const { id } = this.props.match.params;
 
-    Promise.all([findById(id), findCommentsForPost(id), getVoteForPost(id)])
+    Promise.all([findById(id), findCommentsForPost(id), getVoteForPost(id), getUserVotesForComments()])
       .then(res => {
         const post = res[0];
         const comments = res[1];
         const vote = res[2];
+        this.commentVotes = res[3];
 
         if (vote.hasVoted) {
           this.colorVote(vote.choice)
@@ -182,17 +185,34 @@ class PostDetails extends Component {
           </List.Item>
         </List>
         {post.fileUrl ? <FileContent fileUrl={post.fileUrl} /> : null}
-        {this.state.comments.map(comment => <CommentComponent key={comment.id} comment={comment} />)}
+        {this.state.comments.map(comment =>
+          <CommentComponent
+            key={comment.id}
+            comment={comment}
+            votes={this.commentVotes} />)}
       </div >
     )
   }
 }
 
-const CommentComponent = ({ comment }) => {
+const CommentComponent = ({ comment, votes }) => {
+  let upvoteColor = '';
+  let downvoteColor = '';
+  const vote = votes[comment.id];
+
+  if (vote) {
+    if (vote === 1) {
+      upvoteColor = 'green';
+    } else if (vote === -1) {
+      downvoteColor = 'red';
+    }
+  }
+
   const actions = [
     <span key="comment-basic-upvote">
       <Tooltip title="Upvote">
         <Icon
+          style={{ color: upvoteColor }}
           type="like"
           theme="outlined"
           onClick={(event) => voteForComment(event, 1, comment.id)}
@@ -203,6 +223,7 @@ const CommentComponent = ({ comment }) => {
     <span key="comment-basic-downvote">
       <Tooltip title="Downvote">
         <Icon
+          style={{ color: downvoteColor }}
           type="dislike"
           theme="outlined"
           onClick={(event) => voteForComment(event, -1, comment.id)}
@@ -214,7 +235,8 @@ const CommentComponent = ({ comment }) => {
   ];
 
   return (
-    <Comment key={comment.id}
+    <Comment
+      key={comment.id}
       author={comment.creatorUsername}
       content={comment.content}
       datetime={timeSince(comment.createdOn).replace('ago', '')}
@@ -226,7 +248,7 @@ const CommentComponent = ({ comment }) => {
       }
     >
       {comment.children.length > 0 && comment.children.map(child => {
-        return <CommentComponent key={child.id} comment={child} />
+        return <CommentComponent votes={votes} key={child.id} comment={child} />
       })}
     </Comment>
   )
