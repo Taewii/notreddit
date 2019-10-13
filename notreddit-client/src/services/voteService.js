@@ -5,6 +5,7 @@ import { notification } from 'antd';
 
 import { voteForCommentAPI } from "./commentService";
 import { voteForPostAPI } from '../services/postService';
+import { GREEN, RED, DEFAULT, DEFAULT_RGBA } from '../util/constants'
 
 export function getVoteForPost(postId) {
   return request({
@@ -24,8 +25,14 @@ function handleVoteChange(target, choice) {
   const downvoteSvg = downvoteLi.querySelector('svg');
   const downvoteSpan = downvoteLi.querySelector('span');
 
-  const isUpvoted = !!upvoteSvg.getAttribute('color');
-  const isDownvoted = !!downvoteSvg.getAttribute('color');
+  const upvoteStyle = window.getComputedStyle(upvoteSvg);
+  const downvoteStyle = window.getComputedStyle(downvoteSvg);
+
+  const upvoteColor = upvoteStyle.getPropertyValue('color');
+  const downvoteColor = downvoteStyle.getPropertyValue('color');
+
+  const isUpvoted = upvoteColor !== DEFAULT && upvoteColor !== DEFAULT_RGBA;
+  const isDownvoted = downvoteColor !== DEFAULT && downvoteColor !== DEFAULT_RGBA;
 
   if (isUpvoted) {
     upvoteSpan.textContent = +upvoteSpan.textContent - 1;
@@ -34,20 +41,21 @@ function handleVoteChange(target, choice) {
   }
 
   if (isUpvoted && choice === 1) {
-    upvoteSvg.setAttribute('color', '');
+    upvoteSvg.style.color = DEFAULT;
     return;
   } else if (isDownvoted && choice === -1) {
-    downvoteSvg.setAttribute('color', '');
+    downvoteSvg.style.color = DEFAULT;
     return;
   }
 
   if (choice === 1) {
     upvoteSpan.textContent = +upvoteSpan.textContent + 1;
-    upvoteSvg.setAttribute('color', 'green');
-    downvoteSvg.setAttribute('color', '');
+    upvoteSvg.style.color = GREEN;
+    downvoteSvg.style.color = DEFAULT;
+
   } else {
-    upvoteSvg.setAttribute('color', '');
-    downvoteSvg.setAttribute('color', 'red');
+    upvoteSvg.style.color = DEFAULT;
+    downvoteSvg.style.color = RED;
     downvoteSpan.textContent = +downvoteSpan.textContent + 1;
   }
 }
