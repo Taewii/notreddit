@@ -1,5 +1,7 @@
 package notreddit.web.controllers;
 
+import com.weddini.throttling.Throttling;
+import com.weddini.throttling.ThrottlingType;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
 import notreddit.domain.models.responses.CommentListWithChildrenResponse;
@@ -41,6 +43,7 @@ public class CommentController {
         return commentService.findAllFromPost(postId);
     }
 
+    @Throttling(type = ThrottlingType.PrincipalName)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/vote")
     public ResponseEntity<?> vote(@RequestParam byte choice,
