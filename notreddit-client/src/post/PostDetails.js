@@ -84,6 +84,7 @@ class PostDetails extends Component {
             message: 'notreddit',
             description: res.message
           })
+          this.componentDidMount(); // not sure how to force update otherwise..
         }
       })
       .catch(error => {
