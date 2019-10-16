@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "posts")
-public class Post extends BaseUUIDEntity {
+public class Post extends BaseUUIDEntity implements Votable {
 
     @NotNull
     @JoinColumn(name = "creator_id")
@@ -52,10 +52,12 @@ public class Post extends BaseUUIDEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
+    @Override
     public void upvote() {
         this.setUpvotes(this.getUpvotes() + 1);
     }
 
+    @Override
     public void downvote() {
         this.setDownvotes(this.getDownvotes() + 1);
     }

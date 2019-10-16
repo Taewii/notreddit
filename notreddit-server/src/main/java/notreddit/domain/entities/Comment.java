@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "comments")
-public class Comment extends BaseUUIDEntity {
+public class Comment extends BaseUUIDEntity implements Votable {
 
     @NotNull
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
@@ -52,10 +52,12 @@ public class Comment extends BaseUUIDEntity {
         this.getChildren().add(comment);
     }
 
+    @Override
     public void upvote() {
         this.setUpvotes(this.getUpvotes() + 1);
     }
 
+    @Override
     public void downvote() {
         this.setDownvotes(this.getDownvotes() + 1);
     }

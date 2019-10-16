@@ -22,11 +22,14 @@ public class Vote extends BaseUUIDEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Comment comment;
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Comment.class)
+    private Votable comment;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    private Post post;
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.MERGE,
+            targetEntity = Post.class)
+    private Votable post;
 
     @NotNull
     @PastOrPresent

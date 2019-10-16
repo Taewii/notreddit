@@ -1,8 +1,7 @@
 package notreddit.services;
 
-import notreddit.domain.entities.Comment;
-import notreddit.domain.entities.Post;
 import notreddit.domain.entities.User;
+import notreddit.domain.entities.Votable;
 import notreddit.domain.entities.Vote;
 import notreddit.domain.models.responses.ApiResponse;
 import notreddit.domain.models.responses.PostVoteUserChoiceResponse;
@@ -39,16 +38,15 @@ public class VoteServiceImpl implements VoteService {
     @Transactional
     @Override
     public ResponseEntity<?> voteForPostOrComment(byte choice, UUID postId, UUID commentId, User user) {
-        Post post = null;
-        Comment comment = null;
+        Votable votable;
 
         if (postId != null) {
-            post = postRepository.findById(postId).orElse(null);
+            votable = postRepository.findById(postId).orElse(null);
         } else {
-            comment = commentRepository.findById(commentId).orElse(null);
+            votable = commentRepository.findById(commentId).orElse(null);
         }
 
-        if (post == null && comment == null) {
+        if (votable == null) {
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, "Post/Comment does't exist."));
@@ -63,11 +61,7 @@ public class VoteServiceImpl implements VoteService {
 
         // if the user clicked the same choice hes already voted for -> deselect the vote
         if (vote != null && vote.getChoice() == choice) {
-            if (postId != null) {
-                updateVote(true, vote, post, null, (byte) 0);
-            } else {
-                updateVote(true, vote, null, comment, (byte) 0);
-            }
+            updateVote(true, vote, votable, (byte) 0);
 
             voteRepository.delete(vote);
             return ResponseEntity
@@ -79,21 +73,16 @@ public class VoteServiceImpl implements VoteService {
         if (vote == null) {
             vote = new Vote();
             vote.setChoice(choice);
-            vote.setPost(post);
             vote.setUser(user);
 
             if (postId != null) {
-                updateVote(false, vote, post, null, choice);
+                vote.setPost(votable);
             } else {
-                vote.setComment(comment);
-                updateVote(false, vote, null, comment, choice);
+                vote.setComment(votable);
             }
+            updateVote(false, vote, votable, choice);
         } else {
-            if (postId != null) {
-                updateVote(true, vote, post, null, choice);
-            } else {
-                updateVote(true, vote, null, comment, choice);
-            }
+            updateVote(true, vote, votable, choice);
             vote.setChoice(choice);
         }
 
@@ -134,23 +123,19 @@ public class VoteServiceImpl implements VoteService {
         return new PostVoteUserChoiceResponse(true, vote.getChoice());
     }
 
-    private void updateVote(boolean alreadyVoted, Vote vote, Post post, Comment comment, byte choice) {
+    private void updateVote(boolean alreadyVoted, Vote vote, Votable votable, byte choice) {
         if (alreadyVoted) {
-            if (post != null) {
-                if (vote.getChoice() < 0) post.setDownvotes(post.getDownvotes() - 1);
-                else post.setUpvotes(post.getUpvotes() - 1);
+            if (vote.getChoice() < 0) {
+                votable.setDownvotes(votable.getDownvotes() - 1);
             } else {
-                if (vote.getChoice() < 0) comment.setDownvotes(comment.getDownvotes() - 1);
-                else comment.setUpvotes(comment.getUpvotes() - 1);
+                votable.setUpvotes(votable.getUpvotes() - 1);
             }
         }
 
         if (choice == 1) {
-            if (post != null) post.upvote();
-            else comment.upvote();
+            votable.upvote();
         } else if (choice == -1) {
-            if (post != null) post.downvote();
-            else comment.downvote();
+            votable.downvote();
         }
     }
 }
