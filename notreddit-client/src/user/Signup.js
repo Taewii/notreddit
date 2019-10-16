@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import './Signup.css';
+
 import { Link } from 'react-router-dom';
-import { Form, Input, Button, notification } from 'antd';
+import { Form, Input, Button } from 'antd';
 
 import {
   USERNAME_MIN_LENGTH,
@@ -13,6 +14,7 @@ import {
   checkUsernameAvailability,
   checkEmailAvailability
 } from '../services/userService';
+import { successNotification, errorNotification } from '../util/notifications';
 
 const FormItem = Form.Item;
 
@@ -65,18 +67,10 @@ class Signup extends Component {
     };
 
     signup(signupRequest)
-      .then(response => {
-        notification.success({
-          message: 'notreddit',
-          description: "Thank you! You're successfully registered. Please Login to continue!",
-        });
+      .then(res => {
+        successNotification('Thank you! You\'re successfully registered. Please Login to continue!')
         this.props.history.push("/login");
-      }).catch(error => {
-        notification.error({
-          message: 'notreddit',
-          description: error.message || 'Sorry! Something went wrong. Please try again!'
-        });
-      });
+      }).catch(error => errorNotification(error));
   }
 
   isFormInvalid() {

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import './PostDetails.css';
 
-import { List, Icon, notification, Tooltip, Button, Form, Input, Comment, Avatar, Modal } from 'antd';
+import { List, Icon, Tooltip, Button, Form, Input, Comment, Avatar, Modal } from 'antd';
 
+import { errorNotification, successNotification } from '../util/notifications'
 import { findById } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
 import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
@@ -33,15 +34,24 @@ class PostDetails extends Component {
   componentDidMount() {
     this._isMounted = true;
     const { id } = this.props.match.params;
+    const isAuthenticated = this.props.isAuthenticated;
 
-    Promise.all([findById(id), findCommentsForPost(id), getVoteForPost(id), getUserVotesForComments()])
+    const promises = [findById(id), findCommentsForPost(id)];
+
+    // if user is logged in get user related properties
+    if (isAuthenticated) {
+      promises.push(getVoteForPost(id))
+      promises.push(getUserVotesForComments())
+    }
+
+    Promise.all(promises)
       .then(res => {
         const post = res[0];
         const comments = res[1];
         const vote = res[2];
         this.commentVotes = res[3];
 
-        if (vote.hasVoted) {
+        if (isAuthenticated && vote.hasVoted) {
           this.colorVote(vote.choice)
         }
 
@@ -53,12 +63,7 @@ class PostDetails extends Component {
           })
         }
       })
-      .catch(error => {
-        notification.error({
-          message: 'notreddit',
-          description: error.message || 'Sorry! Something went wrong. Please try again!'
-        });
-      })
+      .catch(error => errorNotification(error))
   }
 
   colorVote(choice) {
@@ -88,20 +93,12 @@ class PostDetails extends Component {
     comment(commentData)
       .then(res => {
         if (res.success) {
-          notification.success({
-            message: 'notreddit',
-            description: res.message
-          })
+          successNotification(res.message);
           this.hideModal();
           this.componentDidMount(); // not sure how to force update otherwise..
         }
       })
-      .catch(error => {
-        notification.error({
-          message: 'notreddit',
-          description: error.message || 'Sorry! Something went wrong. Please try again!'
-        });
-      })
+      .catch(error => errorNotification(error))
   }
 
   handleInputChange(event) {
@@ -126,7 +123,11 @@ class PostDetails extends Component {
   }
 
   hideModal() {
-    document.querySelector('.comment-reply-textarea').value = '';
+    const modalTextArea = document.querySelector('.comment-reply-textarea');
+    if (modalTextArea) {
+      modalTextArea.value = '';
+    }
+
     this.setState({
       replyCommentId: null,
       modalIsVisible: false,
@@ -196,6 +197,7 @@ class PostDetails extends Component {
             <Form onSubmit={this.handleSubmit}>
               <Form.Item hasFeedback>
                 <Input.TextArea
+                  disabled={!this.props.isAuthenticated}
                   size="large"
                   name="commentContent"
                   placeholder="Write your comment here."
@@ -217,7 +219,7 @@ class PostDetails extends Component {
           <CommentComponent
             key={comment.id}
             comment={comment}
-            votes={this.commentVotes}
+            votes={this.commentVotes || {}}
             showModal={this.showModalAndSaveCommentId} />)}
         <Modal
           title="Reply to comment"
@@ -231,6 +233,7 @@ class PostDetails extends Component {
           <Form>
             <Form.Item hasFeedback onSubmit={this.handleSubmit}>
               <Input.TextArea
+                disabled={!this.props.isAuthenticated}
                 className="comment-reply-textarea"
                 size="large"
                 name="replyCommentContent"

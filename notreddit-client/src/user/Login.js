@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 
 import { ACCESS_TOKEN } from '../util/constants';
 import { login } from '../services/userService';
+import { errorNotification } from '../util/notifications';
 
-import { Form, Input, Button, Icon, notification } from 'antd';
+import { Form, Input, Button, Icon } from 'antd';
 const FormItem = Form.Item;
 
 class Login extends Component {
@@ -39,17 +40,11 @@ class LoginForm extends Component {
             localStorage.setItem(ACCESS_TOKEN, response.accessToken);
             this.props.onLogin();
           }).catch(error => {
+            let message = '';
             if (error.status === 401) {
-              notification.error({
-                message: 'notreddit',
-                description: 'Your Username or Password is incorrect. Please try again!'
-              });
-            } else {
-              notification.error({
-                message: 'notreddit',
-                description: error.message || 'Sorry! Something went wrong. Please try again!'
-              });
+              message = 'Your Username or Password is incorrect. Please try again!';
             }
+            errorNotification(error, message);
           });
       }
     });

@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import './AllPosts.css';
 
 import { Link } from 'react-router-dom';
-import { List, Icon, notification, Tooltip } from 'antd';
+import { List, Icon, Tooltip } from 'antd';
+
+import { errorNotification } from '../util/notifications';
 import { allPosts } from '../services/postService';
 import { voteForPost } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
@@ -23,7 +25,7 @@ class AllPosts extends Component {
     this.state = {
       initLoading: true,
       loading: false,
-      data: []
+      posts: []
     };
 
     this.colorVote = this.colorVote.bind(this);
@@ -31,24 +33,26 @@ class AllPosts extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    const isAuthenticated = this.props.isAuthenticated;
 
-    getUserVotesForPosts()
-      .then(res => this.votes = res);
+    const promises = [allPosts()];
 
-    allPosts()
+    if (isAuthenticated) {
+      promises.push(getUserVotesForPosts());
+    }
+
+    Promise.all(promises)
       .then(res => {
         if (this._isMounted) {
+          const posts = res[0];
+          this.votes = res[1] || {};
+
           this.setState({
             initLoading: false,
-            data: res
+            posts
           });
         }
-      }).catch(error => {
-        notification.error({
-          message: 'notreddit',
-          description: error.message || 'Sorry! Something went wrong. Please try again!'
-        });
-      });
+      }).catch(error => errorNotification(error));
   }
 
   componentWillUnmount() {
@@ -67,7 +71,8 @@ class AllPosts extends Component {
   }
 
   render() {
-    const { data } = this.state;
+    const { posts } = this.state;
+
     return (
       <List
         bordered
@@ -79,7 +84,7 @@ class AllPosts extends Component {
           },
           pageSize: 5,
         }}
-        dataSource={data}
+        dataSource={posts}
         renderItem={post => (
           <List.Item
             onLoad={(event) => this.colorVote(event, post.id)}

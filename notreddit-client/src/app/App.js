@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
 import './App.css';
-import {
-  Route,
-  withRouter,
-  Switch
-} from 'react-router-dom';
 
+import { Route, withRouter, Switch } from 'react-router-dom';
+import { Layout, notification } from 'antd';
+
+import { successNotification } from '../util/notifications';
 import { getCurrentUser } from '../services/userService';
 import { ACCESS_TOKEN } from '../util/constants';
 import PrivateRoute from '../common/PrivateRoute';
 
-import Login from '../user/Login'
-import Signup from '../user/Signup'
+import Login from '../user/Login';
+import Signup from '../user/Signup';
 import AllUsers from '../user/AllUsers';
 import AppHeader from '../common/AppHeader';
 import NotFound from '../common/NotFound';
@@ -21,7 +20,6 @@ import CreatePost from '../post/CreatePost';
 import AllPosts from '../post/AllPosts';
 import PostDetails from '../post/PostDetails';
 
-import { Layout, notification } from 'antd';
 const { Content } = Layout;
 
 class App extends Component {
@@ -65,7 +63,7 @@ class App extends Component {
       });
   }
 
-  handleLogout(redirectTo = "/", notificationType = "success", description = "You're successfully logged out.") {
+  handleLogout() {
     localStorage.removeItem(ACCESS_TOKEN);
 
     this.setState({
@@ -73,19 +71,12 @@ class App extends Component {
       isAuthenticated: false
     });
 
-    this.props.history.push(redirectTo);
-
-    notification[notificationType]({
-      message: 'notreddit',
-      description: description,
-    });
+    this.props.history.push("/");
+    successNotification('You\'re successfully logged out.')
   }
 
   handleLogin() {
-    notification.success({
-      message: 'notreddit',
-      description: "You're successfully logged in.",
-    });
+    successNotification('You\'re successfully logged in.')
     this.loadCurrentUser();
     this.props.history.push("/");
   }
@@ -136,8 +127,10 @@ class App extends Component {
                 component={CreatePost}
                 authenticated={this.state.isAuthenticated}
               />
-              <Route path="/post/:id" component={PostDetails} />
-              <Route path="/" component={AllPosts} />
+              <Route path="/post/:id"
+                component={(props) => <PostDetails isAuthenticated={this.state.isAuthenticated} {...props} />} />
+              <Route path="/"
+                component={(props) => <AllPosts isAuthenticated={this.state.isAuthenticated} {...props} />} />
               <Route component={NotFound} />
             </Switch>
           </div>

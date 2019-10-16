@@ -7,9 +7,10 @@ import {
   getCurrentUser,
   getAllRoles,
   deleteUser
-} from '../services/userService'
+} from '../services/userService';
+import { successNotification, errorNotification } from '../util/notifications';
 
-import { List, Select, Skeleton, Popconfirm, Button, notification } from 'antd';
+import { List, Select, Skeleton, Popconfirm, Button } from 'antd';
 
 class AllUsers extends Component {
   constructor(props) {
@@ -44,12 +45,7 @@ class AllUsers extends Component {
             data: res.users,
           });
         }
-      }).catch(error => {
-        notification.error({
-          message: 'notreddit',
-          description: error.message || 'Sorry! Something went wrong. Please try again!'
-        });
-      });
+      }).catch(error => errorNotification(error));
   }
 
   componentWillUnmount() {
@@ -59,17 +55,9 @@ class AllUsers extends Component {
   handleChange(userId, currentRole, newRole) {
     handleRoleChange({ userId, currentRole, newRole })
       .then(res => {
-        notification.success({
-          message: 'notreddit',
-          description: res.message
-        });
-        this.componentDidMount(); //reload component
-      }).catch(error => {
-        notification.error({
-          message: 'notreddit',
-          description: error.message
-        });
-      });
+        successNotification(res.message)
+        this.componentDidMount(); // reload component
+      }).catch(error => errorNotification(error));
   }
 
   getUserRoleOptions(user) {
@@ -95,17 +83,9 @@ class AllUsers extends Component {
   handleDeleteConfirm(userId) {
     deleteUser(userId)
       .then(res => {
-        notification.success({
-          message: 'notreddit',
-          description: res.message
-        });
-        this.componentDidMount(); //reload component
-      }).catch(error => {
-        notification.error({
-          message: 'notreddit',
-          description: error.message
-        });
-      })
+        successNotification(res.message)
+        this.componentDidMount(); // reload component
+      }).catch(error => errorNotification(error))
   }
 
   render() {

@@ -3,9 +3,9 @@ import './SubredditCreate.css';
 
 import { SUBREDDIT_MIN_LENGTH } from '../util/constants';
 import { checkSubredditAvailability, createSubreddit } from '../services/subredditService';
+import { successNotification, errorNotification } from '../util/notifications';
 
-
-import { Form, Input, Button, notification, Icon } from 'antd';
+import { Form, Input, Button, Icon } from 'antd';
 const FormItem = Form.Item;
 
 class SubredditCreate extends Component {
@@ -44,18 +44,14 @@ class SubredditCreate extends Component {
     };
 
     createSubreddit(signupRequest)
-      .then(response => {
-        notification.success({
-          message: 'notreddit',
-          description: "Subreddit successfully created.",
-        });
+      .then(res => {
+        if (res.success) {
+          successNotification(res.message);
+        } else {
+          errorNotification(null, res.message)
+        }
         this.props.history.push("/");
-      }).catch(error => {
-        notification.error({
-          message: 'notreddit',
-          description: error.message || 'Sorry! Something went wrong. Please try again!'
-        });
-      });
+      }).catch(error => errorNotification(error));
   }
 
   isFormInvalid() {

@@ -1,11 +1,11 @@
 import { request } from "../util/APIUtils";
 import { API_BASE_URL } from "../util/constants";
 
-import { notification } from 'antd';
+import { errorNotification } from '../util/notifications';
 
 import { voteForCommentAPI } from "./commentService";
 import { voteForPostAPI } from '../services/postService';
-import { GREEN, RED, DEFAULT, DEFAULT_RGBA } from '../util/constants'
+import { GREEN, RED, DEFAULT, DEFAULT_RGBA } from '../util/constants';
 
 export function getVoteForPost(postId) {
   return request({
@@ -68,12 +68,11 @@ export function voteForPost(event, choice, postId) {
       handleVoteChange(target, choice)
     })
     .catch(error => {
-      let message = error.message || 'Sorry! Something went wrong. Please try again!';
-      message = error.status === 401 ? 'You need to be logged in to vote.' : message;
-      notification.error({
-        message: 'notreddit',
-        description: message
-      });
+      let message = '';
+      if (error.status === 401) {
+        message = 'You have to be logged in to vote.'
+      }
+      errorNotification(error, message);
     });
 };
 
@@ -85,11 +84,10 @@ export function voteForComment(event, choice, commentId) {
       handleVoteChange(target, choice)
     })
     .catch(error => {
-      let message = error.message || 'Sorry! Something went wrong. Please try again!';
-      message = error.status === 401 ? 'You need to be logged in to vote.' : message;
-      notification.error({
-        message: 'notreddit',
-        description: message
-      });
+      let message = '';
+      if (error.status === 401) {
+        message = 'You have to be logged in to vote.'
+      }
+      errorNotification(error, message);
     });
 };

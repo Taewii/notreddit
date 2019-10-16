@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import './CreatePost.css';
-import { Form, Input, Button, notification, Select, Upload, Icon } from 'antd';
+import { Form, Input, Button, Select, Upload, Icon } from 'antd';
 
+import { successNotification, errorNotification } from '../util/notifications';
 import { TITLE_MIN_LENGTH } from '../util/constants.js';
 import { getAllSubreddits } from '../services/subredditService';
 import { create } from '../services/postService';
@@ -76,25 +77,14 @@ class CreatePost extends Component {
     }
 
     create(data)
-      .then(response => {
-        if (response.success) {
-          notification.success({
-            message: 'notreddit',
-            description: "Post successfully created.",
-          });
+      .then(res => {
+        if (res.success) {
+          successNotification(res.message);
         } else {
-          notification.error({
-            message: 'notreddit',
-            description: response.message,
-          });
+          errorNotification(null, res.message);
         }
         this.props.history.push("/");
-      }).catch(error => {
-        notification.error({
-          message: 'notreddit',
-          description: error.message || 'Sorry! Something went wrong. Please try again!'
-        });
-      });
+      }).catch(error => errorNotification(error));
   }
 
   handleSelectionChange(selectedValue) {
