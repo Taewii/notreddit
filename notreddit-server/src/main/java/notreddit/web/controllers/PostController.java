@@ -5,17 +5,17 @@ import com.weddini.throttling.ThrottlingType;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.PostCreateRequest;
 import notreddit.domain.models.responses.PostDetailsResponseModel;
-import notreddit.domain.models.responses.PostListResponseModel;
+import notreddit.domain.models.responses.PostsResponseModel;
 import notreddit.services.PostService;
 import notreddit.services.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -41,8 +41,8 @@ public class PostController {
 
     @PreAuthorize("permitAll()")
     @GetMapping("/all")
-    public List<PostListResponseModel> all() {
-        return postService.allPosts();
+    public PostsResponseModel all(Pageable pageable) {
+        return postService.allPosts(pageable);
     }
 
     @PreAuthorize("permitAll()")

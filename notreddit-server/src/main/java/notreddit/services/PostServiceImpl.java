@@ -8,12 +8,15 @@ import notreddit.domain.models.requests.PostCreateRequest;
 import notreddit.domain.models.responses.ApiResponse;
 import notreddit.domain.models.responses.PostDetailsResponseModel;
 import notreddit.domain.models.responses.PostListResponseModel;
+import notreddit.domain.models.responses.PostsResponseModel;
 import notreddit.repositories.FileRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.SubredditRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,14 +55,17 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostListResponseModel> allPosts() {
-        return postRepository.findAll().stream()
+    public PostsResponseModel allPosts(Pageable pageable) {
+        Page<Post> postsPageable = postRepository.findAll(pageable);
+        List<PostListResponseModel> posts = postsPageable.stream()
                 .map(p -> {
                     PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
                     model.setCommentCount(p.getComments().size());
                     return model;
                 })
                 .collect(Collectors.toUnmodifiableList());
+
+        return new PostsResponseModel(postsPageable.getTotalElements(), posts);
     }
 
     @Override
