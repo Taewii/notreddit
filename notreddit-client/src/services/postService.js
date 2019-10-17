@@ -16,9 +16,11 @@ export function findById(id) {
   });
 }
 
-export function allPosts() {
+export function allPosts(page, size) {
+  const url = `${API_BASE_URL}/post/all?page=${page}&size=${size}`;
+  
   return request({
-    url: API_BASE_URL + '/post/all',
+    url,
     method: 'GET'
   });
 }

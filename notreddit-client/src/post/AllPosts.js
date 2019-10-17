@@ -25,34 +25,41 @@ class AllPosts extends Component {
     this.state = {
       initLoading: true,
       loading: false,
+      totalPosts: 0,
       posts: []
     };
 
     this.colorVote = this.colorVote.bind(this);
   }
 
+  loadPosts(page, pageSize) {
+    allPosts(page, pageSize)
+      .then(res => {
+        if (this._isMounted) {
+          this.setState({
+            posts: res.posts,
+            totalPosts: res.total
+          });
+        }
+      }).catch(error => errorNotification(error))
+  }
+
   componentDidMount() {
     this._isMounted = true;
     const isAuthenticated = this.props.isAuthenticated;
 
-    const promises = [allPosts()];
+    this.loadPosts(0, 10);
 
     if (isAuthenticated) {
-      promises.push(getUserVotesForPosts());
+      getUserVotesForPosts()
+        .then(res => {
+          this.votes = res || {}
+        }).catch(error => errorNotification(error));
     }
 
-    Promise.all(promises)
-      .then(res => {
-        if (this._isMounted) {
-          const posts = res[0];
-          this.votes = res[1] || {};
-
-          this.setState({
-            initLoading: false,
-            posts
-          });
-        }
-      }).catch(error => errorNotification(error));
+    this.setState({
+      initLoading: false,
+    });
   }
 
   componentWillUnmount() {
@@ -62,6 +69,10 @@ class AllPosts extends Component {
   colorVote(event, postId) {
     const icons = event.currentTarget.querySelectorAll('svg');
     const vote = this.votes[postId];
+
+    // clear all the colors first and the color them correctly
+    icons[0].setAttribute('color', '');
+    icons[1].setAttribute('color', '');
 
     if (vote === 1) {
       icons[0].setAttribute('color', 'green');
@@ -79,10 +90,15 @@ class AllPosts extends Component {
         itemLayout="vertical"
         size="large"
         pagination={{
-          onChange: page => {
-            console.log(page);
+          showSizeChanger: true,
+          total: this.state.totalPosts,
+          defaultCurrent: 1,
+          onChange: (page, pageSize) => {
+            this.loadPosts(page - 1, pageSize);
           },
-          pageSize: 5,
+          onShowSizeChange: (current, pageSize) => {
+            this.loadPosts(current - 1, pageSize);
+          }
         }}
         dataSource={posts}
         renderItem={post => (
