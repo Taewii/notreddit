@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import { Route, withRouter, Switch } from 'react-router-dom';
+import { Route, withRouter, Redirect, Switch } from 'react-router-dom';
 import { Layout, notification } from 'antd';
 
 import { successNotification } from '../util/notifications';
@@ -71,14 +71,14 @@ class App extends Component {
       isAuthenticated: false
     });
 
-    this.props.history.push("/");
+    this.props.history.push('/home');
     successNotification('You\'re successfully logged out.')
   }
 
   handleLogin() {
     successNotification('You\'re successfully logged in.')
     this.loadCurrentUser();
-    this.props.history.push("/");
+    this.props.history.push('/home');
   }
 
   hasRole(role) {
@@ -99,23 +99,24 @@ class App extends Component {
         <Content className="app-content" style={{ textAlign: "center" }}>
           <div className="container">
             <Switch>
+              <Redirect exact from="/" to="/home" />
               <PrivateRoute
                 path="/login"
                 component={(props) => <Login onLogin={this.handleLogin} {...props} />}
                 authenticated={!this.state.isAuthenticated}
-                redirectPath="/"
+                redirectPath="/home"
               />
               <PrivateRoute
                 path="/signup"
                 component={Signup}
                 authenticated={!this.state.isAuthenticated}
-                redirectPath="/"
+                redirectPath="/home"
               />
               <PrivateRoute
                 path="/user/all"
                 component={AllUsers}
                 authenticated={this.hasRole('ADMIN')}
-                redirectPath="/"
+                redirectPath="/home"
               />
               <PrivateRoute
                 path="/subreddit/create"
@@ -129,7 +130,7 @@ class App extends Component {
               />
               <Route path="/post/:id"
                 component={(props) => <PostDetails isAuthenticated={this.state.isAuthenticated} {...props} />} />
-              <Route path="/"
+              <Route exact path="/home"
                 component={(props) => <AllPosts isAuthenticated={this.state.isAuthenticated} {...props} />} />
               <Route component={NotFound} />
             </Switch>

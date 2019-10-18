@@ -26,7 +26,9 @@ class AllPosts extends Component {
       initLoading: true,
       loading: false,
       totalPosts: 0,
-      posts: []
+      posts: [],
+      page: 0,
+      pageSize: 10
     };
 
     this.colorVote = this.colorVote.bind(this);
@@ -38,7 +40,9 @@ class AllPosts extends Component {
         if (this._isMounted) {
           this.setState({
             posts: res.posts,
-            totalPosts: res.total
+            totalPosts: res.total,
+            page: page + 1,
+            pageSize: +pageSize
           });
         }
       }).catch(error => errorNotification(error))
@@ -48,7 +52,11 @@ class AllPosts extends Component {
     this._isMounted = true;
     const isAuthenticated = this.props.isAuthenticated;
 
-    this.loadPosts(0, 10);
+    const searchParams = new URLSearchParams(this.props.location.search);
+    const page = searchParams.get('page') - 1 || 0;
+    const pageSize = searchParams.get('pageSize') || 10;
+
+    this.loadPosts(page, pageSize);
 
     if (isAuthenticated) {
       getUserVotesForPosts()
@@ -82,7 +90,7 @@ class AllPosts extends Component {
   }
 
   render() {
-    const { posts } = this.state;
+    const { posts, totalPosts, page, pageSize } = this.state;
 
     return (
       <List
@@ -91,13 +99,15 @@ class AllPosts extends Component {
         size="large"
         pagination={{
           showSizeChanger: true,
-          total: this.state.totalPosts,
+          total: totalPosts,
           defaultCurrent: 1,
+          current: page,
+          pageSize: pageSize,
           onChange: (page, pageSize) => {
-            this.loadPosts(page - 1, pageSize);
+            this.props.history.push(`/home?page=${page}&pageSize=${pageSize}`);
           },
-          onShowSizeChange: (current, pageSize) => {
-            this.loadPosts(current - 1, pageSize);
+          onShowSizeChange: (page, pageSize) => {
+            this.props.history.push(`/home?page=${page}&pageSize=${pageSize}`);
           }
         }}
         dataSource={posts}

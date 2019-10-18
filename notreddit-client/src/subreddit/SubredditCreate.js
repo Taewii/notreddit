@@ -50,7 +50,7 @@ class SubredditCreate extends Component {
         } else {
           errorNotification(null, res.message)
         }
-        this.props.history.push("/");
+        this.props.history.push('/home');
       }).catch(error => errorNotification(error));
   }
 
