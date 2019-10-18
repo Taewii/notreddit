@@ -20,4 +20,7 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
     @Query("SELECT c FROM Comment c WHERE c.id = :id")
     Optional<Comment> findByIdWithChildren(@Param("id") UUID id);
+
+    @Query("SELECT c FROM Comment c WHERE c.creator.username = :username")
+    List<Comment> findByCreatorUsername(@Param("username") String username);
 }

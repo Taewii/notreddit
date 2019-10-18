@@ -4,7 +4,8 @@ import com.weddini.throttling.Throttling;
 import com.weddini.throttling.ThrottlingType;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
-import notreddit.domain.models.responses.CommentListWithChildrenResponse;
+import notreddit.domain.models.responses.CommentListWithChildren;
+import notreddit.domain.models.responses.CommentListWithReplyCount;
 import notreddit.services.CommentService;
 import notreddit.services.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,16 @@ public class CommentController {
         return commentService.create(comment, creator);
     }
 
+    @PreAuthorize("permitAll()")
     @GetMapping("/post")
-    public List<CommentListWithChildrenResponse> findAllFromPost(@RequestParam UUID postId) {
+    public List<CommentListWithChildren> findAllFromPost(@RequestParam UUID postId) {
         return commentService.findAllFromPost(postId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/mine")
+    public List<CommentListWithReplyCount> mine(@AuthenticationPrincipal User user) {
+        return commentService.findAllFromUsername(user.getUsername());
     }
 
     @Throttling(type = ThrottlingType.PrincipalName)

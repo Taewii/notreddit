@@ -69,6 +69,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<PostListResponseModel> findAllByUsername(String username) {
+        return postRepository.findAllByUsername(username)
+                .stream()
+                .map(p -> {
+                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
+                    model.setCommentCount(p.getComments().size());
+                    return model;
+                })
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Override
     public ResponseEntity<?> create(PostCreateRequest request, User creator) {
         Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(request.getSubreddit()).orElse(null);
 

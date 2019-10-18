@@ -2,7 +2,8 @@ package notreddit.services;
 
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
-import notreddit.domain.models.responses.CommentListWithChildrenResponse;
+import notreddit.domain.models.responses.CommentListWithChildren;
+import notreddit.domain.models.responses.CommentListWithReplyCount;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -12,5 +13,7 @@ public interface CommentService {
 
     ResponseEntity<?> create(CommentPostRequestModel commentModel, User creator);
 
-    List<CommentListWithChildrenResponse> findAllFromPost(UUID postId);
+    List<CommentListWithChildren> findAllFromPost(UUID postId);
+
+    List<CommentListWithReplyCount> findAllFromUsername(String username);
 }

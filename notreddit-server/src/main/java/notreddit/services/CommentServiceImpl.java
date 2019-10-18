@@ -5,7 +5,8 @@ import notreddit.domain.entities.Post;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
 import notreddit.domain.models.responses.ApiResponse;
-import notreddit.domain.models.responses.CommentListWithChildrenResponse;
+import notreddit.domain.models.responses.CommentListWithChildren;
+import notreddit.domain.models.responses.CommentListWithReplyCount;
 import notreddit.repositories.CommentRepository;
 import notreddit.repositories.PostRepository;
 import org.modelmapper.ModelMapper;
@@ -76,11 +77,23 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentListWithChildrenResponse> findAllFromPost(UUID postId) {
+    public List<CommentListWithChildren> findAllFromPost(UUID postId) {
         return commentRepository
                 .findByPostIdWithChildren(postId)
                 .parallelStream()
-                .map(c -> mapper.map(c, CommentListWithChildrenResponse.class))
+                .map(c -> mapper.map(c, CommentListWithChildren.class))
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Override
+    public List<CommentListWithReplyCount> findAllFromUsername(String username) {
+        return commentRepository
+                .findByCreatorUsername(username)
+                .parallelStream()
+                .map(c -> {
+                    CommentListWithReplyCount model = mapper.map(c, CommentListWithReplyCount.class);
+                    model.setReplies(c.getChildren().size());
+                    return model;
+                }).collect(Collectors.toUnmodifiableList());
     }
 }
