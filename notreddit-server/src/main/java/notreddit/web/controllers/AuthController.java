@@ -3,7 +3,7 @@ package notreddit.web.controllers;
 import notreddit.auth.JwtTokenProvider;
 import notreddit.domain.models.requests.SignInRequest;
 import notreddit.domain.models.requests.SignUpRequest;
-import notreddit.domain.models.responses.JwtAuthenticationResponse;
+import notreddit.domain.models.responses.api.JwtAuthenticationResponse;
 import notreddit.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

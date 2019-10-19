@@ -1,4 +1,4 @@
-package notreddit.domain.models.responses;
+package notreddit.domain.models.responses.api;
 
 import lombok.Getter;
 import lombok.Setter;

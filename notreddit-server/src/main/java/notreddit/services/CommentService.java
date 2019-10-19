@@ -2,8 +2,8 @@ package notreddit.services;
 
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
-import notreddit.domain.models.responses.CommentListWithChildren;
-import notreddit.domain.models.responses.CommentListWithReplyCount;
+import notreddit.domain.models.responses.comment.CommentListWithChildren;
+import notreddit.domain.models.responses.comment.CommentListWithReplyCount;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;

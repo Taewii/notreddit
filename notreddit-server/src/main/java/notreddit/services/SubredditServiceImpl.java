@@ -3,7 +3,7 @@ package notreddit.services;
 import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.SubredditCreateRequest;
-import notreddit.domain.models.responses.ApiResponse;
+import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.repositories.SubredditRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

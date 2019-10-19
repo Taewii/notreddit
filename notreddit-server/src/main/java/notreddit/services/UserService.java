@@ -3,7 +3,7 @@ package notreddit.services;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.ChangeRoleRequest;
 import notreddit.domain.models.requests.SignUpRequest;
-import notreddit.domain.models.responses.UserSummaryResponse;
+import notreddit.domain.models.responses.user.UserSummaryResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

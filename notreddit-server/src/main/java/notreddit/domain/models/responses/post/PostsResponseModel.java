@@ -1,4 +1,4 @@
-package notreddit.domain.models.responses;
+package notreddit.domain.models.responses.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

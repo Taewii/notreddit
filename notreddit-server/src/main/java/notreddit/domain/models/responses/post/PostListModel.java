@@ -1,17 +1,17 @@
-package notreddit.domain.models.responses;
+package notreddit.domain.models.responses.post;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class PostDetailsResponseModel {
+@NoArgsConstructor
+abstract class PostListModel {
 
     private String creatorUsername;
     private String title;
     private String fileThumbnailUrl;
-    private String content;
-    private String fileUrl;
     private String subredditTitle;
     private int upvotes;
     private int downvotes;

@@ -2,10 +2,10 @@ package notreddit.web.controllers;
 
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.ChangeRoleRequest;
-import notreddit.domain.models.responses.PostVoteUserChoiceResponse;
-import notreddit.domain.models.responses.UserIdentityAvailabilityResponse;
-import notreddit.domain.models.responses.UserSummaryResponse;
-import notreddit.domain.models.responses.UsersResponse;
+import notreddit.domain.models.responses.post.PostVoteUserChoiceResponse;
+import notreddit.domain.models.responses.user.UserIdentityAvailabilityResponse;
+import notreddit.domain.models.responses.user.UserSummaryResponse;
+import notreddit.domain.models.responses.user.UsersResponse;
 import notreddit.services.UserService;
 import notreddit.services.VoteService;
 import org.modelmapper.ModelMapper;

@@ -1,6 +1,6 @@
 package notreddit.web.controllers;
 
-import notreddit.domain.models.responses.RolesResponse;
+import notreddit.domain.models.responses.role.RolesResponse;
 import notreddit.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
