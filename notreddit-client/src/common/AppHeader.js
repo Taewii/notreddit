@@ -132,7 +132,7 @@ const ProfileDropdownMenu = (props) => {
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="profile" className="dropdown-item">
-        <Link to={`/users/${props.currentUser.username}`}>Profile</Link>
+        <Link to={`/user/${props.currentUser.username}`}>Profile</Link>
       </Menu.Item>
       <Menu.Item key="logout" className="dropdown-item">
         Logout

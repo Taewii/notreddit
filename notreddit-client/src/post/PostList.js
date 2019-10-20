@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { List, Icon, Tooltip } from 'antd';
 
 import { errorNotification } from '../util/notifications';
-import { allPosts } from '../services/postService';
 import { voteForPost } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
 import { getUserVotesForPosts } from '../services/userService';
@@ -17,9 +16,11 @@ const IconText = ({ type, text }) => (
   </span>
 );
 
-class AllPosts extends Component {
+class PostList extends Component {
   constructor(props) {
     super(props)
+    this.dataLoadingFunction = this.props.dataLoadingFunction;
+    this.username = this.props.username;
     this._isMounted = false;
     this.votes = {};
     this.state = {
@@ -35,7 +36,7 @@ class AllPosts extends Component {
   }
 
   loadPosts(page, pageSize) {
-    allPosts(page, pageSize)
+    this.dataLoadingFunction(page, pageSize, this.username)
       .then(res => {
         if (this._isMounted) {
           this.setState({
@@ -104,10 +105,10 @@ class AllPosts extends Component {
           current: page,
           pageSize: pageSize,
           onChange: (page, pageSize) => {
-            this.props.history.push(`/home?page=${page}&pageSize=${pageSize}`);
+            this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
           },
           onShowSizeChange: (page, pageSize) => {
-            this.props.history.push(`/home?page=${page}&pageSize=${pageSize}`);
+            this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
           }
         }}
         dataSource={posts}
@@ -163,4 +164,4 @@ class AllPosts extends Component {
   }
 }
 
-export default AllPosts;
+export default PostList;

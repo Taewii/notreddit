@@ -4,20 +4,22 @@ import './App.css';
 import { Route, withRouter, Redirect, Switch } from 'react-router-dom';
 import { Layout, notification } from 'antd';
 
+import { ACCESS_TOKEN } from '../util/constants';
 import { successNotification } from '../util/notifications';
 import { getCurrentUser } from '../services/userService';
-import { ACCESS_TOKEN } from '../util/constants';
-import PrivateRoute from '../common/PrivateRoute';
+import { allPosts, postsByUsername } from '../services/postService';
 
 import Login from '../user/Login';
 import Signup from '../user/Signup';
 import AllUsers from '../user/AllUsers';
+import UserDetails from '../user/UserDetails';
 import AppHeader from '../common/AppHeader';
 import NotFound from '../common/NotFound';
+import PrivateRoute from '../common/PrivateRoute';
 import LoadingIndicator from '../common/LoadingIndicator';
 import SubredditCreate from '../subreddit/SubredditCreate';
 import CreatePost from '../post/CreatePost';
-import AllPosts from '../post/AllPosts';
+import PostList from '../post/PostList';
 import PostDetails from '../post/PostDetails';
 
 const { Content } = Layout;
@@ -128,10 +130,24 @@ class App extends Component {
                 component={CreatePost}
                 authenticated={this.state.isAuthenticated}
               />
-              <Route path="/post/:id"
-                component={(props) => <PostDetails isAuthenticated={this.state.isAuthenticated} {...props} />} />
-              <Route exact path="/home"
-                component={(props) => <AllPosts isAuthenticated={this.state.isAuthenticated} {...props} />} />
+              <Route path="/post/:id" component={(props) =>
+                <PostDetails isAuthenticated={this.state.isAuthenticated} {...props} />}
+              />
+              <Route exact path="/home" component={(props) =>
+                <PostList
+                  isAuthenticated={this.state.isAuthenticated}
+                  dataLoadingFunction={allPosts}
+                  username={null}
+                  {...props}
+                />}
+              />
+              <Route path="/user/:username" component={(props) =>
+                <UserDetails
+                  isAuthenticated={this.state.isAuthenticated}
+                  dataLoadingFunction={postsByUsername}
+                  {...props}
+                />}
+              />
               <Route component={NotFound} />
             </Switch>
           </div>

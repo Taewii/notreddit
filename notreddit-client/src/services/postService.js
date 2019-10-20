@@ -18,7 +18,16 @@ export function findById(id) {
 
 export function allPosts(page, size) {
   const url = `${API_BASE_URL}/post/all?page=${page}&size=${size}`;
-  
+
+  return request({
+    url,
+    method: 'GET'
+  });
+}
+
+export function postsByUsername(page, size, username) {
+  const url = `${API_BASE_URL}/post/user/${username}?page=${page}&size=${size}`;
+
   return request({
     url,
     method: 'GET'
