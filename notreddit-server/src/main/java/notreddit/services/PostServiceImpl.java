@@ -56,28 +56,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostsResponseModel allPosts(Pageable pageable) {
-        Page<Post> postsPageable = postRepository.findAll(pageable);
-        List<PostListResponseModel> posts = postsPageable.stream()
-                .map(p -> {
-                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
-                    model.setCommentCount(p.getComments().size());
-                    return model;
-                })
-                .collect(Collectors.toUnmodifiableList());
-
-        return new PostsResponseModel(postsPageable.getTotalElements(), posts);
+        Page<Post> allPosts = postRepository.findAll(pageable);
+        return getPostsResponseModel(allPosts);
     }
 
     @Override
-    public List<PostListResponseModel> findAllByUsername(String username) {
-        return postRepository.findAllByUsername(username)
-                .stream()
-                .map(p -> {
-                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
-                    model.setCommentCount(p.getComments().size());
-                    return model;
-                })
-                .collect(Collectors.toUnmodifiableList());
+    public PostsResponseModel findAllByUsername(String username, Pageable pageable) {
+        Page<Post> allByUsername = postRepository.findAllByUsername(username, pageable);
+        return getPostsResponseModel(allByUsername);
     }
 
     @Override
@@ -112,6 +98,18 @@ public class PostServiceImpl implements PostService {
     public PostDetailsResponseModel findById(UUID id) {
         Post post = postRepository.findById(id).orElseThrow();
         return mapper.map(post, PostDetailsResponseModel.class);
+    }
+
+    private PostsResponseModel getPostsResponseModel(Page<Post> allByUsername) {
+        List<PostListResponseModel> posts = allByUsername.stream()
+                .map(p -> {
+                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
+                    model.setCommentCount(p.getComments().size());
+                    return model;
+                })
+                .collect(Collectors.toUnmodifiableList());
+
+        return new PostsResponseModel(allByUsername.getTotalElements(), posts);
     }
 
     private ResponseEntity<?> createPostWithoutFiles(Post post) {

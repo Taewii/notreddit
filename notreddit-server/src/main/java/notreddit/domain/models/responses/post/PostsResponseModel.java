@@ -12,5 +12,5 @@ import java.util.List;
 public class PostsResponseModel {
 
     private long total;
-    private List<PostListResponseModel> posts;
+    private List<? extends PostListModel> posts;
 }

@@ -45,10 +45,10 @@ public class CommentController {
         return commentService.findAllFromPost(postId);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/mine")
-    public List<CommentListWithReplyCount> mine(@AuthenticationPrincipal User user) {
-        return commentService.findAllFromUsername(user.getUsername());
+    @PreAuthorize("permitAll()")
+    @GetMapping("/user/{username}")
+    public List<CommentListWithReplyCount> findAllByUsername(@PathVariable String username) {
+        return commentService.findAllFromUsername(username);
     }
 
     @Throttling(type = ThrottlingType.PrincipalName)

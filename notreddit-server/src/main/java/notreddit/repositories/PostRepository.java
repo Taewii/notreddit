@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,12 +21,13 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             countQuery = "SELECT COUNT(p) FROM Post p")
     Page<Post> findAll(Pageable pageable);
 
-    @Query("SELECT DISTINCT p FROM Post p " +
+    @Query(value = "SELECT DISTINCT p FROM Post p " +
             "JOIN FETCH p.creator c " +
             "LEFT JOIN FETCH p.subreddit " +
             "LEFT JOIN FETCH p.comments " +
-            "WHERE c.username = :username")
-    List<Post> findAllByUsername(@Param("username") String username);
+            "WHERE c.username = :username",
+            countQuery = "SELECT COUNT(p) FROM Post p WHERE p.creator.username = :username")
+    Page<Post> findAllByUsername(@Param("username") String username, Pageable pageable);
 
     @Query("SELECT p FROM Post p " +
             "JOIN FETCH p.creator " +
