@@ -21,6 +21,7 @@ import SubredditCreate from '../subreddit/SubredditCreate';
 import CreatePost from '../post/CreatePost';
 import PostList from '../post/PostList';
 import PostDetails from '../post/PostDetails';
+import CommentDetails from '../comment/CommentDetails';
 
 const { Content } = Layout;
 
@@ -141,10 +142,16 @@ class App extends Component {
                   {...props}
                 />}
               />
-              <Route path="/user/:username" component={(props) =>
+              <Route exact path={['/user/:username', '/user/:username/posts']} component={(props) =>
                 <UserDetails
                   isAuthenticated={this.state.isAuthenticated}
                   dataLoadingFunction={postsByUsername}
+                  {...props}
+                />}
+              />
+              <Route path="/user/:username/comments" component={(props) =>
+                <CommentDetails
+                  isAuthenticated={this.state.isAuthenticated}
                   {...props}
                 />}
               />

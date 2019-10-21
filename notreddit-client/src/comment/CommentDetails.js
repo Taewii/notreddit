@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 
-import PostList from '../post/PostList';
-import ProfileDetailsMenu from './ProfileDetailsMenu';
+import CommentList from './CommentList';
+import ProfileDetailsMenu from '../user/ProfileDetailsMenu';
 
-class UserDetails extends Component {
+class CommentDetails extends Component {
   constructor(props) {
     super(props);
     this.isAuthenticated = this.props.isAuthenticated;
-    this.dataLoadingFunction = this.props.dataLoadingFunction;
     this.username = this.props.match.params.username;
   }
 
@@ -15,9 +14,8 @@ class UserDetails extends Component {
     return (
       <div>
         <ProfileDetailsMenu username={this.username} />
-        <PostList
+        <CommentList
           isAuthenticated={this.isAuthenticated}
-          dataLoadingFunction={this.dataLoadingFunction}
           username={this.username}
           {...this.props}
         />
@@ -26,4 +24,4 @@ class UserDetails extends Component {
   }
 }
 
-export default UserDetails;
+export default CommentDetails;

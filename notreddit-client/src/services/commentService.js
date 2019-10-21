@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../util/constants";
 
 export function comment(data) {
   return request({
-    url: API_BASE_URL + '/comment/post',
+    url: API_BASE_URL + '/comment/create',
     method: 'POST',
     body: JSON.stringify(data)
   });
@@ -22,5 +22,14 @@ export function voteForCommentAPI(choice, commentId) {
   return request({
     url: API_BASE_URL + '/comment/vote' + query,
     method: 'POST'
+  });
+}
+
+export function commentsByUsername(username, page, size) {
+  const url = `${API_BASE_URL}/comment/user/${username}?page=${page}&size=${size}`;
+
+  return request({
+    url,
+    method: 'GET'
   });
 }

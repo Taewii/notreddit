@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import './PostList.css';
+import './CommentList.css';
 
 import { Link } from 'react-router-dom';
 import { List, Icon, Tooltip } from 'antd';
 
 import { errorNotification } from '../util/notifications';
-import { voteForPost } from '../services/voteService';
+import { voteForComment } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
-import { getUserVotesForPosts } from '../services/userService';
+import { getUserVotesForComments } from '../services/userService';
+import { commentsByUsername } from '../services/commentService';
 
 const IconText = ({ type, text }) => (
   <span>
@@ -16,18 +17,17 @@ const IconText = ({ type, text }) => (
   </span>
 );
 
-class PostList extends Component {
+class CommentList extends Component {
   constructor(props) {
     super(props)
-    this.dataLoadingFunction = this.props.dataLoadingFunction;
-    this.username = this.props.username;
     this._isMounted = false;
+    this.username = this.props.username;
     this.votes = {};
     this.state = {
       initLoading: true,
       loading: false,
-      totalPosts: 0,
-      posts: [],
+      totalComments: 0,
+      comments: [],
       page: 0,
       pageSize: 10
     };
@@ -35,13 +35,13 @@ class PostList extends Component {
     this.colorVote = this.colorVote.bind(this);
   }
 
-  loadPosts(page, pageSize) {
-    this.dataLoadingFunction(page, pageSize, this.username)
+  loadComments(page, pageSize) {
+    commentsByUsername(this.username, page, pageSize)
       .then(res => {
         if (this._isMounted) {
           this.setState({
-            posts: res.posts,
-            totalPosts: res.total,
+            comments: res.comments,
+            totalComments: res.total,
             page: page + 1,
             pageSize: +pageSize
           });
@@ -57,10 +57,10 @@ class PostList extends Component {
     const page = searchParams.get('page') - 1 || 0;
     const pageSize = searchParams.get('pageSize') || 10;
 
-    this.loadPosts(page, pageSize);
+    this.loadComments(page, pageSize);
 
     if (isAuthenticated) {
-      getUserVotesForPosts()
+      getUserVotesForComments()
         .then(res => {
           this.votes = res || {}
         }).catch(error => errorNotification(error));
@@ -75,9 +75,9 @@ class PostList extends Component {
     this._isMounted = false;
   }
 
-  colorVote(event, postId) {
+  colorVote(event, commentId) {
     const icons = event.currentTarget.querySelectorAll('svg');
-    const vote = this.votes[postId];
+    const vote = this.votes[commentId];
 
     // clear all the colors first and the color them correctly
     icons[0].setAttribute('color', '');
@@ -91,16 +91,16 @@ class PostList extends Component {
   }
 
   render() {
-    const { posts, totalPosts, page, pageSize } = this.state;
+    const { comments, totalComments, page, pageSize } = this.state;
 
     return (
       <List
         bordered
         itemLayout="vertical"
-        size="large"
+        size="small"
         pagination={{
           showSizeChanger: true,
-          total: totalPosts,
+          total: totalComments,
           defaultCurrent: 1,
           current: page,
           pageSize: pageSize,
@@ -111,52 +111,49 @@ class PostList extends Component {
             this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
           }
         }}
-        dataSource={posts}
-        renderItem={post => (
+        dataSource={comments}
+        renderItem={comment => (
           <List.Item
-            onLoad={(event) => this.colorVote(event, post.id)}
-            key={post.id}
+            className="comment-item"
+            onLoad={(event) => this.colorVote(event, comment.id)}
+            key={comment.id}
             actions={[
               <span key="comment-basic-upvote">
                 <Tooltip title="Upvote">
                   <Icon
                     type="like"
                     theme="outlined"
-                    onClick={(event) => voteForPost(event, 1, post.id)}
+                    onClick={(event) => voteForComment(event, 1, comment.id)}
                   />
                 </Tooltip>
-                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.upvotes}</span>
+                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.upvotes}</span>
               </span>,
               <span key="comment-basic-downvote">
                 <Tooltip title="Downvote">
                   <Icon
                     type="dislike"
                     theme="outlined"
-                    onClick={(event) => voteForPost(event, -1, post.id)}
+                    onClick={(event) => voteForComment(event, -1, comment.id)}
                   />
                 </Tooltip>
-                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.downvotes}</span>
+                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.downvotes}</span>
               </span>,
               <span key="comments">
-                <Link to={'/post/' + post.id} style={{ color: 'gray' }}>
-                  <IconText type="message" text={post.commentCount} />
+                <Link to={'/post/' + comment.id} style={{ color: 'gray' }}>
+                  <IconText type="message" text={comment.replies} />
                 </Link>
               </span>,
             ]}
           >
             <List.Item.Meta
-              avatar={
-                <Link to={'/post/' + post.id}>
-                  <img src={post.fileThumbnailUrl === null ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpuQW-Yaooyex01Istft3iPtUz5kSjb4UdtMrxjKp0b-JEWIMl' : post.fileThumbnailUrl} width="128px" alt="thumbnail" />
-                </Link>
-              }
-              title={<a href={'/post/' + post.id}>{post.title}</a>}
+              title={<a href={'/post/' + comment.postId}>{comment.postTitle}</a>}
               description={
                 <span>
-                  submitted {timeSince(post.createdOn)} by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
+                  submitted {timeSince(comment.createdOn)} by <a href={'/user/' + comment.creatorUsername}>{comment.creatorUsername}</a>
                 </span>
               }
             />
+            <span className="content">{comment.content}</span>
           </List.Item>
         )}
       />
@@ -164,4 +161,4 @@ class PostList extends Component {
   }
 }
 
-export default PostList;
+export default CommentList;
