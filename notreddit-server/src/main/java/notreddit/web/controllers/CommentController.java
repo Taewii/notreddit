@@ -5,10 +5,11 @@ import com.weddini.throttling.ThrottlingType;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
 import notreddit.domain.models.responses.comment.CommentListWithChildren;
-import notreddit.domain.models.responses.comment.CommentListWithReplyCount;
+import notreddit.domain.models.responses.comment.CommentsResponseModel;
 import notreddit.services.CommentService;
 import notreddit.services.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,9 +34,9 @@ public class CommentController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/post")
-    public ResponseEntity<?> comment(@Valid @RequestBody CommentPostRequestModel comment,
-                                     @AuthenticationPrincipal User creator) {
+    @PostMapping("/create")
+    public ResponseEntity<?> createComment(@Valid @RequestBody CommentPostRequestModel comment,
+                                           @AuthenticationPrincipal User creator) {
         return commentService.create(comment, creator);
     }
 
@@ -47,8 +48,8 @@ public class CommentController {
 
     @PreAuthorize("permitAll()")
     @GetMapping("/user/{username}")
-    public List<CommentListWithReplyCount> findAllByUsername(@PathVariable String username) {
-        return commentService.findAllFromUsername(username);
+    public CommentsResponseModel findAllByUsername(@PathVariable String username, Pageable pageable) {
+        return commentService.findAllFromUsername(username, pageable);
     }
 
     @Throttling(type = ThrottlingType.PrincipalName)

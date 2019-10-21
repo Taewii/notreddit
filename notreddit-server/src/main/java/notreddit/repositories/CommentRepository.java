@@ -1,6 +1,8 @@
 package notreddit.repositories;
 
 import notreddit.domain.entities.Comment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,6 +23,11 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     @Query("SELECT c FROM Comment c WHERE c.id = :id")
     Optional<Comment> findByIdWithChildren(@Param("id") UUID id);
 
-    @Query("SELECT c FROM Comment c WHERE c.creator.username = :username")
-    List<Comment> findByCreatorUsername(@Param("username") String username);
+    @Query(value = "SELECT c FROM Comment c " +
+            "JOIN FETCH c.post " +
+            "WHERE c.creator.username = :username",
+            countQuery = "SELECT COUNT(c) " +
+                    "FROM Comment c " +
+                    "WHERE c.creator.username = :username")
+    Page<Comment> findByCreatorUsername(@Param("username") String username, Pageable pageable);
 }

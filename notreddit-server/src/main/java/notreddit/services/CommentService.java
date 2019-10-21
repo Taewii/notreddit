@@ -3,7 +3,8 @@ package notreddit.services;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
 import notreddit.domain.models.responses.comment.CommentListWithChildren;
-import notreddit.domain.models.responses.comment.CommentListWithReplyCount;
+import notreddit.domain.models.responses.comment.CommentsResponseModel;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -15,5 +16,5 @@ public interface CommentService {
 
     List<CommentListWithChildren> findAllFromPost(UUID postId);
 
-    List<CommentListWithReplyCount> findAllFromUsername(String username);
+    CommentsResponseModel findAllFromUsername(String username, Pageable pageable);
 }

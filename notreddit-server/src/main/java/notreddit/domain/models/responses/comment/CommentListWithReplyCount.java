@@ -8,4 +8,6 @@ import lombok.Setter;
 public class CommentListWithReplyCount extends CommentListModel {
 
     private int replies;
+    private String postTitle;
+    private String postId;
 }

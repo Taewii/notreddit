@@ -7,10 +7,13 @@ import notreddit.domain.models.requests.CommentPostRequestModel;
 import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.domain.models.responses.comment.CommentListWithChildren;
 import notreddit.domain.models.responses.comment.CommentListWithReplyCount;
+import notreddit.domain.models.responses.comment.CommentsResponseModel;
 import notreddit.repositories.CommentRepository;
 import notreddit.repositories.PostRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -86,14 +89,15 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentListWithReplyCount> findAllFromUsername(String username) {
-        return commentRepository
-                .findByCreatorUsername(username)
-                .parallelStream()
+    public CommentsResponseModel findAllFromUsername(String username, Pageable pageable) {
+        Page<Comment> byCreatorUsername = commentRepository.findByCreatorUsername(username, pageable);
+        List<CommentListWithReplyCount> comments = byCreatorUsername.stream()
                 .map(c -> {
                     CommentListWithReplyCount model = mapper.map(c, CommentListWithReplyCount.class);
                     model.setReplies(c.getChildren().size());
                     return model;
                 }).collect(Collectors.toUnmodifiableList());
+
+        return new CommentsResponseModel(byCreatorUsername.getTotalElements(), comments);
     }
 }
