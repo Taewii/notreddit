@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './CommentList.css';
 
 import { Link } from 'react-router-dom';
-import { List, Icon, Tooltip } from 'antd';
+import { List, Icon, Tooltip, Avatar } from 'antd';
 
 import { errorNotification } from '../util/notifications';
 import { voteForComment } from '../services/voteService';
@@ -146,6 +146,11 @@ class CommentList extends Component {
             ]}
           >
             <List.Item.Meta
+              avatar={
+                <Link to={'/post/' + comment.postId}>
+                  <Avatar src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPkZuKBUk2AttQ5hVKzFSDUJe0sfgS66rRnrUNrJlX4X1ugtD91Q" />
+                </Link>
+              }
               title={<a href={'/post/' + comment.postId}>{comment.postTitle}</a>}
               description={
                 <span>
