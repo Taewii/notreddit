@@ -95,3 +95,21 @@ export function getUserVotesForComments() {
     method: 'GET'
   });
 }
+
+export function getUpvotedPosts(page, size, username) {
+  const url = `${API_BASE_URL}/user/${username}/upvoted?page=${page}&size=${size}`;
+
+  return request({
+    url,
+    method: 'GET'
+  });
+}
+
+export function getDownvotedPosts(page, size, username) {
+  const url = `${API_BASE_URL}/user/${username}/downvoted?page=${page}&size=${size}`;
+
+  return request({
+    url,
+    method: 'GET'
+  });
+}

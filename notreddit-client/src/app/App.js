@@ -6,13 +6,14 @@ import { Layout, notification } from 'antd';
 
 import { ACCESS_TOKEN } from '../util/constants';
 import { successNotification } from '../util/notifications';
-import { getCurrentUser } from '../services/userService';
+import { getCurrentUser, getUpvotedPosts, getDownvotedPosts } from '../services/userService';
 import { allPosts, postsByUsername } from '../services/postService';
 
 import Login from '../user/Login';
 import Signup from '../user/Signup';
 import AllUsers from '../user/AllUsers';
-import UserDetails from '../user/UserDetails';
+import UserComments from '../user/UserComments';
+import UserPosts from '../user/UserPosts';
 import AppHeader from '../common/AppHeader';
 import NotFound from '../common/NotFound';
 import PrivateRoute from '../common/PrivateRoute';
@@ -21,7 +22,6 @@ import SubredditCreate from '../subreddit/SubredditCreate';
 import CreatePost from '../post/CreatePost';
 import PostList from '../post/PostList';
 import PostDetails from '../post/PostDetails';
-import CommentDetails from '../comment/CommentDetails';
 
 const { Content } = Layout;
 
@@ -143,15 +143,33 @@ class App extends Component {
                 />}
               />
               <Route exact path={['/user/:username', '/user/:username/posts']} component={(props) =>
-                <UserDetails
+                <UserPosts
                   isAuthenticated={this.state.isAuthenticated}
                   dataLoadingFunction={postsByUsername}
+                  currentUser={this.state.currentUser}
                   {...props}
                 />}
               />
               <Route path="/user/:username/comments" component={(props) =>
-                <CommentDetails
+                <UserComments
                   isAuthenticated={this.state.isAuthenticated}
+                  currentUser={this.state.currentUser}
+                  {...props}
+                />}
+              />
+              <Route path="/user/:username/upvoted" component={(props) =>
+                <UserPosts
+                  isAuthenticated={this.state.isAuthenticated}
+                  dataLoadingFunction={getUpvotedPosts}
+                  currentUser={this.state.currentUser}
+                  {...props}
+                />}
+              />
+              <Route path="/user/:username/downvoted" component={(props) =>
+                <UserPosts
+                  isAuthenticated={this.state.isAuthenticated}
+                  dataLoadingFunction={getDownvotedPosts}
+                  currentUser={this.state.currentUser}
                   {...props}
                 />}
               />

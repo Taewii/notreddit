@@ -139,7 +139,7 @@ class CommentList extends Component {
                 <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.downvotes}</span>
               </span>,
               <span key="comments">
-                <Link to={'/post/' + comment.id} style={{ color: 'gray' }}>
+                <Link to={'/post/' + comment.postId} style={{ color: 'gray' }}>
                   <IconText type="message" text={comment.replies} />
                 </Link>
               </span>,
