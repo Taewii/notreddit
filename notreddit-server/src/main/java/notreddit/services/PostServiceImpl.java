@@ -12,6 +12,7 @@ import notreddit.domain.models.responses.post.PostsResponseModel;
 import notreddit.repositories.FileRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.SubredditRepository;
+import notreddit.web.exceptions.AccessForbiddenException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -67,10 +68,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostsResponseModel getUpvotedPosts(User user, Pageable pageable) {
-        Page<Post> upvotedPostsByUser = postRepository
-                .findPostsByUserAndVoteChoice(user, (byte) 1, pageable);
-        return getPostsResponseModel(upvotedPostsByUser);
+    public PostsResponseModel getPostsByVoteChoice(User user, String username, int choice, Pageable pageable) {
+        if (!user.getUsername().equalsIgnoreCase(username)) {
+            throw new AccessForbiddenException("You are not allowed to view this content");
+        }
+
+        Page<Post> postsByUser = postRepository
+                .findPostsByUserAndVoteChoice(user, (byte) choice, pageable);
+        return getPostsResponseModel(postsByUser);
     }
 
     @Override

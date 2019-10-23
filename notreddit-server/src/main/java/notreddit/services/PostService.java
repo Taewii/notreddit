@@ -19,5 +19,5 @@ public interface PostService {
 
     PostsResponseModel findAllByUsername(String username, Pageable pageable);
 
-    PostsResponseModel getUpvotedPosts(User user, Pageable pageable);
+    PostsResponseModel getPostsByVoteChoice(User user, String username, int choice, Pageable pageable);
 }

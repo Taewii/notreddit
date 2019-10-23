@@ -102,8 +102,18 @@ public class UserController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/upvoted")
-    public PostsResponseModel getUpvotedPosts(@AuthenticationPrincipal User user, Pageable pageable) {
-        return postService.getUpvotedPosts(user, pageable);
+    @GetMapping("/{username}/upvoted")
+    public PostsResponseModel getUpvotedPosts(@AuthenticationPrincipal User user,
+                                              @PathVariable String username,
+                                              Pageable pageable) {
+        return postService.getPostsByVoteChoice(user, username, 1, pageable);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{username}/downvoted")
+    public PostsResponseModel getDownvotedPosts(@AuthenticationPrincipal User user,
+                                                @PathVariable String username,
+                                                Pageable pageable) {
+        return postService.getPostsByVoteChoice(user, username, -1, pageable);
     }
 }

@@ -34,6 +34,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             "JOIN v.post as p " +
             "LEFT JOIN FETCH p.subreddit " +
             "LEFT JOIN FETCH p.comments " +
+            "LEFT JOIN FETCH p.creator " +
             "WHERE v.comment IS NULL " +
             "AND v.choice = :choice " +
             "AND v.user = :user",
