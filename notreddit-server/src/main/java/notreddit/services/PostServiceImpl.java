@@ -67,6 +67,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public PostsResponseModel getUpvotedPosts(User user, Pageable pageable) {
+        Page<Post> upvotedPostsByUser = postRepository
+                .findPostsByUserAndVoteChoice(user, (byte) 1, pageable);
+        return getPostsResponseModel(upvotedPostsByUser);
+    }
+
+    @Override
     public ResponseEntity<?> create(PostCreateRequest request, User creator) {
         Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(request.getSubreddit()).orElse(null);
 

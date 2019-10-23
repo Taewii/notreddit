@@ -18,4 +18,6 @@ public interface PostService {
     PostDetailsResponseModel findById(UUID id);
 
     PostsResponseModel findAllByUsername(String username, Pageable pageable);
+
+    PostsResponseModel getUpvotedPosts(User user, Pageable pageable);
 }
