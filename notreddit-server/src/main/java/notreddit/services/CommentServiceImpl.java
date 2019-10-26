@@ -1,6 +1,7 @@
 package notreddit.services;
 
 import notreddit.domain.entities.Comment;
+import notreddit.domain.entities.Mention;
 import notreddit.domain.entities.Post;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentPostRequestModel;
@@ -61,12 +62,16 @@ public class CommentServiceImpl implements CommentService {
             comment.setParent(parent);
 
             if (parent != null) {
+                Mention mention = createMention(comment, parent.getCreator(), creator);
+                comment.getMentions().add(mention);
                 parent.addChild(comment);
                 commentRepository.saveAndFlush(parent);
             }
         }
 
         if (parent == null) {
+            Mention mention = createMention(comment, post.getCreator(), creator);
+            comment.getMentions().add(mention);
             commentRepository.saveAndFlush(comment);
         }
 
@@ -77,6 +82,16 @@ public class CommentServiceImpl implements CommentService {
         return ResponseEntity
                 .created(location)
                 .body(new ApiResponse(true, "Comment created successfully."));
+    }
+
+    private Mention createMention(Comment comment, User receiver, User creator) {
+        Mention mention = new Mention();
+        mention.setComment(comment);
+        mention.setCreatedOn(LocalDateTime.now());
+        mention.setCreator(creator);
+        mention.setReceiver(receiver);
+
+        return mention;
     }
 
     @Override
