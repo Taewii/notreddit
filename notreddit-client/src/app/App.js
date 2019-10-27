@@ -89,14 +89,16 @@ class App extends Component {
   }
 
   render() {
-    if (this.state.isLoading) {
+    const { isLoading, isAuthenticated, currentUser } = this.state;
+
+    if (isLoading) {
       return <LoadingIndicator />
     }
 
     return (
       <Layout className="app-container">
-        <AppHeader isAuthenticated={this.state.isAuthenticated}
-          currentUser={this.state.currentUser}
+        <AppHeader isAuthenticated={isAuthenticated}
+          currentUser={currentUser}
           onLogout={this.handleLogout} />
 
         <Content className="app-content" style={{ textAlign: "center" }}>
@@ -106,13 +108,13 @@ class App extends Component {
               <PrivateRoute
                 path="/login"
                 component={(props) => <Login onLogin={this.handleLogin} {...props} />}
-                authenticated={!this.state.isAuthenticated}
+                authenticated={!isAuthenticated}
                 redirectPath="/home"
               />
               <PrivateRoute
                 path="/signup"
                 component={Signup}
-                authenticated={!this.state.isAuthenticated}
+                authenticated={!isAuthenticated}
                 redirectPath="/home"
               />
               <PrivateRoute
@@ -124,19 +126,19 @@ class App extends Component {
               <PrivateRoute
                 path="/subreddit/create"
                 component={SubredditCreate}
-                authenticated={this.state.isAuthenticated}
+                authenticated={isAuthenticated}
               />
               <PrivateRoute
                 path="/post/create"
                 component={CreatePost}
-                authenticated={this.state.isAuthenticated}
+                authenticated={isAuthenticated}
               />
               <Route path="/post/:id" component={(props) =>
-                <PostDetails isAuthenticated={this.state.isAuthenticated} {...props} />}
+                <PostDetails isAuthenticated={isAuthenticated} {...props} />}
               />
               <Route exact path="/home" component={(props) =>
                 <PostList
-                  isAuthenticated={this.state.isAuthenticated}
+                  isAuthenticated={isAuthenticated}
                   dataLoadingFunction={allPosts}
                   username={null}
                   {...props}
@@ -144,32 +146,32 @@ class App extends Component {
               />
               <Route exact path={['/user/:username', '/user/:username/posts']} component={(props) =>
                 <UserPosts
-                  isAuthenticated={this.state.isAuthenticated}
+                  isAuthenticated={isAuthenticated}
                   dataLoadingFunction={postsByUsername}
-                  currentUser={this.state.currentUser}
+                  currentUser={currentUser}
                   {...props}
                 />}
               />
               <Route path="/user/:username/comments" component={(props) =>
                 <UserComments
-                  isAuthenticated={this.state.isAuthenticated}
-                  currentUser={this.state.currentUser}
+                  isAuthenticated={isAuthenticated}
+                  currentUser={currentUser}
                   {...props}
                 />}
               />
               <Route path="/user/:username/upvoted" component={(props) =>
                 <UserPosts
-                  isAuthenticated={this.state.isAuthenticated}
+                  isAuthenticated={isAuthenticated}
                   dataLoadingFunction={getUpvotedPosts}
-                  currentUser={this.state.currentUser}
+                  currentUser={currentUser}
                   {...props}
                 />}
               />
               <Route path="/user/:username/downvoted" component={(props) =>
                 <UserPosts
-                  isAuthenticated={this.state.isAuthenticated}
+                  isAuthenticated={isAuthenticated}
                   dataLoadingFunction={getDownvotedPosts}
-                  currentUser={this.state.currentUser}
+                  currentUser={currentUser}
                   {...props}
                 />}
               />

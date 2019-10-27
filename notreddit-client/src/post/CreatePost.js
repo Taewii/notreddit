@@ -143,6 +143,8 @@ class CreatePost extends Component {
   }
 
   render() {
+    const { title, url, file, loading } = this.state;
+
     return (
       <div className="post-container">
         <h1 className="page-title">Create a Post</h1>
@@ -151,14 +153,14 @@ class CreatePost extends Component {
             <FormItem label="Title"
               hasFeedback
               required
-              validateStatus={this.state.title.validateStatus}
-              help={this.state.title.errorMsg}>
+              validateStatus={title.validateStatus}
+              help={title.errorMsg}>
               <Input
                 size="large"
                 name="title"
                 autoComplete="off"
                 placeholder="Post Title"
-                value={this.state.title.value}
+                value={title.value}
                 onChange={(event) => this.handleInputChange(event, this.validateTitle)} />
             </FormItem>
             <FormItem label="Content">
@@ -183,21 +185,21 @@ class CreatePost extends Component {
             </FormItem>
             <FormItem label="url"
               hasFeedback
-              validateStatus={this.state.url.validateStatus}
-              help={this.state.url.errorMsg}>
+              validateStatus={url.validateStatus}
+              help={url.errorMsg}>
               <Input
                 size="large"
                 name="url"
                 autoComplete="off"
                 placeholder="URL"
-                disabled={this.state.file.value !== null}
-                value={this.state.url.value}
+                disabled={file.value !== null}
+                value={url.value}
                 onChange={(event) => this.handleInputChange(event, this.validateUrl)} />
             </FormItem>
             <FormItem label="File/Image">
               <Dragger
                 name="file"
-                disabled={this.state.url.value.length > 0}
+                disabled={url.value.length > 0}
                 onRemove={this.handleFileRemove}
                 customRequest={this.handleFileUpload}>
                 <p className="ant-upload-drag-icon">
@@ -211,7 +213,7 @@ class CreatePost extends Component {
               <Button type="primary"
                 htmlType="submit"
                 size="large"
-                loading={this.state.loading}
+                loading={loading}
                 className="post-form-button"
                 disabled={this.isFormInvalid()}>Create</Button>
             </FormItem>

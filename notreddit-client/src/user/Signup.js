@@ -82,6 +82,8 @@ class Signup extends Component {
   }
 
   render() {
+    const { username, password, confirmPassword, email } = this.state;
+
     return (
       <div className="signup-container">
         <h1 className="page-title">Sign Up</h1>
@@ -89,55 +91,55 @@ class Signup extends Component {
           <Form onSubmit={this.handleSubmit} className="signup-form">
             <FormItem label="Username"
               hasFeedback
-              validateStatus={this.state.username.validateStatus}
-              help={this.state.username.errorMsg}>
+              validateStatus={username.validateStatus}
+              help={username.errorMsg}>
               <Input
                 size="large"
                 name="username"
                 autoComplete="off"
                 placeholder="A unique username"
-                value={this.state.username.value}
+                value={username.value}
                 onBlur={this.validateUsernameAvailability}
                 onChange={(event) => this.handleInputChange(event, this.validateUsername)} />
             </FormItem>
             <FormItem
               label="Password"
-              validateStatus={this.state.password.validateStatus}
-              help={this.state.password.errorMsg}>
+              validateStatus={password.validateStatus}
+              help={password.errorMsg}>
               <Input
                 size="large"
                 name="password"
                 type="password"
                 autoComplete="off"
                 placeholder="A password with minimum of 6 characters"
-                value={this.state.password.value}
+                value={password.value}
                 onChange={(event) => this.handleInputChange(event, this.validatePassword)} />
             </FormItem>
             <FormItem
               label="Confirm Password"
-              validateStatus={this.state.confirmPassword.validateStatus}
-              help={this.state.confirmPassword.errorMsg}>
+              validateStatus={confirmPassword.validateStatus}
+              help={confirmPassword.errorMsg}>
               <Input
                 size="large"
                 name="confirmPassword"
                 type="password"
                 autoComplete="off"
                 placeholder="Please re-type your password"
-                value={this.state.confirmPassword.value}
+                value={confirmPassword.value}
                 onChange={(event) => this.handleInputChange(event, this.validateConfirmPassword)} />
             </FormItem>
             <FormItem
               label="Email"
               hasFeedback
-              validateStatus={this.state.email.validateStatus}
-              help={this.state.email.errorMsg}>
+              validateStatus={email.validateStatus}
+              help={email.errorMsg}>
               <Input
                 size="large"
                 name="email"
                 type="email"
                 autoComplete="off"
                 placeholder="Your email"
-                value={this.state.email.value}
+                value={email.value}
                 onBlur={this.validateEmailAvailability}
                 onChange={(event) => this.handleInputChange(event, this.validateEmail)} />
             </FormItem>

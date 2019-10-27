@@ -59,6 +59,8 @@ class SubredditCreate extends Component {
   }
 
   render() {
+    const { title } = this.state;
+
     return (
       <div className="subreddit-container">
         <h1 className="page-title">Create Subreddit</h1>
@@ -66,15 +68,15 @@ class SubredditCreate extends Component {
           <Form onSubmit={this.handleSubmit} className="subreddit-form">
             <FormItem label="Name"
               hasFeedback
-              validateStatus={this.state.title.validateStatus}
-              help={this.state.title.errorMsg}>
+              validateStatus={title.validateStatus}
+              help={title.errorMsg}>
               <Input
                 prefix={<Icon type="smile" />}
                 size="large"
                 name="title"
                 autoComplete="off"
                 placeholder="A unique subreddit name"
-                value={this.state.title.value}
+                value={title.value}
                 onBlur={this.validateSubredditAvailability}
                 onChange={(event) => this.handleInputChange(event, this.validateTitle)} />
             </FormItem>
