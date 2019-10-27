@@ -108,7 +108,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDetailsResponseModel findById(UUID id) {
-        Post post = postRepository.findById(id).orElseThrow();
+        Post post = postRepository.findByIdEager(id).orElseThrow();
         return mapper.map(post, PostDetailsResponseModel.class);
     }
 

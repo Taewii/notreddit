@@ -51,5 +51,5 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             "LEFT JOIN FETCH p.subreddit " +
             "LEFT JOIN FETCH p.comments " +
             "WHERE p.id = :id")
-    Optional<Post> findById(@Param("id") UUID id);
+    Optional<Post> findByIdEager(@Param("id") UUID id);
 }
