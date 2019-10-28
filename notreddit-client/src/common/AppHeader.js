@@ -4,7 +4,7 @@ import {
   withRouter
 } from 'react-router-dom';
 import './AppHeader.css';
-import { Layout, Menu, Dropdown, Icon } from 'antd';
+import { Layout, Menu, Dropdown, Icon, Badge } from 'antd';
 const Header = Layout.Header;
 
 class AppHeader extends Component {
@@ -37,6 +37,7 @@ class AppHeader extends Component {
         </Menu.Item>,
         <Menu.Item key="/profile" className="profile-menu">
           <ProfileDropdownMenu
+            mentionCount={this.props.mentionCount}
             currentUser={this.props.currentUser}
             handleMenuClick={this.handleMenuClick} />
         </Menu.Item>
@@ -134,6 +135,16 @@ const ProfileDropdownMenu = (props) => {
       <Menu.Item key="profile" className="dropdown-item">
         <Link to={`/user/${props.currentUser.username}`}>Profile</Link>
       </Menu.Item>
+      <Badge count={props.mentionCount}>
+        <Menu.Item key="mentions" className="dropdown-item">
+          <Link
+            style={{ color: "inherit" }}
+            to={`/user/mentions`}
+          >
+            Mentions
+          </Link>
+        </Menu.Item>
+      </Badge>
       <Menu.Item key="logout" className="dropdown-item">
         Logout
       </Menu.Item>
@@ -145,11 +156,13 @@ const ProfileDropdownMenu = (props) => {
       overlay={dropdownMenu}
       getPopupContainer={() => document.getElementsByClassName('profile-menu')[0]}>
       <button className="ant-dropdown-link">
-        <Icon type="user" className="nav-icon" style={{ marginRight: 0 }} /> <Icon type="down" />
+        <Badge count={props.mentionCount} dot>
+          <Icon type="user" className="nav-icon" style={{ marginRight: 0 }} />
+          <Icon type="down" />
+        </Badge>
       </button>
     </Dropdown>
   );
 }
-
 
 export default withRouter(AppHeader);

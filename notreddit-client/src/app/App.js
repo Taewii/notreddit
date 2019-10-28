@@ -5,9 +5,10 @@ import { Route, withRouter, Redirect, Switch } from 'react-router-dom';
 import { Layout, notification } from 'antd';
 
 import { ACCESS_TOKEN } from '../util/constants';
-import { successNotification } from '../util/notifications';
+import { successNotification, errorNotification } from '../util/notifications';
 import { getCurrentUser, getUpvotedPosts, getDownvotedPosts } from '../services/userService';
 import { allPosts, postsByUsername } from '../services/postService';
+import { getUnreadMentionsCount} from '../services/mentionService';
 
 import Login from '../user/Login';
 import Signup from '../user/Signup';
@@ -33,6 +34,7 @@ class App extends Component {
       isAuthenticated: false,
       isLoading: false,
       roles: [],
+      mentionCount: 0
     }
     this.handleLogout = this.handleLogout.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
@@ -52,14 +54,20 @@ class App extends Component {
     this.setState({
       isLoading: true
     });
+
     getCurrentUser()
       .then(response => {
+
+        getUnreadMentionsCount()
+          .then(res => this.setState({ mentionCount: res }))
+
         this.setState({
           currentUser: response,
           isAuthenticated: true,
           isLoading: false
         });
       }).catch(error => {
+        errorNotification(error);
         this.setState({
           isLoading: false
         });
@@ -89,7 +97,9 @@ class App extends Component {
   }
 
   render() {
-    const { isLoading, isAuthenticated, currentUser } = this.state;
+    const { isLoading, isAuthenticated, currentUser, mentionCount } = this.state;
+
+    console.log(mentionCount);
 
     if (isLoading) {
       return <LoadingIndicator />
@@ -97,7 +107,9 @@ class App extends Component {
 
     return (
       <Layout className="app-container">
-        <AppHeader isAuthenticated={isAuthenticated}
+        <AppHeader
+          mentionCount={mentionCount}
+          isAuthenticated={isAuthenticated}
           currentUser={currentUser}
           onLogout={this.handleLogout} />
 
