@@ -7,6 +7,7 @@ import notreddit.domain.models.responses.post.PostsResponseModel;
 import notreddit.domain.models.responses.user.UserIdentityAvailabilityResponse;
 import notreddit.domain.models.responses.user.UserSummaryResponse;
 import notreddit.domain.models.responses.user.UsersResponse;
+import notreddit.services.MentionService;
 import notreddit.services.PostService;
 import notreddit.services.UserService;
 import notreddit.services.VoteService;
@@ -30,16 +31,19 @@ public class UserController {
     private final UserService userService;
     private final VoteService voteService;
     private final PostService postService;
+    private final MentionService mentionService;
     private final ModelMapper mapper;
 
     @Autowired
     public UserController(UserService userService,
                           VoteService voteService,
                           PostService postService,
+                          MentionService mentionService,
                           ModelMapper mapper) {
         this.userService = userService;
         this.voteService = voteService;
         this.postService = postService;
+        this.mentionService = mentionService;
         this.mapper = mapper;
     }
 
@@ -78,6 +82,12 @@ public class UserController {
     public PostVoteUserChoiceResponse getUserVoteForPost(@PathVariable UUID postId,
                                                          @AuthenticationPrincipal User user) {
         return voteService.getUserChoiceForPost(user, postId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/unread-mentions-count")
+    public int getUsersUnreadMentionsCount(@AuthenticationPrincipal User user) {
+        return mentionService.getUnreadMentionCountByUser(user);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
