@@ -23,6 +23,7 @@ import SubredditCreate from '../subreddit/SubredditCreate';
 import CreatePost from '../post/CreatePost';
 import PostList from '../post/PostList';
 import PostDetails from '../post/PostDetails';
+import MentionList from '../mention/MentionList';
 
 const { Content } = Layout;
 
@@ -99,8 +100,6 @@ class App extends Component {
   render() {
     const { isLoading, isAuthenticated, currentUser, mentionCount } = this.state;
 
-    console.log(mentionCount);
-
     if (isLoading) {
       return <LoadingIndicator />
     }
@@ -143,6 +142,11 @@ class App extends Component {
               <PrivateRoute
                 path="/post/create"
                 component={CreatePost}
+                authenticated={isAuthenticated}
+              />
+               <PrivateRoute
+                path="/user/mentions"
+                component={MentionList}
                 authenticated={isAuthenticated}
               />
               <Route path="/post/:id" component={(props) =>

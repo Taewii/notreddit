@@ -135,16 +135,16 @@ const ProfileDropdownMenu = (props) => {
       <Menu.Item key="profile" className="dropdown-item">
         <Link to={`/user/${props.currentUser.username}`}>Profile</Link>
       </Menu.Item>
-      <Badge count={props.mentionCount}>
-        <Menu.Item key="mentions" className="dropdown-item">
+      <Menu.Item key="mentions" className="dropdown-item">
+        <Badge count={props.mentionCount}>
           <Link
             style={{ color: "inherit" }}
             to={`/user/mentions`}
           >
             Mentions
           </Link>
-        </Menu.Item>
-      </Badge>
+        </Badge>
+      </Menu.Item>
       <Menu.Item key="logout" className="dropdown-item">
         Logout
       </Menu.Item>
