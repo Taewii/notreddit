@@ -84,12 +84,6 @@ public class UserController {
         return voteService.getUserChoiceForPost(user, postId);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/unread-mentions-count")
-    public int getUsersUnreadMentionsCount(@AuthenticationPrincipal User user) {
-        return mentionService.getUnreadMentionCountByUser(user);
-    }
-
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public UsersResponse getAllUsers() {

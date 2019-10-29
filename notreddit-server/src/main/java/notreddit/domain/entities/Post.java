@@ -46,7 +46,10 @@ public class Post extends BaseUUIDEntity implements Votable {
     @Column(nullable = false)
     private LocalDateTime createdOn;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "post")
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "post")
     private File file;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
