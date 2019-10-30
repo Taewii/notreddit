@@ -1,13 +1,17 @@
 package notreddit.services;
 
 import notreddit.domain.entities.User;
-import notreddit.domain.models.responses.MentionResponseModel;
+import notreddit.domain.models.responses.mention.MentionResponse;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
-import java.util.List;
+import java.util.UUID;
 
 public interface MentionService {
 
     int getUnreadMentionCountByUser(User user);
 
-    List<MentionResponseModel> getMentionByUser(User user);
+    MentionResponse getMentionByUser(User user, Pageable pageable);
+
+    ResponseEntity<?> mark(boolean read, User user, UUID mentionId);
 }
