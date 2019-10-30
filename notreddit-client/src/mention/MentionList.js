@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import './MentionList.css';
 
-import { List, Icon, Tooltip } from 'antd';
+import { List, Icon, Button } from 'antd';
 
-import { errorNotification } from '../util/notifications';
+import { errorNotification, successNotification } from '../util/notifications';
 import { timeSince } from '../util/APIUtils';
-import { getUsersMentions } from '../services/mentionService';
+import { getUsersMentions, markAsRead, markAsUnread } from '../services/mentionService';
 
 const IconText = ({ type, text }) => (
   <span>
@@ -13,7 +13,6 @@ const IconText = ({ type, text }) => (
     {text}
   </span>
 );
-
 
 class MentionList extends Component {
   constructor(props) {
@@ -33,8 +32,8 @@ class MentionList extends Component {
       .then(res => {
         if (this._isMounted) {
           this.setState({
-            mentions: res,
-            // totalComments: res.total,
+            mentions: res.mentions,
+            totalMentions: res.total,
             page: page + 1,
             pageSize: +pageSize
           });
@@ -61,54 +60,79 @@ class MentionList extends Component {
   }
 
   markAsRead(mentionId) {
-    console.log(mentionId)
+    markAsRead(mentionId)
+      .then(res => {
+        if (res.success) {
+          successNotification(res.message);
+        } else {
+          errorNotification(res.message)
+        }
+        this.componentDidMount();
+      })
+      .catch(error => errorNotification(error));
   }
 
   markAsUnread(mentionId) {
-    console.log(mentionId)
+    markAsUnread(mentionId)
+      .then(res => {
+        if (res.success) {
+          successNotification(res.message);
+        } else {
+          errorNotification(res.message)
+        }
+        this.componentDidMount();
+      })
+      .catch(error => errorNotification(error));
   }
 
   render() {
-    const { mentions, page, pageSize } = this.state;
+    const { mentions, page, pageSize, totalMentions } = this.state;
 
     return (
       <List
         bordered
         itemLayout="vertical"
         size="small"
-        // pagination={{
-        //   showSizeChanger: true,
-        //   total: totalComments,
-        //   defaultCurrent: 1,
-        //   current: page,
-        //   pageSize: pageSize,
-        //   onChange: (page, pageSize) => {
-        //     this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
-        //   },
-        //   onShowSizeChange: (page, pageSize) => {
-        //     this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
-        //   }
-        // }}
+        pagination={{
+          showSizeChanger: true,
+          total: totalMentions,
+          defaultCurrent: 1,
+          current: page,
+          pageSize: pageSize,
+          onChange: (page, pageSize) => {
+            this.loadMentions(page - 1, pageSize)
+            this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
+          },
+          onShowSizeChange: (page, pageSize) => {
+            this.loadMentions(page - 1, pageSize)
+            this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
+          }
+        }}
         dataSource={mentions}
         renderItem={mention => (
           <List.Item
-            className="comment-item"
+            className="mention-item"
             key={mention.id}
             actions={[
-              <span key="comment-basic-upvote" onClick={() => this.markAsRead(mention.id)}>
-                <Tooltip title="Mark as read">
+              <span className="mention-read" key="mention-read">
+                <Button disabled={mention.read} onClick={() => this.markAsRead(mention.id)}>
                   <IconText type="check" text="Mark as read" />
-                </Tooltip>
+                </Button>
               </span>,
-              <span key="comment-basic-upvote" onClick={() => this.markAsUnread(mention.id)}>
-                <Tooltip title="Mark as unread">
+              <span key="mention-unread">
+                <Button disabled={!mention.read} onClick={() => this.markAsUnread(mention.id)}>
                   <IconText type="close" text="Mark as unread" />
-                </Tooltip>
+                </Button>
               </span>
             ]}
           >
             <List.Item.Meta
-              title={<span><span className="mention-type">comment reply </span> <a href={'/post/' + mention.commentPostId}>{mention.commentPostTitle}</a></span>}
+              title={
+                <span>
+                  <span className="mention-type">comment reply</span>
+                  <a href={'/post/' + mention.commentPostId}>{mention.commentPostTitle}</a>
+                  <span className={"is-read" + (!mention.read ? ' hidden' : '')}>READ</span>
+                </span>}
               description={
                 <span>
                   from <a href={'/user/' + mention.creatorUsername}>{mention.creatorUsername}</a> sent {(timeSince(mention.createdOn)).slice(0, -4)}

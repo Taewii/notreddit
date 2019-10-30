@@ -8,7 +8,7 @@ import { ACCESS_TOKEN } from '../util/constants';
 import { successNotification, errorNotification } from '../util/notifications';
 import { getCurrentUser, getUpvotedPosts, getDownvotedPosts } from '../services/userService';
 import { allPosts, postsByUsername } from '../services/postService';
-import { getUnreadMentionsCount} from '../services/mentionService';
+import { getUnreadMentionsCount } from '../services/mentionService';
 
 import Login from '../user/Login';
 import Signup from '../user/Signup';
@@ -144,7 +144,7 @@ class App extends Component {
                 component={CreatePost}
                 authenticated={isAuthenticated}
               />
-               <PrivateRoute
+              <PrivateRoute
                 path="/user/mentions"
                 component={MentionList}
                 authenticated={isAuthenticated}

@@ -2,4 +2,18 @@
   font-style: italic;
   font-size: 0.7em;
   font-weight: bold;
+  margin-right: 5px;
+}
+
+.is-read {
+  margin-left: 10px;
+  color: green;
+  border: 1px solid green;
+  border-radius: 4px;
+  font-weight: bold;
+  padding: 3px;
+}
+
+.hidden {
+  display: none;
 }
