@@ -1,7 +1,5 @@
 package notreddit.web.controllers;
 
-import com.weddini.throttling.Throttling;
-import com.weddini.throttling.ThrottlingType;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.PostCreateRequest;
 import notreddit.domain.models.responses.post.PostDetailsResponseModel;
@@ -57,7 +55,6 @@ public class PostController {
         return postService.findById(id);
     }
 
-    @Throttling(type = ThrottlingType.PrincipalName)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/vote")
     public ResponseEntity<?> vote(@RequestParam byte choice,

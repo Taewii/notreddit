@@ -80,12 +80,6 @@
             <version>2.3.5</version>
         </dependency>
         <dependency>
-            <groupId>com.weddini.throttling</groupId>
-            <artifactId>spring-boot-throttling-starter</artifactId>
-            <version>0.0.9</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.dropbox.core</groupId>
             <artifactId>dropbox-core-sdk</artifactId>
             <version>3.1.1</version>
