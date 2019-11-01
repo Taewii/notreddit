@@ -35,10 +35,10 @@ export function postsByUsername(page, size, username) {
 }
 
 export function voteForPostAPI(choice, postId) {
-  const query = `?choice=${choice}&postId=${postId}`;
+  const url = `${API_BASE_URL}/post/vote?choice=${choice}&postId=${postId}`;
 
   return request({
-    url: API_BASE_URL + '/post/vote' + query,
+    url,
     method: 'POST'
   });
 }

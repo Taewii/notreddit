@@ -7,7 +7,7 @@ import { List, Icon, Tooltip } from 'antd';
 import { errorNotification } from '../util/notifications';
 import { voteForPost } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
-import { getUserVotesForPosts } from '../services/userService';
+import { getUserVotesForPosts } from '../services/voteService';
 
 const IconText = ({ type, text }) => (
   <span>

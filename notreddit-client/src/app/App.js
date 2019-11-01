@@ -68,7 +68,6 @@ class App extends Component {
           isLoading: false
         });
       }).catch(error => {
-        errorNotification(error);
         this.setState({
           isLoading: false
         });

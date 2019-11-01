@@ -7,7 +7,7 @@ import { List, Icon, Tooltip, Avatar } from 'antd';
 import { errorNotification } from '../util/notifications';
 import { voteForComment } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
-import { getUserVotesForComments } from '../services/userService';
+import { getUserVotesForComments } from '../services/voteService';
 import { commentsByUsername } from '../services/commentService';
 
 const IconText = ({ type, text }) => (

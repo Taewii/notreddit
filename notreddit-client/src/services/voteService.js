@@ -9,7 +9,21 @@ import { GREEN, RED, DEFAULT, DEFAULT_RGBA } from '../util/constants';
 
 export function getVoteForPost(postId) {
   return request({
-    url: API_BASE_URL + '/user/vote/' + postId,
+    url: API_BASE_URL + '/vote/post?postId=' + postId,
+    method: 'GET'
+  });
+}
+
+export function getUserVotesForPosts() {
+  return request({
+    url: API_BASE_URL + '/vote/votes-posts',
+    method: 'GET'
+  });
+}
+
+export function getUserVotesForComments() {
+  return request({
+    url: API_BASE_URL + '/vote/votes-comments',
     method: 'GET'
   });
 }

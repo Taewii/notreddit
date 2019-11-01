@@ -131,7 +131,7 @@ class MentionList extends Component {
                 <span>
                   <span className="mention-type">comment reply</span>
                   <a href={'/post/' + mention.commentPostId}>{mention.commentPostTitle}</a>
-                  <span className={"is-read" + (!mention.read ? ' hidden' : '')}>READ</span>
+                  <span className={"is-read" + (!mention.read ? ' hidden' : '')}>read</span>
                 </span>}
               description={
                 <span>

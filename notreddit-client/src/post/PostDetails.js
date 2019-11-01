@@ -8,7 +8,7 @@ import { findById } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
 import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
 import { comment, findCommentsForPost } from '../services/commentService';
-import { getUserVotesForComments } from '../services/userService';
+import { getUserVotesForComments } from '../services/voteService';
 
 class PostDetails extends Component {
   constructor(props) {
