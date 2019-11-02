@@ -34,6 +34,15 @@ export function postsByUsername(page, size, username) {
   });
 }
 
+export function postsBySubreddit(page, size, subreddit) {
+  const url = `${API_BASE_URL}/post/subreddit/${subreddit}?page=${page}&size=${size}`;
+
+  return request({
+    url,
+    method: 'GET'
+  });
+}
+
 export function voteForPostAPI(choice, postId) {
   const url = `${API_BASE_URL}/post/vote?choice=${choice}&postId=${postId}`;
 

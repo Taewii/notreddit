@@ -5,9 +5,9 @@ import { Route, withRouter, Redirect, Switch } from 'react-router-dom';
 import { Layout, notification } from 'antd';
 
 import { ACCESS_TOKEN } from '../util/constants';
-import { successNotification, errorNotification } from '../util/notifications';
+import { successNotification } from '../util/notifications';
 import { getCurrentUser, getUpvotedPosts, getDownvotedPosts } from '../services/userService';
-import { allPosts, postsByUsername } from '../services/postService';
+import { allPosts, postsByUsername, postsBySubreddit } from '../services/postService';
 import { getUnreadMentionsCount } from '../services/mentionService';
 
 import Login from '../user/Login';
@@ -20,6 +20,7 @@ import NotFound from '../common/NotFound';
 import PrivateRoute from '../common/PrivateRoute';
 import LoadingIndicator from '../common/LoadingIndicator';
 import SubredditCreate from '../subreddit/SubredditCreate';
+import SubredditPosts from '../subreddit/SubredditPosts';
 import CreatePost from '../post/CreatePost';
 import PostList from '../post/PostList';
 import PostDetails from '../post/PostDetails';
@@ -187,6 +188,13 @@ class App extends Component {
                   isAuthenticated={isAuthenticated}
                   dataLoadingFunction={getDownvotedPosts}
                   currentUser={currentUser}
+                  {...props}
+                />}
+              />
+              <Route path="/subreddit/:subreddit" component={(props) =>
+                <SubredditPosts
+                  isAuthenticated={isAuthenticated}
+                  dataLoadingFunction={postsBySubreddit}
                   {...props}
                 />}
               />
