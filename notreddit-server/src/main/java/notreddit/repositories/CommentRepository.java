@@ -25,9 +25,9 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
     @Query(value = "SELECT c FROM Comment c " +
             "JOIN FETCH c.post " +
-            "WHERE c.creator.username = :username",
+            "WHERE LOWER(c.creator.username) = :username",
             countQuery = "SELECT COUNT(c) " +
                     "FROM Comment c " +
-                    "WHERE c.creator.username = :username")
+                    "WHERE LOWER(c.creator.username) = :username")
     Page<Comment> findByCreatorUsername(@Param("username") String username, Pageable pageable);
 }

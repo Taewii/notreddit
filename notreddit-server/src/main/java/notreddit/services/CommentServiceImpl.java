@@ -105,7 +105,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentsResponseModel findAllFromUsername(String username, Pageable pageable) {
-        Page<Comment> byCreatorUsername = commentRepository.findByCreatorUsername(username, pageable);
+        Page<Comment> byCreatorUsername = commentRepository.findByCreatorUsername(username.toLowerCase(), pageable);
         List<CommentListWithReplyCount> comments = byCreatorUsername.stream()
                 .map(c -> {
                     CommentListWithReplyCount model = mapper.map(c, CommentListWithReplyCount.class);

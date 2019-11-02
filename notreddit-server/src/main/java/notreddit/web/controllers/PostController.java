@@ -50,6 +50,12 @@ public class PostController {
     }
 
     @PreAuthorize("permitAll()")
+    @GetMapping("/subreddit/{subreddit}")
+    public PostsResponseModel findAllBySubreddit(@PathVariable String subreddit, Pageable pageable) {
+        return postService.findAllBySubreddit(subreddit.toLowerCase(), pageable);
+    }
+
+    @PreAuthorize("permitAll()")
     @GetMapping("/{id}")
     public PostDetailsResponseModel findById(@PathVariable UUID id) {
         return postService.findById(id);

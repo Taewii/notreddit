@@ -20,4 +20,6 @@ public interface PostService {
     PostsResponseModel findAllByUsername(String username, Pageable pageable);
 
     PostsResponseModel getPostsByVoteChoice(User user, String username, int choice, Pageable pageable);
+
+    PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable);
 }

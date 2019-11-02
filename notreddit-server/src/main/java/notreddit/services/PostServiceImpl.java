@@ -63,7 +63,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostsResponseModel findAllByUsername(String username, Pageable pageable) {
-        Page<Post> allByUsername = postRepository.findAllByUsername(username, pageable);
+        Page<Post> allByUsername = postRepository.findAllByUsername(username.toLowerCase(), pageable);
+        return getPostsResponseModel(allByUsername);
+    }
+
+    @Override
+    public PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable) {
+        Page<Post> allByUsername = postRepository.findAllBySubreddit(subreddit, pageable);
         return getPostsResponseModel(allByUsername);
     }
 

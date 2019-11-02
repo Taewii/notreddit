@@ -26,9 +26,17 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             "JOIN FETCH p.creator c " +
             "LEFT JOIN FETCH p.subreddit " +
             "LEFT JOIN FETCH p.comments " +
-            "WHERE c.username = :username",
-            countQuery = "SELECT COUNT(p) FROM Post p WHERE p.creator.username = :username")
+            "WHERE LOWER(c.username) = :username",
+            countQuery = "SELECT COUNT(p) FROM Post p WHERE LOWER(p.creator.username) = :username")
     Page<Post> findAllByUsername(@Param("username") String username, Pageable pageable);
+
+    @Query(value = "SELECT DISTINCT p FROM Post p " +
+            "JOIN FETCH p.creator c " +
+            "LEFT JOIN FETCH p.subreddit " +
+            "LEFT JOIN FETCH p.comments " +
+            "WHERE LOWER(p.subreddit.title) = :subreddit",
+            countQuery = "SELECT COUNT(p) FROM Post p WHERE LOWER(p.subreddit.title) = :subreddit")
+    Page<Post> findAllBySubreddit(@Param("subreddit") String subreddit, Pageable pageable);
 
     @Query(value = "SELECT p FROM Vote v " +
             "JOIN v.post as p " +
