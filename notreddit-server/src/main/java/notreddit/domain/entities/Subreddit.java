@@ -18,8 +18,8 @@ public class Subreddit extends BaseLongEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User creator;
 
-    @Length(min = 4)
     @NotBlank
+    @Length(min = 3)
     @Column(nullable = false)
     private String title;
 

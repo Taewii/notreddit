@@ -11,10 +11,8 @@ import javax.validation.constraints.NotBlank;
 public class SignInRequest {
 
     @NotBlank
-    @Length(min = 4)
     private String usernameOrEmail;
 
     @NotBlank
-    @Length(min = 6)
     private String password;
 }

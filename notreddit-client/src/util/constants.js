@@ -6,7 +6,7 @@ export const USERNAME_MIN_LENGTH = 4;
 export const TITLE_MIN_LENGTH = 4;
 export const PASSWORD_MIN_LENGTH = 6;
 
-export const SUBREDDIT_MIN_LENGTH = 4;
+export const SUBREDDIT_MIN_LENGTH = 3;
 
 export const DEFAULT = 'rgb(89, 89, 89)';
 export const DEFAULT_RGBA = 'rgba(0, 0, 0, 0.45)';

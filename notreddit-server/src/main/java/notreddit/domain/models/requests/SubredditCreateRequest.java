@@ -11,6 +11,6 @@ import javax.validation.constraints.NotBlank;
 public class SubredditCreateRequest {
 
     @NotBlank
-    @Length(min = 4)
+    @Length(min = 3)
     private String title;
 }
