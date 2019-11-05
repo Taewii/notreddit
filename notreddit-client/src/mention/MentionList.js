@@ -1,18 +1,12 @@
 import React, { Component } from 'react';
 import './MentionList.css';
 
-import { List, Icon, Button } from 'antd';
+import { List, Button } from 'antd';
 
+import { IconText } from '../util/IconText';
 import { errorNotification, successNotification } from '../util/notifications';
 import { timeSince } from '../util/APIUtils';
 import { getUsersMentions, markAsRead, markAsUnread } from '../services/mentionService';
-
-const IconText = ({ type, text }) => (
-  <span>
-    <Icon type={type} style={{ marginRight: 8 }} />
-    {text}
-  </span>
-);
 
 class MentionList extends Component {
   constructor(props) {

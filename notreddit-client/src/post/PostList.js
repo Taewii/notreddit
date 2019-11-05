@@ -4,23 +4,19 @@ import './PostList.css';
 import { Link } from 'react-router-dom';
 import { List, Icon, Tooltip } from 'antd';
 
+import { IconText } from '../util/IconText';
 import { errorNotification } from '../util/notifications';
 import { voteForPost } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
 import { getUserVotesForPosts } from '../services/voteService';
-
-const IconText = ({ type, text }) => (
-  <span>
-    <Icon type={type} style={{ marginRight: 8 }} />
-    {text}
-  </span>
-);
 
 class PostList extends Component {
   constructor(props) {
     super(props)
     this.dataLoadingFunction = this.props.dataLoadingFunction;
     this.username = this.props.username;
+    this.currentUser = this.props.currentUser;
+    this.currentUserUsername = '';
     this._isMounted = false;
     this.votes = {};
     this.state = {
@@ -31,6 +27,10 @@ class PostList extends Component {
       page: 0,
       pageSize: 10
     };
+
+    if (this.currentUser !== null) {
+      this.currentUserUsername = this.currentUser.username
+    }
 
     this.colorVote = this.colorVote.bind(this);
   }
@@ -116,33 +116,7 @@ class PostList extends Component {
           <List.Item
             onLoad={(event) => this.colorVote(event, post.id)}
             key={post.id}
-            actions={[
-              <span key="comment-basic-upvote">
-                <Tooltip title="Upvote">
-                  <Icon
-                    type="like"
-                    theme="outlined"
-                    onClick={(event) => voteForPost(event, 1, post.id)}
-                  />
-                </Tooltip>
-                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.upvotes}</span>
-              </span>,
-              <span key="comment-basic-downvote">
-                <Tooltip title="Downvote">
-                  <Icon
-                    type="dislike"
-                    theme="outlined"
-                    onClick={(event) => voteForPost(event, -1, post.id)}
-                  />
-                </Tooltip>
-                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.downvotes}</span>
-              </span>,
-              <span key="comments">
-                <Link to={'/post/' + post.id} style={{ color: 'gray' }}>
-                  <IconText type="message" text={post.commentCount} />
-                </Link>
-              </span>,
-            ]}
+            actions={actions(post, this.currentUserUsername)}
           >
             <List.Item.Meta
               avatar={
@@ -162,6 +136,52 @@ class PostList extends Component {
       />
     );
   }
+}
+
+const actions = (post, currentUser) => {
+  let actions = [
+    <span key="comment-basic-upvote">
+      <Tooltip title="Upvote">
+        <Icon
+          type="like"
+          theme="outlined"
+          onClick={(event) => voteForPost(event, 1, post.id)}
+        />
+      </Tooltip>
+      <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.upvotes}</span>
+    </span>,
+    <span key="comment-basic-downvote">
+      <Tooltip title="Downvote">
+        <Icon
+          type="dislike"
+          theme="outlined"
+          onClick={(event) => voteForPost(event, -1, post.id)}
+        />
+      </Tooltip>
+      <span style={{ paddingLeft: 8, cursor: 'auto' }}>{post.downvotes}</span>
+    </span>,
+    <span key="comments">
+      <Link to={'/post/' + post.id} style={{ color: 'gray' }}>
+        <IconText type="message" text={post.commentCount} />
+      </Link>
+    </span>,
+  ]
+
+  if (post.creatorUsername === currentUser) {
+    const editAndDelete = [
+      <span key="edit-comment">
+        <IconText type="edit" text="Edit" />
+      </span>,
+      <span key="remove-comment">
+        <IconText type="delete" text="Delete" />
+      </span>
+    ]
+
+
+    actions = actions.concat(editAndDelete);
+  }
+
+  return actions;
 }
 
 export default PostList;

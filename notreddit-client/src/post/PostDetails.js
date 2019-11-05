@@ -9,6 +9,7 @@ import { timeSince } from '../util/APIUtils';
 import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
 import { comment, findCommentsForPost } from '../services/commentService';
 import { getUserVotesForComments } from '../services/voteService';
+import { IconText } from '../util/IconText';
 
 class PostDetails extends Component {
   constructor(props) {
@@ -23,6 +24,13 @@ class PostDetails extends Component {
       commentContent: '',
       replyCommentContent: '',
       modalIsVisible: false,
+    }
+
+    this.currentUser = this.props.currentUser;
+    this.currentUserUsername = '';
+
+    if (this.currentUser !== null) {
+      this.currentUserUsername = this.currentUser.username
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -138,7 +146,7 @@ class PostDetails extends Component {
   render() {
     const { post, postId } = this.state;
 
-    const actions = [
+    let actions = [
       <span key="comment-basic-upvote">
         <Tooltip title="Upvote">
           <Icon
@@ -167,6 +175,19 @@ class PostDetails extends Component {
         }
       </span>,
     ]
+
+    if (this.currentUserUsername === post.creatorUsername) {
+      const editAndDelete = [
+        <span key="edit-comment">
+          <IconText type="edit" text="Edit" />
+        </span>,
+        <span key="remove-comment">
+          <IconText type="delete" text="Delete" />
+        </span>
+      ];
+
+      actions = actions.concat(editAndDelete);
+    }
 
     return (
       <div className="post">
@@ -220,7 +241,8 @@ class PostDetails extends Component {
             key={comment.id}
             comment={comment}
             votes={this.commentVotes || {}}
-            showModal={this.showModalAndSaveCommentId} />)}
+            showModal={this.showModalAndSaveCommentId}
+            currentUser={this.currentUserUsername} />)}
         <Modal
           title="Reply to comment"
           okText="Reply"
@@ -248,7 +270,7 @@ class PostDetails extends Component {
   }
 }
 
-const CommentComponent = ({ comment, votes, showModal }) => {
+const CommentComponent = ({ comment, votes, showModal, currentUser }) => {
   let upvoteColor = '';
   let downvoteColor = '';
   const vote = votes[comment.id];
@@ -261,7 +283,7 @@ const CommentComponent = ({ comment, votes, showModal }) => {
     }
   }
 
-  const actions = [
+  let actions = [
     <span key="comment-basic-upvote">
       <Tooltip title="Upvote">
         <Icon
@@ -286,6 +308,19 @@ const CommentComponent = ({ comment, votes, showModal }) => {
     </span>,
     <span onClick={showModal.bind(null, comment.id)} key="comment-basic-reply-to">Reply to</span>,
   ];
+
+  if (currentUser === comment.creatorUsername) {
+    const editAndDelete = [
+      <span key="edit-comment">
+        <IconText type="edit" text="Edit" />
+      </span>,
+      <span key="remove-comment">
+        <IconText type="delete" text="Delete" />
+      </span>
+    ];
+
+    actions = actions.concat(editAndDelete);
+  }
 
   return (
     <Comment

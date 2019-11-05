@@ -4,24 +4,19 @@ import './CommentList.css';
 import { Link } from 'react-router-dom';
 import { List, Icon, Tooltip, Avatar } from 'antd';
 
+import { IconText } from '../util/IconText';
 import { errorNotification } from '../util/notifications';
 import { voteForComment } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
 import { getUserVotesForComments } from '../services/voteService';
 import { commentsByUsername } from '../services/commentService';
 
-const IconText = ({ type, text }) => (
-  <span>
-    <Icon type={type} style={{ marginRight: 8 }} />
-    {text}
-  </span>
-);
-
 class CommentList extends Component {
   constructor(props) {
     super(props)
     this._isMounted = false;
     this.username = this.props.username;
+    this.currentUser = this.props.currentUser;
     this.votes = {};
     this.state = {
       initLoading: true,
@@ -117,33 +112,7 @@ class CommentList extends Component {
             className="comment-item"
             onLoad={(event) => this.colorVote(event, comment.id)}
             key={comment.id}
-            actions={[
-              <span key="comment-basic-upvote">
-                <Tooltip title="Upvote">
-                  <Icon
-                    type="like"
-                    theme="outlined"
-                    onClick={(event) => voteForComment(event, 1, comment.id)}
-                  />
-                </Tooltip>
-                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.upvotes}</span>
-              </span>,
-              <span key="comment-basic-downvote">
-                <Tooltip title="Downvote">
-                  <Icon
-                    type="dislike"
-                    theme="outlined"
-                    onClick={(event) => voteForComment(event, -1, comment.id)}
-                  />
-                </Tooltip>
-                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.downvotes}</span>
-              </span>,
-              <span key="comments">
-                <Link to={'/post/' + comment.postId} style={{ color: 'gray' }}>
-                  <IconText type="message" text={comment.replies} />
-                </Link>
-              </span>,
-            ]}
+            actions={actions(comment, this.currentUser)}
           >
             <List.Item.Meta
               avatar={
@@ -164,6 +133,51 @@ class CommentList extends Component {
       />
     );
   }
+}
+
+const actions = (comment, currentUser) => {
+  let actions = [
+    <span key="comment-basic-upvote">
+      <Tooltip title="Upvote">
+        <Icon
+          type="like"
+          theme="outlined"
+          onClick={(event) => voteForComment(event, 1, comment.id)}
+        />
+      </Tooltip>
+      <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.upvotes}</span>
+    </span>,
+    <span key="comment-basic-downvote">
+      <Tooltip title="Downvote">
+        <Icon
+          type="dislike"
+          theme="outlined"
+          onClick={(event) => voteForComment(event, -1, comment.id)}
+        />
+      </Tooltip>
+      <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.downvotes}</span>
+    </span>,
+    <span key="comments">
+      <Link to={'/post/' + comment.postId} style={{ color: 'gray' }}>
+        <IconText type="message" text={comment.replies} />
+      </Link>
+    </span>,
+  ]
+
+  if (currentUser.username === comment.creatorUsername) {
+    const editAndDelete = [
+      <span key="edit-comment">
+        <IconText type="edit" text="Edit" />
+      </span>,
+      <span key="remove-comment">
+        <IconText type="delete" text="Delete" />
+      </span>
+    ];
+
+    actions = actions.concat(editAndDelete);
+  }
+
+  return actions;
 }
 
 export default CommentList;

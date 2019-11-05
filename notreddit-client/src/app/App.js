@@ -150,12 +150,16 @@ class App extends Component {
                 authenticated={isAuthenticated}
               />
               <Route path="/post/:id" component={(props) =>
-                <PostDetails isAuthenticated={isAuthenticated} {...props} />}
+                <PostDetails
+                  isAuthenticated={isAuthenticated}
+                  currentUser={currentUser}
+                  {...props} />}
               />
               <Route exact path="/home" component={(props) =>
                 <PostList
                   isAuthenticated={isAuthenticated}
                   dataLoadingFunction={allPosts}
+                  currentUser={currentUser}
                   username={null}
                   {...props}
                 />}

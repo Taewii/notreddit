@@ -21,6 +21,7 @@ class UserComments extends Component {
       <div>
         <ProfileDetailsMenu username={this.username} currentUser={this.currentUserUsername} />
         <CommentList
+          currentUser={this.currentUserUsername}
           isAuthenticated={this.isAuthenticated}
           username={this.username}
           {...this.props}
