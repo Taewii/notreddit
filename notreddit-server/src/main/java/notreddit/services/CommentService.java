@@ -17,4 +17,6 @@ public interface CommentService {
     List<CommentListWithChildren> findAllFromPost(UUID postId);
 
     CommentsResponseModel findAllFromUsername(String username, Pageable pageable);
+
+    ResponseEntity<?> delete(UUID commentId, User user);
 }

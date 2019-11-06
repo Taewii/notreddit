@@ -5,9 +5,11 @@ import notreddit.domain.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
@@ -29,4 +31,8 @@ public interface MentionRepository extends JpaRepository<Mention, UUID> {
             "ORDER BY m.isRead, m.createdOn DESC",
             countQuery = "SELECT COUNT(m) FROM Mention m WHERE m.receiver = :receiver")
     Page<Mention> getUsersMentions(@NotNull @Param("receiver") User receiver, Pageable pageable);
+
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    void deleteAllByCommentId(UUID commentId);
 }

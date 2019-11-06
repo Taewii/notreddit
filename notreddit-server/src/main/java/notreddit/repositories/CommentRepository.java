@@ -20,8 +20,8 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
             "AND c.post.id = :id")
     List<Comment> findByPostIdWithChildren(@Param("id") UUID id);
 
-    @Query("SELECT c FROM Comment c WHERE c.id = :id")
-    Optional<Comment> findByIdWithChildren(@Param("id") UUID id);
+    @Query("SELECT c FROM Comment c LEFT JOIN FETCH c.mentions WHERE c.id = :id")
+    Optional<Comment> findByIdWithMentions(@Param("id") UUID id);
 
     @Query(value = "SELECT c FROM Comment c " +
             "JOIN FETCH c.post " +

@@ -57,4 +57,11 @@ public class CommentController {
                                   @AuthenticationPrincipal User user) {
         return voteService.voteForPostOrComment(choice, null, commentId, user);
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delete(@RequestParam UUID commentId,
+                                    @AuthenticationPrincipal User user) {
+        return commentService.delete(commentId, user);
+    }
 }

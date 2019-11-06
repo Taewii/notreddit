@@ -3,9 +3,11 @@ package notreddit.repositories;
 import notreddit.domain.entities.User;
 import notreddit.domain.entities.Vote;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +25,8 @@ public interface VoteRepository extends JpaRepository<Vote, UUID> {
 
     @Query("SELECT v FROM Vote v JOIN FETCH v.comment WHERE v.user = :user AND v.post IS NULL ")
     List<Vote> findCommentVotesByUser(@Param("user") User user);
+
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    void deleteAllByCommentId(UUID commentId);
 }

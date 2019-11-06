@@ -68,4 +68,11 @@ public class PostController {
                                   @AuthenticationPrincipal User user) {
         return voteService.voteForPostOrComment(choice, postId, null, user);
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delete(@RequestParam UUID postId,
+                                    @AuthenticationPrincipal User user) {
+        return postService.delete(postId, user);
+    }
 }

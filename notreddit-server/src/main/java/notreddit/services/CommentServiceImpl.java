@@ -10,7 +10,9 @@ import notreddit.domain.models.responses.comment.CommentListWithChildren;
 import notreddit.domain.models.responses.comment.CommentListWithReplyCount;
 import notreddit.domain.models.responses.comment.CommentsResponseModel;
 import notreddit.repositories.CommentRepository;
+import notreddit.repositories.MentionRepository;
 import notreddit.repositories.PostRepository;
+import notreddit.repositories.VoteRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,14 +32,20 @@ public class CommentServiceImpl implements CommentService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final MentionRepository mentionRepository;
+    private final VoteRepository voteRepository;
     private final ModelMapper mapper;
 
     @Autowired
     public CommentServiceImpl(PostRepository postRepository,
                               CommentRepository commentRepository,
+                              MentionRepository mentionRepository,
+                              VoteRepository voteRepository,
                               ModelMapper mapper) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
+        this.mentionRepository = mentionRepository;
+        this.voteRepository = voteRepository;
         this.mapper = mapper;
     }
 
@@ -58,7 +66,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setCreatedOn(LocalDateTime.now());
 
         if (commentModel.getParentId() != null) {
-            parent = commentRepository.findByIdWithChildren(commentModel.getParentId()).orElse(null);
+            parent = commentRepository.findById(commentModel.getParentId()).orElse(null);
             comment.setParent(parent);
 
             if (parent != null) {
@@ -114,5 +122,34 @@ public class CommentServiceImpl implements CommentService {
                 }).collect(Collectors.toUnmodifiableList());
 
         return new CommentsResponseModel(byCreatorUsername.getTotalElements(), comments);
+    }
+
+    @Override
+    public ResponseEntity<?> delete(UUID commentId, User user) {
+        Comment comment = commentRepository.findByIdWithMentions(commentId).orElse(null);
+
+        if (comment == null || !user.getUsername().equals(comment.getCreator().getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Comment doesn't exist or you are not the creator."));
+        }
+
+        mentionRepository.deleteAllByCommentId(commentId);
+
+        if (!comment.getChildren().isEmpty()) {
+            comment.setContent("[deleted]");
+            commentRepository.saveAndFlush(comment);
+
+            return ResponseEntity
+                    .ok(new ApiResponse(true, "Comment deleted successfully."));
+        }
+
+        voteRepository.deleteAllByCommentId(commentId);
+
+        // TODO: 6.11.2019 г. deleted mentions dont flush fast enough so it cant delete the comment right away
+        commentRepository.delete(comment);
+
+        return ResponseEntity
+                .ok(new ApiResponse(true, "Comment deleted successfully."));
     }
 }

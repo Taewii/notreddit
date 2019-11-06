@@ -38,7 +38,10 @@ public class Comment extends BaseUUIDEntity implements Votable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment parent;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
     @JoinColumn(name = "parent_id")
     private List<Comment> children = new ArrayList<>();
 

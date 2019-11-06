@@ -74,6 +74,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public ResponseEntity<?> delete(UUID postId, User user) {
+        // TODO: 6.11.2019 г.  
+        return null;
+    }
+
+    @Override
     public PostsResponseModel getPostsByVoteChoice(User user, String username, int choice, Pageable pageable) {
         if (!user.getUsername().equalsIgnoreCase(username)) {
             throw new AccessForbiddenException("You are not allowed to view this content");
