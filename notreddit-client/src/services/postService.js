@@ -51,3 +51,11 @@ export function voteForPostAPI(choice, postId) {
     method: 'POST'
   });
 }
+
+export function deletePostById(postId) {
+  const url = `${API_BASE_URL}/post/delete?postId=${postId}`;
+  return request({
+    url,
+    method: 'DELETE'
+  });
+}

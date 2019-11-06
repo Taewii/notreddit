@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import './CommentList.css';
 
 import { Link } from 'react-router-dom';
-import { List, Icon, Tooltip, Avatar } from 'antd';
+import { List, Icon, Tooltip, Avatar, Popconfirm } from 'antd';
 
 import { IconText } from '../util/IconText';
-import { errorNotification } from '../util/notifications';
-import { voteForComment } from '../services/voteService';
+import { errorNotification, successNotification } from '../util/notifications';
 import { timeSince } from '../util/APIUtils';
+import { voteForComment } from '../services/voteService';
 import { getUserVotesForComments } from '../services/voteService';
-import { commentsByUsername } from '../services/commentService';
+import { commentsByUsername, deleteCommentById } from '../services/commentService';
 
 class CommentList extends Component {
   constructor(props) {
@@ -27,6 +27,7 @@ class CommentList extends Component {
       pageSize: 10
     };
 
+    this.deleteComment = this.deleteComment.bind(this);
     this.colorVote = this.colorVote.bind(this);
   }
 
@@ -85,6 +86,14 @@ class CommentList extends Component {
     }
   }
 
+  deleteComment(commentId) {
+    deleteCommentById(commentId)
+      .then(res => {
+        successNotification(res.message);
+        this.componentDidMount();
+      }).catch(error => errorNotification(error));
+  }
+
   render() {
     const { comments, totalComments, page, pageSize } = this.state;
 
@@ -112,7 +121,7 @@ class CommentList extends Component {
             className="comment-item"
             onLoad={(event) => this.colorVote(event, comment.id)}
             key={comment.id}
-            actions={actions(comment, this.currentUser)}
+            actions={actions(comment, this.currentUser, this.deleteComment)}
           >
             <List.Item.Meta
               avatar={
@@ -135,7 +144,7 @@ class CommentList extends Component {
   }
 }
 
-const actions = (comment, currentUser) => {
+const actions = (comment, currentUser, deleteComment) => {
   let actions = [
     <span key="comment-basic-upvote">
       <Tooltip title="Upvote">
@@ -169,9 +178,14 @@ const actions = (comment, currentUser) => {
       <span key="edit-comment">
         <IconText type="edit" text="Edit" />
       </span>,
-      <span key="remove-comment">
-        <IconText type="delete" text="Delete" />
-      </span>
+      <Popconfirm
+        title="Are you sure you want to delete this comment?"
+        onConfirm={deleteComment.bind(this, comment.id)}
+      >
+        <span key="remove-comment">
+          <IconText type="delete" text="Delete" />
+        </span>
+      </Popconfirm>
     ];
 
     actions = actions.concat(editAndDelete);

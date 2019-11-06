@@ -33,3 +33,12 @@ export function commentsByUsername(username, page, size) {
     method: 'GET'
   });
 }
+
+export function deleteCommentById(commentId) {
+  const url = `${API_BASE_URL}/comment/delete?commentId=${commentId}`;
+
+  return request({
+    url,
+    method: 'DELETE'
+  });
+}

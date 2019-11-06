@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import './PostList.css';
 
 import { Link } from 'react-router-dom';
-import { List, Icon, Tooltip } from 'antd';
+import { List, Icon, Tooltip, Popconfirm } from 'antd';
 
 import { IconText } from '../util/IconText';
-import { errorNotification } from '../util/notifications';
+import { errorNotification, successNotification } from '../util/notifications';
 import { voteForPost } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
 import { getUserVotesForPosts } from '../services/voteService';
+import { deletePostById } from '../services/postService';
 
 class PostList extends Component {
   constructor(props) {
@@ -32,6 +33,7 @@ class PostList extends Component {
       this.currentUserUsername = this.currentUser.username
     }
 
+    this.deletePost = this.deletePost.bind(this);
     this.colorVote = this.colorVote.bind(this);
   }
 
@@ -90,6 +92,14 @@ class PostList extends Component {
     }
   }
 
+  deletePost(postId) {
+    deletePostById(postId)
+      .then(res => {
+        successNotification(res.message);
+        this.componentDidMount();
+      }).catch(error => errorNotification(error));
+  }
+
   render() {
     const { posts, totalPosts, page, pageSize } = this.state;
 
@@ -116,7 +126,7 @@ class PostList extends Component {
           <List.Item
             onLoad={(event) => this.colorVote(event, post.id)}
             key={post.id}
-            actions={actions(post, this.currentUserUsername)}
+            actions={actions(post, this.currentUserUsername, this.deletePost)}
           >
             <List.Item.Meta
               avatar={
@@ -138,7 +148,7 @@ class PostList extends Component {
   }
 }
 
-const actions = (post, currentUser) => {
+const actions = (post, currentUser, deletePost) => {
   let actions = [
     <span key="comment-basic-upvote">
       <Tooltip title="Upvote">
@@ -172,9 +182,14 @@ const actions = (post, currentUser) => {
       <span key="edit-comment">
         <IconText type="edit" text="Edit" />
       </span>,
-      <span key="remove-comment">
-        <IconText type="delete" text="Delete" />
-      </span>
+      <Popconfirm
+        title="Are you sure you want to delete this post?"
+        onConfirm={deletePost.bind(this, post.id)}
+      >
+        <span key="remove-comment">
+          <IconText type="delete" text="Delete" />
+        </span>
+      </Popconfirm>
     ]
 
 

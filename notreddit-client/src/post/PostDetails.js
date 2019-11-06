@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import './PostDetails.css';
 
-import { List, Icon, Tooltip, Button, Form, Input, Comment, Avatar, Modal } from 'antd';
+import { List, Icon, Tooltip, Button, Form, Input, Comment, Avatar, Modal, Popconfirm } from 'antd';
 
 import { errorNotification, successNotification } from '../util/notifications'
-import { findById } from '../services/postService';
 import { timeSince } from '../util/APIUtils';
-import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
-import { comment, findCommentsForPost } from '../services/commentService';
-import { getUserVotesForComments } from '../services/voteService';
 import { IconText } from '../util/IconText';
+import { findById, deletePostById } from '../services/postService';
+import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
+import { comment, findCommentsForPost, deleteCommentById } from '../services/commentService';
+import { getUserVotesForComments } from '../services/voteService';
 
 class PostDetails extends Component {
   constructor(props) {
@@ -37,6 +37,8 @@ class PostDetails extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.showModalAndSaveCommentId = this.showModalAndSaveCommentId.bind(this);
     this.hideModal = this.hideModal.bind(this);
+    this.deletePost = this.deletePost.bind(this);
+    this.deleteComment = this.deleteComment.bind(this);
   }
 
   componentDidMount() {
@@ -130,6 +132,24 @@ class PostDetails extends Component {
     })
   }
 
+  deletePost(postId) {
+    console.log('deletePost ' + postId)
+    deletePostById(postId)
+      .then(res => {
+        successNotification(res.message)
+        this.props.history.push('/home');
+      }).catch(error => errorNotification(error));
+  }
+
+  deleteComment(commentId) {
+    console.log('deleteComment ' + commentId)
+    deleteCommentById(commentId)
+      .then(res => {
+        successNotification(res.message);
+        this.componentDidMount();
+      }).catch(error => errorNotification(error));
+  }
+
   hideModal() {
     const modalTextArea = document.querySelector('.comment-reply-textarea');
     if (modalTextArea) {
@@ -178,12 +198,17 @@ class PostDetails extends Component {
 
     if (this.currentUserUsername === post.creatorUsername) {
       const editAndDelete = [
-        <span key="edit-comment">
+        <span key="edit-comment" onClick={() => this.props.history.push(`/post/edit/${postId}`)}>
           <IconText type="edit" text="Edit" />
         </span>,
-        <span key="remove-comment">
-          <IconText type="delete" text="Delete" />
-        </span>
+        <Popconfirm
+          title="Are you sure you want to delete this post?"
+          onConfirm={this.deletePost.bind(this, postId)}
+        >
+          <span key="remove-comment">
+            <IconText type="delete" text="Delete" />
+          </span>
+        </Popconfirm>
       ];
 
       actions = actions.concat(editAndDelete);
@@ -242,7 +267,8 @@ class PostDetails extends Component {
             comment={comment}
             votes={this.commentVotes || {}}
             showModal={this.showModalAndSaveCommentId}
-            currentUser={this.currentUserUsername} />)}
+            currentUser={this.currentUserUsername}
+            deleteComment={this.deleteComment} />)}
         <Modal
           title="Reply to comment"
           okText="Reply"
@@ -270,7 +296,7 @@ class PostDetails extends Component {
   }
 }
 
-const CommentComponent = ({ comment, votes, showModal, currentUser }) => {
+const CommentComponent = ({ comment, votes, showModal, currentUser, deleteComment }) => {
   let upvoteColor = '';
   let downvoteColor = '';
   const vote = votes[comment.id];
@@ -314,9 +340,14 @@ const CommentComponent = ({ comment, votes, showModal, currentUser }) => {
       <span key="edit-comment">
         <IconText type="edit" text="Edit" />
       </span>,
-      <span key="remove-comment">
-        <IconText type="delete" text="Delete" />
-      </span>
+      <Popconfirm
+        title="Are you sure you want to delete this comment?"
+        onConfirm={deleteComment.bind(this, comment.id)}
+      >
+        <span key="remove-comment">
+          <IconText type="delete" text="Delete" />
+        </span>
+      </Popconfirm>
     ];
 
     actions = actions.concat(editAndDelete);
