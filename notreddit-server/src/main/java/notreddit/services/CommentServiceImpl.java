@@ -126,7 +126,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public ResponseEntity<?> delete(UUID commentId, User user) {
-        Comment comment = commentRepository.findByIdWithMentions(commentId).orElse(null);
+        Comment comment = commentRepository.findById(commentId).orElse(null);
 
         if (comment == null || !user.getUsername().equals(comment.getCreator().getUsername())) {
             return ResponseEntity
@@ -145,8 +145,6 @@ public class CommentServiceImpl implements CommentService {
         }
 
         voteRepository.deleteAllByCommentId(commentId);
-
-        // TODO: 6.11.2019 г. deleted mentions dont flush fast enough so it cant delete the comment right away
         commentRepository.delete(comment);
 
         return ResponseEntity

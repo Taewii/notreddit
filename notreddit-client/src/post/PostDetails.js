@@ -367,7 +367,13 @@ const CommentComponent = ({ comment, votes, showModal, currentUser, deleteCommen
       }
     >
       {comment.children.length > 0 && comment.children.map(child => {
-        return <CommentComponent showModal={showModal} votes={votes} key={child.id} comment={child} />
+        return <CommentComponent
+          showModal={showModal}
+          votes={votes}
+          key={child.id}
+          comment={child}
+          currentUser={currentUser}
+          deleteComment={deleteComment} />
       })}
     </Comment>
   )
