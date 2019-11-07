@@ -29,4 +29,8 @@ public interface VoteRepository extends JpaRepository<Vote, UUID> {
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteAllByCommentId(UUID commentId);
+
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    void deleteAllByPostId(UUID commentId);
 }

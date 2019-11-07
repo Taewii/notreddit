@@ -9,9 +9,7 @@ import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.domain.models.responses.post.PostDetailsResponseModel;
 import notreddit.domain.models.responses.post.PostListResponseModel;
 import notreddit.domain.models.responses.post.PostsResponseModel;
-import notreddit.repositories.FileRepository;
-import notreddit.repositories.PostRepository;
-import notreddit.repositories.SubredditRepository;
+import notreddit.repositories.*;
 import notreddit.web.exceptions.AccessForbiddenException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +31,14 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImpl implements PostService {
 
+    private final CloudStorage cloudStorage;
+    private final ThumbnailService thumbnailService;
     private final SubredditRepository subredditRepository;
     private final PostRepository postRepository;
     private final FileRepository fileRepository;
-    private final CloudStorage cloudStorage;
-    private final ThumbnailService thumbnailService;
+    private final VoteRepository voteRepository;
+    private final CommentRepository commentRepository;
+    private final MentionRepository mentionRepository;
     private final ModelMapper mapper;
 
     @Autowired
@@ -46,12 +47,18 @@ public class PostServiceImpl implements PostService {
                            @Qualifier("dropboxService") CloudStorage cloudStorage,
                            FileRepository fileRepository,
                            ThumbnailService thumbnailService,
+                           VoteRepository voteRepository,
+                           CommentRepository commentRepository,
+                           MentionRepository mentionRepository,
                            ModelMapper mapper) {
         this.subredditRepository = subredditRepository;
         this.postRepository = postRepository;
         this.cloudStorage = cloudStorage;
         this.fileRepository = fileRepository;
         this.thumbnailService = thumbnailService;
+        this.voteRepository = voteRepository;
+        this.commentRepository = commentRepository;
+        this.mentionRepository = mentionRepository;
         this.mapper = mapper;
     }
 
@@ -75,8 +82,26 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ResponseEntity<?> delete(UUID postId, User user) {
-        // TODO: 6.11.2019 г.  
-        return null;
+        Post post = postRepository.findByIdWithCreatorAndComments(postId).orElse(null);
+
+        if (post == null || !user.getUsername().equals(post.getCreator().getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Post doesn't exist or you are not the creator."));
+        }
+
+        voteRepository.deleteAllByPostId(post.getId());
+        post.getComments()
+                .parallelStream()
+                .forEach(comment -> {
+                    mentionRepository.deleteAllByCommentId(comment.getId());
+                    voteRepository.deleteAllByCommentId(comment.getId());
+                    commentRepository.deleteById(comment.getId());
+                });
+
+        postRepository.delete(post);
+        return ResponseEntity
+                .ok(new ApiResponse(true, "Post deleted successfully."));
     }
 
     @Override
