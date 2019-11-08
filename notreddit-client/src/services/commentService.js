@@ -42,3 +42,11 @@ export function deleteCommentById(commentId) {
     method: 'DELETE'
   });
 }
+
+export function editComment(data) {
+  return request({
+    url: API_BASE_URL + '/comment/edit',
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}

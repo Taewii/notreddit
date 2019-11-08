@@ -8,7 +8,7 @@ import { timeSince } from '../util/APIUtils';
 import { IconText } from '../util/IconText';
 import { findById, deletePostById } from '../services/postService';
 import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
-import { comment, findCommentsForPost, deleteCommentById } from '../services/commentService';
+import { comment, findCommentsForPost, deleteCommentById, editComment } from '../services/commentService';
 import { getUserVotesForComments } from '../services/voteService';
 
 class PostDetails extends Component {
@@ -23,7 +23,9 @@ class PostDetails extends Component {
       replyCommentId: null,
       commentContent: '',
       replyCommentContent: '',
-      modalIsVisible: false,
+      editCommentContent: '',
+      replyModalIsVisible: false,
+      editModalIsVisible: false,
     }
 
     this.currentUser = this.props.currentUser;
@@ -34,9 +36,12 @@ class PostDetails extends Component {
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.showModalAndSaveCommentId = this.showModalAndSaveCommentId.bind(this);
-    this.hideModal = this.hideModal.bind(this);
+    this.handleCommentReply = this.handleCommentReply.bind(this);
+    this.handleCommentEdit = this.handleCommentEdit.bind(this);
+    this.showReplyModalAndSaveCommentId = this.showReplyModalAndSaveCommentId.bind(this);
+    this.showEditModalAndSaveCommentIdAndContent = this.showEditModalAndSaveCommentIdAndContent.bind(this);
+    this.hideReplyModal = this.hideReplyModal.bind(this);
+    this.hideEditModal = this.hideEditModal.bind(this);
     this.deletePost = this.deletePost.bind(this);
     this.deleteComment = this.deleteComment.bind(this);
   }
@@ -88,7 +93,34 @@ class PostDetails extends Component {
     }
   }
 
-  handleSubmit(event) {
+  handleInputChange(event) {
+    const target = event.target;
+    const inputName = target.name;
+    const inputValue = target.value;
+
+    this.setState({
+      [inputName]: inputValue
+    });
+  }
+
+  handleCommentEdit(event) {
+    event.preventDefault();
+    const commentData = {
+      content: this.state.editCommentContent,
+      commentId: this.state.replyCommentId
+    };
+
+
+    editComment(commentData)
+      .then(res => {
+        successNotification(res.message);
+        this.hideEditModal();
+        this.componentDidMount();
+      })
+      .catch(error => errorNotification(error));
+  }
+
+  handleCommentReply(event) {
     event.preventDefault();
     const commentData = {
       postId: this.state.postId,
@@ -102,38 +134,61 @@ class PostDetails extends Component {
 
     comment(commentData)
       .then(res => {
-        if (res.success) {
-          successNotification(res.message);
-          this.hideModal();
-          this.componentDidMount(); // not sure how to force update otherwise..
-        }
+        successNotification(res.message);
+        this.setState({ commentContent: '' })
+        this.hideReplyModal();
+        this.componentDidMount(); // not sure how to force update otherwise..
       })
-      .catch(error => errorNotification(error))
-  }
-
-  handleInputChange(event) {
-    const target = event.target;
-    const inputName = target.name;
-    const inputValue = target.value;
-
-    this.setState({
-      [inputName]: inputValue
-    });
+      .catch(error => errorNotification(error));
   }
 
   componentWillUnmount() {
     this._isMounted = false;
   }
 
-  showModalAndSaveCommentId(commentId) {
+  showReplyModalAndSaveCommentId(commentId) {
     this.setState({
       replyCommentId: commentId,
-      modalIsVisible: true
+      replyModalIsVisible: true
+    });
+  }
+
+  showEditModalAndSaveCommentIdAndContent(commentId, commentContent) {
+    this.setState({
+      editCommentContent: commentContent,
+      replyCommentId: commentId,
+      editModalIsVisible: true
+    });
+  }
+
+  hideEditModal() {
+    const modalTextArea = document.querySelector('.comment-edit-textarea');
+    if (modalTextArea) {
+      modalTextArea.value = '';
+    }
+
+    this.setState({
+      replyCommentId: null,
+      editModalIsVisible: false,
+      editCommentContent: ''
     })
   }
 
+  hideReplyModal() {
+    const modalTextArea = document.querySelector('.comment-reply-textarea');
+    if (modalTextArea) {
+      modalTextArea.value = '';
+    }
+
+    this.setState({
+      replyCommentId: null,
+      replyModalIsVisible: false,
+      replyCommentContent: ''
+    })
+  }
+
+
   deletePost(postId) {
-    console.log('deletePost ' + postId)
     deletePostById(postId)
       .then(res => {
         successNotification(res.message)
@@ -142,25 +197,11 @@ class PostDetails extends Component {
   }
 
   deleteComment(commentId) {
-    console.log('deleteComment ' + commentId)
     deleteCommentById(commentId)
       .then(res => {
         successNotification(res.message);
         this.componentDidMount();
       }).catch(error => errorNotification(error));
-  }
-
-  hideModal() {
-    const modalTextArea = document.querySelector('.comment-reply-textarea');
-    if (modalTextArea) {
-      modalTextArea.value = '';
-    }
-
-    this.setState({
-      replyCommentId: null,
-      modalIsVisible: false,
-      replyCommentContent: ''
-    })
   }
 
   render() {
@@ -240,7 +281,7 @@ class PostDetails extends Component {
           </List.Item>
           {post.content ? <Content content={post.content} /> : null}
           <List.Item>
-            <Form onSubmit={this.handleSubmit}>
+            <Form onSubmit={this.handleCommentReply}>
               <Form.Item hasFeedback>
                 <Input.TextArea
                   disabled={!this.props.isAuthenticated}
@@ -266,20 +307,21 @@ class PostDetails extends Component {
             key={comment.id}
             comment={comment}
             votes={this.commentVotes || {}}
-            showModal={this.showModalAndSaveCommentId}
+            showReplyModal={this.showReplyModalAndSaveCommentId}
+            showEditModal={this.showEditModalAndSaveCommentIdAndContent}
             currentUser={this.currentUserUsername}
             deleteComment={this.deleteComment} />)}
         <Modal
           title="Reply to comment"
           okText="Reply"
           cancelText="Discard"
-          visible={this.state.modalIsVisible}
-          onOk={this.handleSubmit}
-          onCancel={this.hideModal}
+          visible={this.state.replyModalIsVisible}
+          onOk={this.handleCommentReply}
+          onCancel={this.hideReplyModal}
           okButtonProps={{ disabled: this.state.replyCommentContent.trim().length === 0 }}
         >
           <Form>
-            <Form.Item hasFeedback onSubmit={this.handleSubmit}>
+            <Form.Item hasFeedback onSubmit={this.handleCommentReply}>
               <Input.TextArea
                 disabled={!this.props.isAuthenticated}
                 className="comment-reply-textarea"
@@ -291,12 +333,34 @@ class PostDetails extends Component {
             </Form.Item>
           </Form>
         </Modal>
+        <Modal
+          title="Edit comment"
+          okText="Edit"
+          cancelText="Discard"
+          visible={this.state.editModalIsVisible}
+          onOk={this.handleCommentEdit}
+          onCancel={this.hideEditModal}
+          okButtonProps={{ disabled: this.state.editCommentContent.trim().length === 0 }}
+        >
+          <Form>
+            <Form.Item hasFeedback onSubmit={this.handleCommentEdit}>
+              <Input.TextArea
+                disabled={!this.props.isAuthenticated}
+                className="comment-edit-textarea"
+                defaultValue={this.state.editCommentContent}
+                size="large"
+                name="editCommentContent"
+                onChange={this.handleInputChange}
+              />
+            </Form.Item>
+          </Form>
+        </Modal>
       </div >
     )
   }
 }
 
-const CommentComponent = ({ comment, votes, showModal, currentUser, deleteComment }) => {
+const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, currentUser, deleteComment }) => {
   let upvoteColor = '';
   let downvoteColor = '';
   const vote = votes[comment.id];
@@ -332,12 +396,12 @@ const CommentComponent = ({ comment, votes, showModal, currentUser, deleteCommen
       </Tooltip>
       <span style={{ paddingLeft: 8, cursor: 'auto' }}>{comment.downvotes}</span>
     </span>,
-    <span onClick={showModal.bind(null, comment.id)} key="comment-basic-reply-to">Reply to</span>,
+    <span onClick={showReplyModal.bind(this, comment.id)} key="comment-basic-reply-to">Reply to</span>,
   ];
 
   if (currentUser === comment.creatorUsername) {
     const editAndDelete = [
-      <span key="edit-comment">
+      <span key="edit-comment" onClick={showEditModal.bind(this, comment.id, comment.content)}>
         <IconText type="edit" text="Edit" />
       </span>,
       <Popconfirm
@@ -368,7 +432,8 @@ const CommentComponent = ({ comment, votes, showModal, currentUser, deleteCommen
     >
       {comment.children.length > 0 && comment.children.map(child => {
         return <CommentComponent
-          showModal={showModal}
+          showReplyModal={showReplyModal}
+          showEditModal={showEditModal}
           votes={votes}
           key={child.id}
           comment={child}
