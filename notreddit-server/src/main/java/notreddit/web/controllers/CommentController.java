@@ -1,7 +1,8 @@
 package notreddit.web.controllers;
 
 import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.CommentPostRequestModel;
+import notreddit.domain.models.requests.CommentCreateRequestModel;
+import notreddit.domain.models.requests.CommentEditRequestModel;
 import notreddit.domain.models.responses.comment.CommentListWithChildren;
 import notreddit.domain.models.responses.comment.CommentsResponseModel;
 import notreddit.services.CommentService;
@@ -33,7 +34,7 @@ public class CommentController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
-    public ResponseEntity<?> createComment(@Valid @RequestBody CommentPostRequestModel comment,
+    public ResponseEntity<?> createComment(@Valid @RequestBody CommentCreateRequestModel comment,
                                            @AuthenticationPrincipal User creator) {
         return commentService.create(comment, creator);
     }
@@ -63,5 +64,12 @@ public class CommentController {
     public ResponseEntity<?> delete(@RequestParam UUID commentId,
                                     @AuthenticationPrincipal User user) {
         return commentService.delete(commentId, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/edit")
+    public ResponseEntity<?> delete(@Valid @RequestBody CommentEditRequestModel comment,
+                                    @AuthenticationPrincipal User user) {
+        return commentService.edit(comment, user);
     }
 }

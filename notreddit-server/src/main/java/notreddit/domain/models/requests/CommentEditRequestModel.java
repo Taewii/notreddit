@@ -9,13 +9,11 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class CommentPostRequestModel {
+public class CommentEditRequestModel {
 
     @NotNull
-    private UUID postId;
+    private UUID commentId;
 
     @NotBlank
     private String content;
-
-    private UUID parentId;
 }

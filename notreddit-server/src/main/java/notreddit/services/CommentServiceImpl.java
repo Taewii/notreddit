@@ -4,7 +4,8 @@ import notreddit.domain.entities.Comment;
 import notreddit.domain.entities.Mention;
 import notreddit.domain.entities.Post;
 import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.CommentPostRequestModel;
+import notreddit.domain.models.requests.CommentCreateRequestModel;
+import notreddit.domain.models.requests.CommentEditRequestModel;
 import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.domain.models.responses.comment.CommentListWithChildren;
 import notreddit.domain.models.responses.comment.CommentListWithReplyCount;
@@ -50,7 +51,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ResponseEntity<?> create(CommentPostRequestModel commentModel, User creator) {
+    public ResponseEntity<?> create(CommentCreateRequestModel commentModel, User creator) {
         Post post = postRepository.findById(commentModel.getPostId()).orElse(null);
         Comment parent = null;
 
@@ -149,5 +150,22 @@ public class CommentServiceImpl implements CommentService {
 
         return ResponseEntity
                 .ok(new ApiResponse(true, "Comment deleted successfully."));
+    }
+
+    @Override
+    public ResponseEntity<?> edit(CommentEditRequestModel commentModel, User user) {
+        Comment comment = commentRepository.findById(commentModel.getCommentId()).orElse(null);
+
+        if (comment == null || !user.getUsername().equals(comment.getCreator().getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Comment doesn't exist or you are not the creator."));
+        }
+
+        comment.setContent(commentModel.getContent());
+        commentRepository.saveAndFlush(comment);
+
+        return ResponseEntity
+                .ok(new ApiResponse(true, "Comment edited successfully."));
     }
 }
