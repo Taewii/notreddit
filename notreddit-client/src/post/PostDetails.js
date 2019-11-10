@@ -347,7 +347,7 @@ class PostDetails extends Component {
               <Input.TextArea
                 disabled={!this.props.isAuthenticated}
                 className="comment-edit-textarea"
-                defaultValue={this.state.editCommentContent}
+                value={this.state.editCommentContent}
                 size="large"
                 name="editCommentContent"
                 onChange={this.handleInputChange}
