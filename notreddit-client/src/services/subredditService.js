@@ -22,3 +22,10 @@ export function getAllSubreddits() {
     method: 'GET'
   })
 }
+
+export function getAllSubredditsWithPostsCount() {
+  return request({
+    url: API_BASE_URL + "/subreddit/all-with-post-count",
+    method: 'GET'
+  })
+}

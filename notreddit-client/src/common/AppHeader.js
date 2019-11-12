@@ -103,8 +103,11 @@ const AdminDropdownMenu = (props) => {
 const SubredditDropdownMenu = (props) => {
   const dropdownMenu = (
     <Menu onClick={props.handleMenuClick} className="profile-dropdown-menu">
-      <Menu.Item key="all-users" className="dropdown-item">
+      <Menu.Item key="subreddit-create" className="dropdown-item">
         <Link to="/subreddit/create">Create</Link>
+      </Menu.Item>
+      <Menu.Item key="subreddit-all" className="dropdown-item">
+        <Link to="/subreddit/all">All Subreddits</Link>
       </Menu.Item>
     </Menu>
   );

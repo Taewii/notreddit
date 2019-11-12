@@ -187,7 +187,6 @@ class PostDetails extends Component {
     })
   }
 
-
   deletePost(postId) {
     deletePostById(postId)
       .then(res => {
@@ -239,9 +238,9 @@ class PostDetails extends Component {
 
     if (this.currentUserUsername === post.creatorUsername) {
       const editAndDelete = [
-        <span key="edit-comment" onClick={() => this.props.history.push(`/post/edit/${postId}`)}>
-          <IconText type="edit" text="Edit" />
-        </span>,
+        // <span key="edit-comment" onClick={() => this.props.history.push(`/post/edit/${postId}`)}>
+        //   <IconText type="edit" text="Edit" />
+        // </span>,
         <Popconfirm
           title="Are you sure you want to delete this post?"
           onConfirm={this.deletePost.bind(this, postId)}

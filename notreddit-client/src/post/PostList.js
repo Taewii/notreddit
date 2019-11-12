@@ -179,9 +179,9 @@ const actions = (post, currentUser, deletePost) => {
 
   if (post.creatorUsername === currentUser) {
     const editAndDelete = [
-      <span key="edit-comment">
-        <IconText type="edit" text="Edit" />
-      </span>,
+      // <span key="edit-comment">
+      //   <IconText type="edit" text="Edit" />
+      // </span>,
       <Popconfirm
         title="Are you sure you want to delete this post?"
         onConfirm={deletePost.bind(this, post.id)}

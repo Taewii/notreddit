@@ -21,6 +21,7 @@ import PrivateRoute from '../common/PrivateRoute';
 import LoadingIndicator from '../common/LoadingIndicator';
 import SubredditCreate from '../subreddit/SubredditCreate';
 import SubredditPosts from '../subreddit/SubredditPosts';
+import SubredditList from '../subreddit/SubredditList';
 import CreatePost from '../post/CreatePost';
 import PostList from '../post/PostList';
 import PostDetails from '../post/PostDetails';
@@ -195,10 +196,17 @@ class App extends Component {
                   {...props}
                 />}
               />
+               <Route path="/subreddit/all" component={(props) =>
+                <SubredditList
+                  // isAuthenticated={isAuthenticated}
+                  {...props}
+                />}
+              />
               <Route path="/subreddit/:subreddit" component={(props) =>
                 <SubredditPosts
                   isAuthenticated={isAuthenticated}
                   dataLoadingFunction={postsBySubreddit}
+                  currentUser={currentUser}
                   {...props}
                 />}
               />
