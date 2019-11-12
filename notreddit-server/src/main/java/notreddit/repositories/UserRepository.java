@@ -15,7 +15,7 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    @Query("SELECT a FROM User a JOIN FETCH a.roles WHERE a.id = :id")
+    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.id = :id")
     Optional<User> findByIdWithRoles(@Param("id") UUID id);
 
     Optional<User> findByUsernameOrEmailIgnoreCase(@NotBlank String username, @Email @NotBlank String email);
@@ -26,4 +26,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT DISTINCT u FROM User u JOIN FETCH u.roles r")
     List<User> findAllWithRoles();
+
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.subscriptions WHERE u = :user")
+    User getWithSubscriptions(@Param("user") User user);
 }

@@ -25,4 +25,7 @@ public class Subreddit extends BaseLongEntity {
 
     @OneToMany(mappedBy = "subreddit", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts = new HashSet<>();
+
+    @ManyToMany(mappedBy = "subscriptions")
+    private Set<User> subscribers = new HashSet<>();
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/subreddit")
@@ -49,5 +50,25 @@ public class SubredditController {
     @GetMapping("/all-with-post-count")
     public List<SubredditWithPostCountResponse> getAllSubredditsWithPostCount() {
         return subredditService.getAllWithPostCount();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/subscribe")
+    public ResponseEntity<?> subscribe(@RequestParam String subreddit,
+                                       @AuthenticationPrincipal User user) {
+        return subredditService.subscribe(subreddit, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/unsubscribe")
+    public ResponseEntity<?> unsubscribe(@RequestParam String subreddit,
+                                         @AuthenticationPrincipal User user) {
+        return subredditService.unsubscribe(subreddit, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/subscriptions")
+    public Set<String> getUserSubscriptions(@AuthenticationPrincipal User user) {
+        return subredditService.getUserSubscriptions(user);
     }
 }

@@ -6,6 +6,7 @@ import notreddit.domain.models.requests.SubredditCreateRequest;
 import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse;
 import notreddit.repositories.SubredditRepository;
+import notreddit.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,18 +15,22 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class SubredditServiceImpl implements SubredditService {
 
     private final SubredditRepository subredditRepository;
+    private final UserRepository userRepository;
     private final ModelMapper mapper;
 
     @Autowired
     public SubredditServiceImpl(SubredditRepository subredditRepository,
+                                UserRepository userRepository,
                                 ModelMapper mapper) {
         this.subredditRepository = subredditRepository;
+        this.userRepository = userRepository;
         this.mapper = mapper;
     }
 
@@ -67,5 +72,50 @@ public class SubredditServiceImpl implements SubredditService {
     @Override
     public List<SubredditWithPostCountResponse> getAllWithPostCount() {
         return subredditRepository.findAllWithPostCount();
+    }
+
+    @Override
+    public ResponseEntity<?> subscribe(String subredditTitle, User user) {
+        Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(subredditTitle).orElse(null);
+        user = userRepository.getWithSubscriptions(user);
+
+        if (subreddit == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Subreddit with such name doesn't exist."));
+        }
+
+        user.subscribe(subreddit);
+        userRepository.saveAndFlush(user);
+
+        String responseMessage = String.format("Successfully subscribed to %s.", subreddit.getTitle());
+        return ResponseEntity.ok(new ApiResponse(true, responseMessage));
+    }
+
+    @Override
+    public ResponseEntity<?> unsubscribe(String subredditTitle, User user) {
+        Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(subredditTitle).orElse(null);
+        user = userRepository.getWithSubscriptions(user);
+
+        if (subreddit == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Subreddit with such name doesn't exist."));
+        }
+
+        user.unsubscribe(subreddit);
+        userRepository.saveAndFlush(user);
+
+        String responseMessage = String.format("Successfully unsubscribed from %s.", subreddit.getTitle());
+        return ResponseEntity.ok(new ApiResponse(true, responseMessage));
+    }
+
+    @Override
+    public Set<String> getUserSubscriptions(User user) {
+        user = userRepository.getWithSubscriptions(user);
+        return user.getSubscriptions()
+                .parallelStream()
+                .map(Subreddit::getTitle)
+                .collect(Collectors.toUnmodifiableSet());
     }
 }
