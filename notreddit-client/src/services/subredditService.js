@@ -20,12 +20,37 @@ export function getAllSubreddits() {
   return request({
     url: API_BASE_URL + "/subreddit/all",
     method: 'GET'
-  })
+  });
 }
 
 export function getAllSubredditsWithPostsCount() {
   return request({
     url: API_BASE_URL + "/subreddit/all-with-post-count",
     method: 'GET'
-  })
+  });
+}
+
+export function getUserSubscriptions() {
+  return request({
+    url: API_BASE_URL + "/subreddit/subscriptions",
+    method: 'GET'
+  });
+}
+
+export function subscribe(subreddit) {
+  const url = `${API_BASE_URL}/subreddit/subscribe?subreddit=${subreddit}`;
+
+  return request({
+    url,
+    method: 'POST'
+  });
+}
+
+export function unsubscribe(subreddit) {
+  const url = `${API_BASE_URL}/subreddit/unsubscribe?subreddit=${subreddit}`;
+
+  return request({
+    url,
+    method: 'POST'
+  });
 }
