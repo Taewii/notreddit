@@ -46,7 +46,7 @@ public class SubredditController {
         return subredditService.getAllAsStrings();
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("permitAll()")
     @GetMapping("/all-with-post-count")
     public List<SubredditWithPostCountResponse> getAllSubredditsWithPostCount() {
         return subredditService.getAllWithPostCount();

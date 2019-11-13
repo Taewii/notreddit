@@ -196,9 +196,9 @@ class App extends Component {
                   {...props}
                 />}
               />
-               <Route path="/subreddit/all" component={(props) =>
+              <Route path="/subreddit/all" component={(props) =>
                 <SubredditList
-                  // isAuthenticated={isAuthenticated}
+                  isAuthenticated={isAuthenticated}
                   {...props}
                 />}
               />

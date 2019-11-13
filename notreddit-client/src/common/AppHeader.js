@@ -4,7 +4,7 @@ import {
   withRouter
 } from 'react-router-dom';
 import './AppHeader.css';
-import { Layout, Menu, Dropdown, Icon, Badge } from 'antd';
+import { Layout, Menu, Dropdown, Icon, Badge, Divider } from 'antd';
 const Header = Layout.Header;
 
 class AppHeader extends Component {
@@ -52,6 +52,10 @@ class AppHeader extends Component {
       }
     } else {
       menuItems = [
+        <Menu.Item key="/subreddit/all">
+          <Link to="/subreddit/all">Subreddits</Link>
+        </Menu.Item>,
+        <Divider type="vertical" style={{ backgroundColor: "#1890ff" }} />,
         <Menu.Item key="/login">
           <Link to="/login">Login</Link>
         </Menu.Item>,

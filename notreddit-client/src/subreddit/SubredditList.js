@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './SubredditList.css';
 
+import { Link } from 'react-router-dom';
 import { List, Button } from 'antd';
 
 import { successNotification, errorNotification } from '../util/notifications';
@@ -15,6 +16,7 @@ class SubredditList extends Component {
   constructor(props) {
     super(props)
     this._isMounted = false;
+    this.isAuthenticated = this.props.isAuthenticated;
     this.state = {
       initLoading: true,
       loading: false,
@@ -29,16 +31,18 @@ class SubredditList extends Component {
   componentDidMount() {
     this._isMounted = true;
 
-    getUserSubscriptions()
-      .then(res => {
-        this.setState({
-          subscriptions: res.reduce((current, item) => {
-            current[item] = true;
-            return current;
-          }, {})
-        });
-      })
-      .catch(error => errorNotification(error));
+    if (this.isAuthenticated) {
+      getUserSubscriptions()
+        .then(res => {
+          this.setState({
+            subscriptions: res.reduce((current, item) => {
+              current[item] = true;
+              return current;
+            }, {})
+          });
+        })
+        .catch(error => errorNotification(error));
+    }
 
     getAllSubredditsWithPostsCount()
       .then(res => {
@@ -76,6 +80,24 @@ class SubredditList extends Component {
   render() {
     const { initLoading, data } = this.state;
 
+    const ActionButton = (subreddit) => {
+      subreddit = subreddit.subreddit; // not sure why it doesnt send just the ti
+
+      if (!this.isAuthenticated) {
+        return (
+          <Link to={`/subreddit/${subreddit}`}>
+            <Button type="primary">Visit {subreddit}</Button>
+          </Link>
+        );
+      }
+
+      return this.state.subscriptions[subreddit]
+        ? <Button className="subreddit-button" type="danger"
+          onClick={(e) => this.unsubscribe(subreddit)}>Unsubscribe</Button>
+        : <Button className="subreddit-button" type="primary"
+          onClick={(e) => this.subscribe(subreddit)}>Subscribe</Button>
+    }
+
     return (
       <List
         className="user-list"
@@ -88,13 +110,7 @@ class SubredditList extends Component {
             <List.Item.Meta
               title={<a style={{ color: "#1890ff" }} href={`/subreddit/${subreddit.title}`}>{subreddit.title}</a>}
               description={`${subreddit.title} currently has ${subreddit.postCount} ${subreddit.postCount === 1 ? 'post' : 'posts'}.`} />
-            {
-              this.state.subscriptions[subreddit.title]
-                ? <Button className="subreddit-button" type="danger"
-                  onClick={(e) => this.unsubscribe(subreddit.title)}>Unsubscribe</Button>
-                : <Button className="subreddit-button" type="primary"
-                  onClick={(e) => this.subscribe(subreddit.title)}>Subscribe</Button>
-            }
+            <ActionButton subreddit={subreddit.title} />
           </List.Item >
         )
         }
