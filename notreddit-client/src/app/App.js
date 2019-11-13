@@ -7,7 +7,7 @@ import { Layout, notification } from 'antd';
 import { ACCESS_TOKEN } from '../util/constants';
 import { successNotification } from '../util/notifications';
 import { getCurrentUser, getUpvotedPosts, getDownvotedPosts } from '../services/userService';
-import { allPosts, postsByUsername, postsBySubreddit } from '../services/postService';
+import { allPosts, postsByUsername, postsBySubreddit, allSubscribedPosts } from '../services/postService';
 import { getUnreadMentionsCount } from '../services/mentionService';
 
 import Login from '../user/Login';
@@ -159,7 +159,7 @@ class App extends Component {
               <Route exact path="/home" component={(props) =>
                 <PostList
                   isAuthenticated={isAuthenticated}
-                  dataLoadingFunction={allPosts}
+                  dataLoadingFunction={isAuthenticated ? allSubscribedPosts : allPosts}
                   currentUser={currentUser}
                   username={null}
                   {...props}

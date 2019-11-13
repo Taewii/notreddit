@@ -24,4 +24,6 @@ public interface PostService {
     PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable);
 
     ResponseEntity<?> delete(UUID postId, User user);
+
+    PostsResponseModel subscribedPosts(User user, Pageable pageable);
 }

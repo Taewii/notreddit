@@ -1,6 +1,7 @@
 package notreddit.repositories;
 
 import notreddit.domain.entities.Post;
+import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -29,6 +32,18 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             "WHERE LOWER(c.username) = :username",
             countQuery = "SELECT COUNT(p) FROM Post p WHERE LOWER(p.creator.username) = :username")
     Page<Post> findAllByUsername(@Param("username") String username, Pageable pageable);
+
+    @Query(value = "SELECT DISTINCT p FROM Post p " +
+            "JOIN FETCH p.creator c " +
+            "LEFT JOIN FETCH p.subreddit " +
+            "LEFT JOIN FETCH p.comments " +
+            "WHERE p.id IN :subscriptions")
+    List<Post> getSubscribedPosts(@Param("subscriptions") List<Long> subscriptions);
+
+    @Query(value = "SELECT DISTINCT p.id FROM Post p " +
+            "WHERE p.subreddit IN :subscriptions",
+            countQuery = "SELECT COUNT(p) FROM Post p WHERE p.subreddit IN :subscriptions")
+    Page<Long> getSubscribedPostsIds(@Param("subscriptions") Set<Subreddit> subscriptions, Pageable pageable);
 
     @Query(value = "SELECT DISTINCT p FROM Post p " +
             "JOIN FETCH p.creator c " +

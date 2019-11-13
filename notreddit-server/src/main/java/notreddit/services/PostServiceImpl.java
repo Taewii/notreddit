@@ -39,6 +39,7 @@ public class PostServiceImpl implements PostService {
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
     private final MentionRepository mentionRepository;
+    private final UserRepository userRepository;
     private final ModelMapper mapper;
 
     @Autowired
@@ -50,6 +51,7 @@ public class PostServiceImpl implements PostService {
                            VoteRepository voteRepository,
                            CommentRepository commentRepository,
                            MentionRepository mentionRepository,
+                           UserRepository userRepository,
                            ModelMapper mapper) {
         this.subredditRepository = subredditRepository;
         this.postRepository = postRepository;
@@ -59,6 +61,7 @@ public class PostServiceImpl implements PostService {
         this.voteRepository = voteRepository;
         this.commentRepository = commentRepository;
         this.mentionRepository = mentionRepository;
+        this.userRepository = userRepository;
         this.mapper = mapper;
     }
 
@@ -105,6 +108,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public PostsResponseModel subscribedPosts(User user, Pageable pageable) {
+        user = userRepository.getWithSubscriptions(user);
+        /* Using two queries to avoid
+         * Hibernate “HHH000104: firstResult/maxResults specified with collection fetch; applying in memory!”
+         * warning message, taken from https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
+         */
+        Page<Long> subscribedPostsIds = postRepository.getSubscribedPostsIds(user.getSubscriptions(), pageable);
+        List<Post> subscribedPosts = postRepository.getSubscribedPosts(subscribedPostsIds.getContent());
+        return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
+    }
+
+    @Override
     public PostsResponseModel getPostsByVoteChoice(User user, String username, int choice, Pageable pageable) {
         if (!user.getUsername().equalsIgnoreCase(username)) {
             throw new AccessForbiddenException("You are not allowed to view this content");
@@ -147,18 +162,6 @@ public class PostServiceImpl implements PostService {
     public PostDetailsResponseModel findById(UUID id) {
         Post post = postRepository.findByIdEager(id).orElseThrow();
         return mapper.map(post, PostDetailsResponseModel.class);
-    }
-
-    private PostsResponseModel getPostsResponseModel(Page<Post> allByUsername) {
-        List<PostListResponseModel> posts = allByUsername.stream()
-                .map(p -> {
-                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
-                    model.setCommentCount(p.getComments().size());
-                    return model;
-                })
-                .collect(Collectors.toUnmodifiableList());
-
-        return new PostsResponseModel(allByUsername.getTotalElements(), posts);
     }
 
     private ResponseEntity<?> createPostWithoutFiles(Post post) {
@@ -222,5 +225,29 @@ public class PostServiceImpl implements PostService {
         return ResponseEntity
                 .created(location)
                 .body(new ApiResponse(true, "Post created successfully."));
+    }
+
+    private PostsResponseModel getPostsResponseModel(Page<Post> allByUsername) {
+        List<PostListResponseModel> posts = allByUsername.stream()
+                .map(p -> {
+                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
+                    model.setCommentCount(p.getComments().size());
+                    return model;
+                })
+                .collect(Collectors.toUnmodifiableList());
+
+        return new PostsResponseModel(allByUsername.getTotalElements(), posts);
+    }
+
+    private PostsResponseModel getPostsResponseModel(long total, List<Post> posts) {
+        List<PostListResponseModel> mappedPosts = posts.stream()
+                .map(p -> {
+                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
+                    model.setCommentCount(p.getComments().size());
+                    return model;
+                })
+                .collect(Collectors.toUnmodifiableList());
+
+        return new PostsResponseModel(total, mappedPosts);
     }
 }

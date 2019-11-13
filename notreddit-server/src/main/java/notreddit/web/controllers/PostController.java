@@ -43,6 +43,13 @@ public class PostController {
         return postService.allPosts(pageable);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/subscribed")
+    public PostsResponseModel getUserSubscribedPosts(@AuthenticationPrincipal User user,
+                                                     Pageable pageable) {
+        return postService.subscribedPosts(user, pageable);
+    }
+
     @PreAuthorize("permitAll()")
     @GetMapping("/user/{username}")
     public PostsResponseModel findAllByUsername(@PathVariable String username, Pageable pageable) {
