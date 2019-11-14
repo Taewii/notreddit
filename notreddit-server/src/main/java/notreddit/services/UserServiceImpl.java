@@ -1,12 +1,14 @@
 package notreddit.services;
 
 import notreddit.domain.entities.Role;
+import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.ChangeRoleRequest;
 import notreddit.domain.models.requests.SignUpRequest;
 import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.domain.models.responses.user.UserSummaryResponse;
 import notreddit.repositories.RoleRepository;
+import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,21 +28,26 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static notreddit.services.SubredditServiceImpl.DEFAULT_SUBREDDITS;
+
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final SubredditRepository subredditRepository;
     private final PasswordEncoder encoder;
     private final ModelMapper mapper;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
+                           SubredditRepository subredditRepository,
                            PasswordEncoder encoder,
                            ModelMapper mapper) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.subredditRepository = subredditRepository;
         this.encoder = encoder;
         this.mapper = mapper;
     }
@@ -61,6 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<?> register(SignUpRequest model) {
         if (existsByUsername(model.getUsername())) {
             return ResponseEntity
@@ -82,6 +90,9 @@ public class UserServiceImpl implements UserService {
         } else {
             user.setRoles(this.getInheritedRolesFromRole("USER"));
         }
+
+        Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(DEFAULT_SUBREDDITS);
+        user.setSubscriptions(defaultSubreddits);
 
         userRepository.saveAndFlush(user);
         URI location = ServletUriComponentsBuilder

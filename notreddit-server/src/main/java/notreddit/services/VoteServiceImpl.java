@@ -35,8 +35,8 @@ public class VoteServiceImpl implements VoteService {
     }
 
     // all the if (postId != null) are cus the method handles votes for both posts and comments
-    @Transactional
     @Override
+    @Transactional
     public ResponseEntity<?> voteForPostOrComment(byte choice, UUID postId, UUID commentId, User user) {
         Votable votable;
 

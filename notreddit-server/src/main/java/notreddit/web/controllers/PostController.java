@@ -51,6 +51,12 @@ public class PostController {
     }
 
     @PreAuthorize("permitAll()")
+    @GetMapping("/default-posts")
+    public PostsResponseModel getPostsFromTheDefaultSubreddits(Pageable pageable) {
+        return postService.defaultPosts(pageable);
+    }
+
+    @PreAuthorize("permitAll()")
     @GetMapping("/user/{username}")
     public PostsResponseModel findAllByUsername(@PathVariable String username, Pageable pageable) {
         return postService.findAllByUsername(username, pageable);

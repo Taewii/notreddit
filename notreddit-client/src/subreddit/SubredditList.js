@@ -80,9 +80,7 @@ class SubredditList extends Component {
   render() {
     const { initLoading, data } = this.state;
 
-    const ActionButton = (subreddit) => {
-      subreddit = subreddit.subreddit; // not sure why it doesnt send just the ti
-
+    const ActionButton = ({ subreddit }) => {
       if (!this.isAuthenticated) {
         return (
           <Link to={`/subreddit/${subreddit}`}>

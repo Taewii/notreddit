@@ -14,12 +14,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class SubredditServiceImpl implements SubredditService {
+
+    static final List<String> DEFAULT_SUBREDDITS = new ArrayList<String>() {{
+        add("aww");
+        add("HumansBeingBros");
+        add("EyeBleach");
+    }}.stream().map(String::toLowerCase).collect(Collectors.toUnmodifiableList());
 
     private final SubredditRepository subredditRepository;
     private final UserRepository userRepository;

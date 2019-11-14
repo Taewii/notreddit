@@ -25,6 +25,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -115,6 +116,14 @@ public class PostServiceImpl implements PostService {
          * warning message, taken from https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
          */
         Page<Long> subscribedPostsIds = postRepository.getSubscribedPostsIds(user.getSubscriptions(), pageable);
+        List<Post> subscribedPosts = postRepository.getSubscribedPosts(subscribedPostsIds.getContent());
+        return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
+    }
+
+    @Override
+    public PostsResponseModel defaultPosts(Pageable pageable) {
+        Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(SubredditServiceImpl.DEFAULT_SUBREDDITS);
+        Page<Long> subscribedPostsIds = postRepository.getSubscribedPostsIds(defaultSubreddits, pageable);
         List<Post> subscribedPosts = postRepository.getSubscribedPosts(subscribedPostsIds.getContent());
         return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
     }
