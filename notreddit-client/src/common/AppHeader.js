@@ -55,7 +55,9 @@ class AppHeader extends Component {
         <Menu.Item key="/subreddit/all">
           <Link to="/subreddit/all">Subreddits</Link>
         </Menu.Item>,
-        <Divider type="vertical" style={{ backgroundColor: "#1890ff" }} />,
+        <Menu.Item key="divider" disabled={true}>
+          <Divider type="vertical" style={{ backgroundColor: "#1890ff" }} />
+        </Menu.Item>,
         <Menu.Item key="/login">
           <Link to="/login">Login</Link>
         </Menu.Item>,

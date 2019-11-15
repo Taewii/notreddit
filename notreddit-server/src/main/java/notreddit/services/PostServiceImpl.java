@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,10 +89,19 @@ public class PostServiceImpl implements PostService {
     public ResponseEntity<?> delete(UUID postId, User user) {
         Post post = postRepository.findByIdWithCreatorAndComments(postId).orElse(null);
 
-        if (post == null || !user.getUsername().equals(post.getCreator().getUsername())) {
+        if (post == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Post doesn't exist or you are not the creator."));
+                    .body(new ApiResponse(false, "Post doesn't exist."));
+        }
+
+        boolean isCreatorOrModerator = user.getUsername().equals(post.getCreator().getUsername()) ||
+                user.getRoles().stream().anyMatch(r -> r.getAuthority().equals("ROLE_MODERATOR"));
+
+        if (!isCreatorOrModerator) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponse(false, "You don't have the authority to do that."));
         }
 
         voteRepository.deleteAllByPostId(post.getId());

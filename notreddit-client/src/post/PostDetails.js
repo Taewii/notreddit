@@ -16,6 +16,7 @@ class PostDetails extends Component {
     super(props);
     this._isMounted = false;
     this.commentVotes = {};
+    this.userIsModerator = false;
     this.state = {
       post: {},
       comments: [],
@@ -33,6 +34,7 @@ class PostDetails extends Component {
 
     if (this.currentUser !== null) {
       this.currentUserUsername = this.currentUser.username
+      this.userIsModerator = this.currentUser.roles.includes('MODERATOR');
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -252,6 +254,17 @@ class PostDetails extends Component {
       ];
 
       actions = actions.concat(editAndDelete);
+    } else if (this.userIsModerator) {
+      actions.push(
+        <Popconfirm
+          title="Are you sure you want to delete this post?"
+          onConfirm={this.deletePost.bind(this, postId)}
+        >
+          <span key="remove-comment">
+            <IconText type="delete" text="Delete" />
+          </span>
+        </Popconfirm>
+      )
     }
 
     return (
@@ -309,7 +322,9 @@ class PostDetails extends Component {
             showReplyModal={this.showReplyModalAndSaveCommentId}
             showEditModal={this.showEditModalAndSaveCommentIdAndContent}
             currentUser={this.currentUserUsername}
-            deleteComment={this.deleteComment} />)}
+            deleteComment={this.deleteComment}
+            userIsModerator={this.userIsModerator}
+          />)}
         <Modal
           title="Reply to comment"
           okText="Reply"
@@ -359,7 +374,7 @@ class PostDetails extends Component {
   }
 }
 
-const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, currentUser, deleteComment }) => {
+const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, currentUser, deleteComment, userIsModerator }) => {
   let upvoteColor = '';
   let downvoteColor = '';
   const vote = votes[comment.id];
@@ -414,6 +429,17 @@ const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, curre
     ];
 
     actions = actions.concat(editAndDelete);
+  } else if (userIsModerator) {
+    actions.push(
+      <Popconfirm
+        title="Are you sure you want to delete this comment?"
+        onConfirm={deleteComment.bind(this, comment.id)}
+      >
+        <span key="remove-comment">
+          <IconText type="delete" text="Delete" />
+        </span>
+      </Popconfirm>
+    )
   }
 
   return (
@@ -437,7 +463,9 @@ const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, curre
           key={child.id}
           comment={child}
           currentUser={currentUser}
-          deleteComment={deleteComment} />
+          deleteComment={deleteComment}
+          userIsModerator={userIsModerator}
+        />
       })}
     </Comment>
   )

@@ -18,6 +18,7 @@ class PostList extends Component {
     this.username = this.props.username;
     this.currentUser = this.props.currentUser;
     this.currentUserUsername = '';
+    this.userIsModerator = false;
     this._isMounted = false;
     this.votes = {};
     this.state = {
@@ -31,6 +32,7 @@ class PostList extends Component {
 
     if (this.currentUser !== null) {
       this.currentUserUsername = this.currentUser.username
+      this.userIsModerator = this.currentUser.roles.includes('MODERATOR');
     }
 
     this.deletePost = this.deletePost.bind(this);
@@ -126,7 +128,7 @@ class PostList extends Component {
           <List.Item
             onLoad={(event) => this.colorVote(event, post.id)}
             key={post.id}
-            actions={actions(post, this.currentUserUsername, this.deletePost)}
+            actions={actions(post, this.currentUserUsername, this.deletePost, this.userIsModerator)}
           >
             <List.Item.Meta
               avatar={
@@ -148,7 +150,7 @@ class PostList extends Component {
   }
 }
 
-const actions = (post, currentUser, deletePost) => {
+const actions = (post, currentUser, deletePost, userIsModerator) => {
   let actions = [
     <span key="comment-basic-upvote">
       <Tooltip title="Upvote">
@@ -194,6 +196,17 @@ const actions = (post, currentUser, deletePost) => {
 
 
     actions = actions.concat(editAndDelete);
+  } else if (userIsModerator) {
+    actions.push(
+      <Popconfirm
+        title="Are you sure you want to delete this post?"
+        onConfirm={deletePost.bind(this, post.id)}
+      >
+        <span key="remove-comment">
+          <IconText type="delete" text="Delete" />
+        </span>
+      </Popconfirm>
+    )
   }
 
   return actions;

@@ -18,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -129,10 +130,19 @@ public class CommentServiceImpl implements CommentService {
     public ResponseEntity<?> delete(UUID commentId, User user) {
         Comment comment = commentRepository.findById(commentId).orElse(null);
 
-        if (comment == null || !user.getUsername().equals(comment.getCreator().getUsername())) {
+        if (comment == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Comment doesn't exist or you are not the creator."));
+                    .body(new ApiResponse(false, "Comment doesn't exist."));
+        }
+
+        boolean isCreatorOrModerator = user.getUsername().equals(comment.getCreator().getUsername()) ||
+                user.getRoles().stream().anyMatch(r -> r.getAuthority().equals("ROLE_MODERATOR"));
+
+        if (!isCreatorOrModerator) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponse(false, "You don't have the authority to do that."));
         }
 
         mentionRepository.deleteAllByCommentId(commentId);
