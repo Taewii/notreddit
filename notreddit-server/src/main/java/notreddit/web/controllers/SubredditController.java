@@ -2,6 +2,7 @@ package notreddit.web.controllers;
 
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.SubredditCreateRequest;
+import notreddit.domain.models.responses.subreddit.IsUserSubscribedToSubredditResponse;
 import notreddit.domain.models.responses.subreddit.SubredditAvailabilityResponse;
 import notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse;
 import notreddit.services.SubredditService;
@@ -31,6 +32,14 @@ public class SubredditController {
     public SubredditAvailabilityResponse checkNameAvailability(@RequestParam String title) {
         Boolean available = !subredditService.existsByTitle(title);
         return new SubredditAvailabilityResponse(available);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/is-subscribed")
+    public IsUserSubscribedToSubredditResponse isUserSubscribedToSubreddit(@RequestParam String subreddit,
+                                                                           @AuthenticationPrincipal User user) {
+        Boolean isSubscribed = subredditService.isUserSubscribedToSubreddit(subreddit, user);
+        return new IsUserSubscribedToSubredditResponse(isSubscribed);
     }
 
     @PreAuthorize("isAuthenticated()")

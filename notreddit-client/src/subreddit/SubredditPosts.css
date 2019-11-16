@@ -1,0 +1,14 @@
+.subreddit-posts-title {
+  color: #1890ff;
+  font-size: 1.8em;
+}
+
+.subreddit-posts-button {
+  margin-left: 20px;
+}
+
+.header-container {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}

@@ -23,4 +23,6 @@ public interface SubredditService {
     ResponseEntity<?> unsubscribe(String subreddit, User user);
 
     Set<String> getUserSubscriptions(User user);
+
+    Boolean isUserSubscribedToSubreddit(String subreddit, User user);
 }

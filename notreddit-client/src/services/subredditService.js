@@ -8,6 +8,13 @@ export function checkSubredditAvailability(subreddit) {
   });
 }
 
+export function isUserSubscribedToSubreddit(subreddit) {
+  return request({
+    url: API_BASE_URL + "/subreddit/is-subscribed?subreddit=" + subreddit,
+    method: 'GET'
+  });
+}
+
 export function createSubreddit(subredditRequest) {
   return request({
     url: API_BASE_URL + "/subreddit/create",

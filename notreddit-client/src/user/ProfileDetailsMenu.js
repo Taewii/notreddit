@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './ProfileDetailsMenu.css';
 
 import { Link, withRouter } from 'react-router-dom';
 import { Menu, Icon } from 'antd';
@@ -43,13 +44,16 @@ class ProfileDetailsMenu extends Component {
     }
 
     return (
-      <Menu
-        style={{ marginBottom: '20px' }}
-        onClick={this.handleClick}
-        selectedKeys={[this.props.location.pathname, this.props.location.pathname + '/posts']}
-        mode="horizontal">
-        {menuItems}
-      </Menu>
+      <>
+        <h1 className="user-profile-info-title">{this.username}'s profile</h1>
+        <Menu
+          style={{ marginBottom: '20px' }}
+          onClick={this.handleClick}
+          selectedKeys={[this.props.location.pathname, this.props.location.pathname + '/posts']}
+          mode="horizontal">
+          {menuItems}
+        </Menu>
+      </>
     );
   }
 }
