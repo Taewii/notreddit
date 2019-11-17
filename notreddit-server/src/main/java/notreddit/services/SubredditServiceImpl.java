@@ -69,8 +69,7 @@ public class SubredditServiceImpl implements SubredditService {
 
     @Override
     public Boolean isUserSubscribedToSubreddit(String subreddit, User user) {
-        Boolean userSubscribedToSubreddit = subredditRepository.isUserSubscribedToSubreddit(subreddit, user.getId());
-        return userSubscribedToSubreddit;
+        return subredditRepository.isUserSubscribedToSubreddit(subreddit, user.getId());
     }
 
     @Override

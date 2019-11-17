@@ -5,7 +5,7 @@ public enum Authority {
 
     private static final String ROLE_PREFIX = "ROLE_";
 
-    String role;
+    final String role;
 
     Authority() {
         this.role = ROLE_PREFIX + name();

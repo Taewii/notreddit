@@ -28,7 +28,7 @@ public class SubredditController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/checkSubredditAvailability")
+    @GetMapping("/check-subreddit-availability")
     public SubredditAvailabilityResponse checkNameAvailability(@RequestParam String title) {
         Boolean available = !subredditService.existsByTitle(title);
         return new SubredditAvailabilityResponse(available);

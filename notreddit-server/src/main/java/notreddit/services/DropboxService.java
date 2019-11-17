@@ -54,6 +54,8 @@ public class DropboxService implements CloudStorage {
         SharedLinkMetadata sharedLinkMetadata;
         try {
             sharedLinkMetadata = getSharedLinkMetadata(fileId);
+
+            if (sharedLinkMetadata == null) return false;
             client.files().deleteV2(sharedLinkMetadata.getPathLower());
             return true;
         } catch (DbxException e) {

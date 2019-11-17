@@ -81,8 +81,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable) {
-        Page<Post> allByUsername = postRepository.findAllBySubreddit(subreddit, pageable);
-        return getPostsResponseModel(allByUsername);
+        Page<Long> allBySubredditTitle = postRepository.getPostIdsBySubredditTitle(subreddit, pageable);
+        List<Post> postsBySubreddit = postRepository.getPostsFromIdList(allBySubredditTitle.getContent());
+
+        return getPostsResponseModel(allBySubredditTitle.getTotalElements(), postsBySubreddit);
     }
 
     @Override
@@ -113,6 +115,11 @@ public class PostServiceImpl implements PostService {
                     commentRepository.deleteById(comment.getId());
                 });
 
+        String fileUrl = post.getFile().getUrl();
+        if (fileUrl.contains("dropbox")) { // if the file is uploaded to the cloud storage -> delete it
+            cloudStorage.removeFile(fileUrl);
+        }
+
         postRepository.delete(post);
         return ResponseEntity
                 .ok(new ApiResponse(true, "Post deleted successfully."));
@@ -126,7 +133,7 @@ public class PostServiceImpl implements PostService {
          * warning message, taken from https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
          */
         Page<Long> subscribedPostsIds = postRepository.getSubscribedPostsIds(user.getSubscriptions(), pageable);
-        List<Post> subscribedPosts = postRepository.getSubscribedPosts(subscribedPostsIds.getContent());
+        List<Post> subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent());
         return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
     }
 
@@ -134,7 +141,7 @@ public class PostServiceImpl implements PostService {
     public PostsResponseModel defaultPosts(Pageable pageable) {
         Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(SubredditServiceImpl.DEFAULT_SUBREDDITS);
         Page<Long> subscribedPostsIds = postRepository.getSubscribedPostsIds(defaultSubreddits, pageable);
-        List<Post> subscribedPosts = postRepository.getSubscribedPosts(subscribedPostsIds.getContent());
+        List<Post> subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent());
         return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
     }
 
@@ -220,11 +227,8 @@ public class PostServiceImpl implements PostService {
         String fileUrl = params.get("url").toString();
 
         File file = new File();
-        if (params.containsKey("id")) {
-            file.setFileId(Long.parseLong(params.get("id").toString()));
-        } else {
-            file.setFileId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
-        }
+        file.setUrl(fileUrl);
+        file.setFileId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
 
         if (params.get("contentType").toString().contains("image")) {
             file.setThumbnailUrl(fileUrl);
@@ -232,7 +236,6 @@ public class PostServiceImpl implements PostService {
             file.setThumbnailUrl(thumbnailService.generateThumbnailUrl(fileUrl));
         }
 
-        file.setUrl(fileUrl);
         return file;
     }
 

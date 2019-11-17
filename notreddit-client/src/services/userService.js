@@ -19,14 +19,14 @@ export function signup(signupRequest) {
 
 export function checkUsernameAvailability(username) {
   return request({
-    url: API_BASE_URL + "/user/checkUsernameAvailability?username=" + username,
+    url: API_BASE_URL + "/user/check-username-availability?username=" + username,
     method: 'GET'
   });
 }
 
 export function checkEmailAvailability(email) {
   return request({
-    url: API_BASE_URL + "/user/checkEmailAvailability?email=" + email,
+    url: API_BASE_URL + "/user/check-email-availability?email=" + email,
     method: 'GET'
   });
 }
@@ -62,7 +62,7 @@ export function getAllUsersWithRoles() {
 
 export function handleRoleChange(changeRoleRequest) {
   return request({
-    url: API_BASE_URL + "/user/changeRole",
+    url: API_BASE_URL + "/user/change-role",
     method: 'POST',
     body: JSON.stringify(changeRoleRequest)
   });

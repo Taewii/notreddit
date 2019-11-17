@@ -38,20 +38,17 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             "LEFT JOIN FETCH p.subreddit " +
             "LEFT JOIN FETCH p.comments " +
             "WHERE p.id IN :subscriptions")
-    List<Post> getSubscribedPosts(@Param("subscriptions") List<Long> subscriptions);
+    List<Post> getPostsFromIdList(@Param("subscriptions") List<Long> subscriptions);
+
+    @Query(value = "SELECT DISTINCT p.id FROM Post p " +
+            "WHERE p.subreddit.title = :title",
+            countQuery = "SELECT COUNT(p) FROM Post p WHERE p.subreddit.title = :title")
+    Page<Long> getPostIdsBySubredditTitle(@Param("title") String title, Pageable pageable);
 
     @Query(value = "SELECT DISTINCT p.id FROM Post p " +
             "WHERE p.subreddit IN :subscriptions",
             countQuery = "SELECT COUNT(p) FROM Post p WHERE p.subreddit IN :subscriptions")
     Page<Long> getSubscribedPostsIds(@Param("subscriptions") Set<Subreddit> subscriptions, Pageable pageable);
-
-    @Query(value = "SELECT DISTINCT p FROM Post p " +
-            "JOIN FETCH p.creator c " +
-            "LEFT JOIN FETCH p.subreddit " +
-            "LEFT JOIN FETCH p.comments " +
-            "WHERE LOWER(p.subreddit.title) = :subreddit",
-            countQuery = "SELECT COUNT(p) FROM Post p WHERE LOWER(p.subreddit.title) = :subreddit")
-    Page<Post> findAllBySubreddit(@Param("subreddit") String subreddit, Pageable pageable);
 
     @Query(value = "SELECT p FROM Vote v " +
             "JOIN v.post as p " +

@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../util/constants";
 
 export function checkSubredditAvailability(subreddit) {
   return request({
-    url: API_BASE_URL + "/subreddit/checkSubredditAvailability?title=" + subreddit,
+    url: API_BASE_URL + "/subreddit/check-subreddit-availability?title=" + subreddit,
     method: 'GET'
   });
 }

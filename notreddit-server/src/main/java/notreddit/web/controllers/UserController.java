@@ -36,13 +36,15 @@ public class UserController {
         this.mapper = mapper;
     }
 
-    @GetMapping("/checkUsernameAvailability")
+    @PreAuthorize("isAnonymous()")
+    @GetMapping("/check-username-availability")
     public UserIdentityAvailabilityResponse checkUsernameAvailability(@RequestParam String username) {
         Boolean available = !userService.existsByUsername(username);
         return new UserIdentityAvailabilityResponse(available);
     }
 
-    @GetMapping("/checkEmailAvailability")
+    @PreAuthorize("isAnonymous()")
+    @GetMapping("/check-email-availability")
     public UserIdentityAvailabilityResponse checkEmailAvailability(@RequestParam String email) {
         Boolean available = !userService.existsByEmail(email);
         return new UserIdentityAvailabilityResponse(available);
@@ -62,7 +64,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/changeRole")
+    @PostMapping("/change-role")
     public ResponseEntity<?> changeUserRole(@Valid @RequestBody ChangeRoleRequest request,
                                             @AuthenticationPrincipal User user) {
         return userService.changeRole(request, user);
