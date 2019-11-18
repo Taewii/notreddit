@@ -18,7 +18,7 @@ public interface SubredditRepository extends JpaRepository<Subreddit, Long> {
 
     Optional<Subreddit> findByTitleIgnoreCase(@Length(min = 4) @NotBlank String title);
 
-    @Query("SELECT new notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse(s.title, s.posts.size) " +
+    @Query("SELECT new notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse(s.title, s.posts.size, s.subscribers.size) " +
             "FROM Subreddit s ORDER BY s.title")
     List<SubredditWithPostCountResponse> findAllWithPostCount();
 

@@ -107,7 +107,8 @@ class SubredditList extends Component {
           <List.Item>
             <List.Item.Meta
               title={<a style={{ color: "#1890ff" }} href={`/subreddit/${subreddit.title}`}>{subreddit.title}</a>}
-              description={`${subreddit.title} currently has ${subreddit.postCount} ${subreddit.postCount === 1 ? 'post' : 'posts'}.`} />
+              description={`${subreddit.title} currently has ${subreddit.postCount} ${subreddit.postCount === 1 ? 'post' : 'posts'}
+               and ${subreddit.subscriberCount} ${subreddit.subscriberCount === 1 ? 'subscriber' : 'subscribers'}.`} />
             <ActionButton subreddit={subreddit.title} />
           </List.Item >
         )

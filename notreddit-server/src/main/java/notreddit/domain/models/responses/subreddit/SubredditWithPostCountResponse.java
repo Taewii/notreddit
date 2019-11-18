@@ -13,4 +13,5 @@ public class SubredditWithPostCountResponse {
 
     private String title;
     private Integer postCount;
+    private Integer subscriberCount;
 }

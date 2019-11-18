@@ -445,12 +445,12 @@ const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, curre
   return (
     <Comment
       key={comment.id}
-      author={comment.creatorUsername}
+      author={<a href={`/user/${comment.creatorUsername}`}>{comment.creatorUsername}</a>}
       content={comment.content}
       datetime={timeSince(comment.createdOn).replace('ago', '')}
       actions={actions}
       avatar={
-        <Avatar style={{ backgroundColor: '#1890ff', verticalAlign: 'middle' }}>
+        <Avatar style={{ backgroundColor: getAvatarColor(comment.creatorUsername), verticalAlign: 'middle' }}>
           {comment.creatorUsername[0].toUpperCase()}
         </Avatar>
       }
@@ -469,6 +469,21 @@ const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, curre
       })}
     </Comment>
   )
+}
+
+const getAvatarColor = (sender) => {
+  const colors = [
+    '#2196F3', '#32c787', '#00BCD4', '#ff5652',
+    '#ffc107', '#ff85af', '#FF9800', '#a0acc5'
+  ];
+
+  let hash = 0;
+  for (let i = 0; i < sender.length; i++) {
+    hash = 31 * hash + sender.charCodeAt(i);
+  }
+
+  const index = Math.abs(hash % colors.length);
+  return colors[index];
 }
 
 const Content = ({ content }) => (
