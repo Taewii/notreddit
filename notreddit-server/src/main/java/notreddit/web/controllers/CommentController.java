@@ -41,8 +41,8 @@ public class CommentController {
 
     @PreAuthorize("permitAll()")
     @GetMapping("/post")
-    public List<CommentListWithChildren> findAllFromPost(@RequestParam UUID postId) {
-        return commentService.findAllFromPost(postId);
+    public List<CommentListWithChildren> findAllFromPost(@RequestParam UUID postId, Pageable pageable) {
+        return commentService.findAllFromPost(postId, pageable);
     }
 
     @PreAuthorize("permitAll()")

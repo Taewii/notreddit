@@ -105,9 +105,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentListWithChildren> findAllFromPost(UUID postId) {
+    public List<CommentListWithChildren> findAllFromPost(UUID postId, Pageable pageable) {
         return commentRepository
-                .findByPostIdWithChildren(postId)
+                .findByPostIdWithChildren(postId, pageable.getSort())
                 .parallelStream()
                 .map(c -> mapper.map(c, CommentListWithChildren.class))
                 .collect(Collectors.toUnmodifiableList());

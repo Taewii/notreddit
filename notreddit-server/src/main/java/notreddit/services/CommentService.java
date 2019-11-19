@@ -15,7 +15,7 @@ public interface CommentService {
 
     ResponseEntity<?> create(CommentCreateRequestModel commentModel, User creator);
 
-    List<CommentListWithChildren> findAllFromPost(UUID postId);
+    List<CommentListWithChildren> findAllFromPost(UUID postId, Pageable pageable);
 
     CommentsResponseModel findAllFromUsername(String username, Pageable pageable);
 

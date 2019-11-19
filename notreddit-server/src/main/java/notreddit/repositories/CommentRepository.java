@@ -3,6 +3,7 @@ package notreddit.repositories;
 import notreddit.domain.entities.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,7 +18,7 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     @Query("SELECT c FROM Comment c " +
             "WHERE c.parent IS NULL " +
             "AND c.post.id = :id")
-    List<Comment> findByPostIdWithChildren(@Param("id") UUID id);
+    List<Comment> findByPostIdWithChildren(@Param("id") UUID id, Sort sort);
 
     @Query(value = "SELECT c FROM Comment c " +
             "JOIN FETCH c.post " +

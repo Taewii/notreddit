@@ -15,7 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,8 +80,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable) {
-        Page<Long> allBySubredditTitle = postRepository.getPostIdsBySubredditTitle(subreddit, pageable);
-        List<Post> postsBySubreddit = postRepository.getPostsFromIdList(allBySubredditTitle.getContent());
+        Page<UUID> allBySubredditTitle = postRepository.getPostIdsBySubredditTitle(subreddit.toLowerCase(), pageable);
+        List<Post> postsBySubreddit = new ArrayList<>();
+
+        // if I call the method with an empty array the IN statement in the sql throws an exception
+        if (allBySubredditTitle.getTotalElements() > 0) {
+            postsBySubreddit = postRepository.getPostsFromIdList(allBySubredditTitle.getContent(), pageable.getSort());
+        }
 
         return getPostsResponseModel(allBySubredditTitle.getTotalElements(), postsBySubreddit);
     }
@@ -132,16 +136,16 @@ public class PostServiceImpl implements PostService {
          * Hibernate “HHH000104: firstResult/maxResults specified with collection fetch; applying in memory!”
          * warning message, taken from https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
          */
-        Page<Long> subscribedPostsIds = postRepository.getSubscribedPostsIds(user.getSubscriptions(), pageable);
-        List<Post> subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent());
+        Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(user.getSubscriptions(), pageable);
+        List<Post> subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent(), pageable.getSort());
         return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
     }
 
     @Override
     public PostsResponseModel defaultPosts(Pageable pageable) {
         Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(SubredditServiceImpl.DEFAULT_SUBREDDITS);
-        Page<Long> subscribedPostsIds = postRepository.getSubscribedPostsIds(defaultSubreddits, pageable);
-        List<Post> subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent());
+        Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(defaultSubreddits, pageable);
+        List<Post> subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent(), pageable.getSort());
         return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
     }
 
@@ -151,9 +155,31 @@ public class PostServiceImpl implements PostService {
             throw new AccessForbiddenException("You are not allowed to view this content");
         }
 
-        Page<Post> postsByUser = postRepository
-                .findPostsByUserAndVoteChoice(user, (byte) choice, pageable);
-        return getPostsResponseModel(postsByUser);
+        PageRequest nativeQuerySorting = (PageRequest) pageable;
+
+        // changing the sorting param from createdOn -> created_on, cus its a native query
+        if (pageable.getSort().isSorted()) {
+            Sort.Order createdOn = pageable.getSort().getOrderFor("createdOn");
+            if (createdOn != null) {
+                Sort createdOnNativeQuery = Sort.by("created_on");
+                if (createdOn.getDirection().isAscending()) {
+                    createdOnNativeQuery = createdOnNativeQuery.ascending();
+                } else {
+                    createdOnNativeQuery = createdOnNativeQuery.descending();
+                }
+                nativeQuerySorting = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), createdOnNativeQuery);
+            }
+        }
+
+        Page<String> postIdsByVoteChoice = postRepository.findPostIdsByUserAndVoteChoice(user.getId(), (byte) choice, nativeQuerySorting);
+        List<UUID> postIds = postIdsByVoteChoice.getContent().stream().map(UUID::fromString).collect(Collectors.toList());
+        List<Post> posts = new ArrayList<>();
+
+        if (!postIds.isEmpty()) {
+            posts = postRepository.getPostsFromIdList(postIds, pageable.getSort());
+        }
+
+        return getPostsResponseModel(postIdsByVoteChoice.getTotalElements(), posts);
     }
 
     @Override

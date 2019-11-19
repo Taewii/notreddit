@@ -2,9 +2,9 @@ package notreddit.repositories;
 
 import notreddit.domain.entities.Post;
 import notreddit.domain.entities.Subreddit;
-import notreddit.domain.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,33 +38,32 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             "LEFT JOIN FETCH p.subreddit " +
             "LEFT JOIN FETCH p.comments " +
             "WHERE p.id IN :subscriptions")
-    List<Post> getPostsFromIdList(@Param("subscriptions") List<Long> subscriptions);
+    List<Post> getPostsFromIdList(@Param("subscriptions") List<UUID> subscriptions, Sort sort);
 
-    @Query(value = "SELECT DISTINCT p.id FROM Post p " +
-            "WHERE p.subreddit.title = :title",
+    @Query(value = "SELECT p.id FROM Post p " +
+            "WHERE LOWER(p.subreddit.title) = :title",
             countQuery = "SELECT COUNT(p) FROM Post p WHERE p.subreddit.title = :title")
-    Page<Long> getPostIdsBySubredditTitle(@Param("title") String title, Pageable pageable);
+    Page<UUID> getPostIdsBySubredditTitle(@Param("title") String title, Pageable pageable);
 
-    @Query(value = "SELECT DISTINCT p.id FROM Post p " +
+    @Query(value = "SELECT p.id FROM Post p " +
             "WHERE p.subreddit IN :subscriptions",
             countQuery = "SELECT COUNT(p) FROM Post p WHERE p.subreddit IN :subscriptions")
-    Page<Long> getSubscribedPostsIds(@Param("subscriptions") Set<Subreddit> subscriptions, Pageable pageable);
+    Page<UUID> getSubscribedPostsIds(@Param("subscriptions") Set<Subreddit> subscriptions, Pageable pageable);
 
-    @Query(value = "SELECT p FROM Vote v " +
-            "JOIN v.post as p " +
-            "LEFT JOIN FETCH p.subreddit " +
-            "LEFT JOIN FETCH p.comments " +
-            "LEFT JOIN FETCH p.creator " +
-            "WHERE v.comment IS NULL " +
+    @Query(value = "SELECT cast(p.id as varchar) FROM posts p " +
+            "LEFT JOIN votes v ON v.post_id = p.id " +
+            "WHERE v.comment_id IS NULL " +
             "AND v.choice = :choice " +
-            "AND v.user = :user",
-            countQuery = "SELECT COUNT(v) FROM Vote v " +
-                    "WHERE v.comment IS NULL " +
-                    "AND v.choice = 1 " +
-                    "AND v.user = :user")
-    Page<Post> findPostsByUserAndVoteChoice(@Param("user") User user,
-                                            @Param("choice") byte choice,
-                                            Pageable pageable);
+            "AND v.user_id = :userId ",
+            countQuery = "SELECT COUNT(p.id) FROM posts p " +
+                    "LEFT JOIN votes v ON v.post_id = p.id " +
+                    "WHERE v.comment_id IS NULL " +
+                    "AND v.choice = :choice " +
+                    "AND v.user_id = :userId ",
+            nativeQuery = true)
+    Page<String> findPostIdsByUserAndVoteChoice(@Param("userId") UUID userId,
+                                                @Param("choice") byte choice,
+                                                Pageable pageable);
 
     @Query("SELECT p FROM Post p " +
             "JOIN FETCH p.creator " +
