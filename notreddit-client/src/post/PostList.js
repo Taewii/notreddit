@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './PostList.css';
 
 import { Link } from 'react-router-dom';
-import { List, Icon, Tooltip, Popconfirm } from 'antd';
+import { List, Icon, Tooltip, Popconfirm, Select } from 'antd';
 
 import { IconText } from '../util/IconText';
 import { errorNotification, successNotification } from '../util/notifications';
@@ -10,6 +10,8 @@ import { voteForPost } from '../services/voteService';
 import { timeSince } from '../util/APIUtils';
 import { getUserVotesForPosts } from '../services/voteService';
 import { deletePostById } from '../services/postService';
+
+const { Option } = Select;
 
 class PostList extends Component {
   constructor(props) {
@@ -39,15 +41,16 @@ class PostList extends Component {
     this.colorVote = this.colorVote.bind(this);
   }
 
-  loadPosts(page, pageSize) {
-    this.dataLoadingFunction(page, pageSize, this.username)
+  loadPosts(page, pageSize, sort) {
+    this.dataLoadingFunction(page, pageSize, sort, this.username)
       .then(res => {
         if (this._isMounted) {
           this.setState({
             posts: res.posts,
             totalPosts: res.total,
             page: page + 1,
-            pageSize: +pageSize
+            pageSize: +pageSize,
+            sort
           });
         }
       }).catch(error => errorNotification(error))
@@ -60,8 +63,9 @@ class PostList extends Component {
     const searchParams = new URLSearchParams(this.props.location.search);
     const page = searchParams.get('page') - 1 || 0;
     const pageSize = searchParams.get('pageSize') || 10;
+    const sort = searchParams.get('sort') || '';
 
-    this.loadPosts(page, pageSize);
+    this.loadPosts(page, pageSize, sort);
 
     if (isAuthenticated) {
       getUserVotesForPosts()
@@ -103,49 +107,74 @@ class PostList extends Component {
   }
 
   render() {
-    const { posts, totalPosts, page, pageSize } = this.state;
+    const { posts, totalPosts, page, pageSize, sort } = this.state;
 
     return (
-      <List
-        bordered
-        itemLayout="vertical"
-        size="large"
-        pagination={{
-          showSizeChanger: true,
-          total: totalPosts,
-          defaultCurrent: 1,
-          current: page,
-          pageSize: pageSize,
-          onChange: (page, pageSize) => {
-            this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
-          },
-          onShowSizeChange: (page, pageSize) => {
-            this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
+      <>
+        <Select
+          showSearch
+          style={{ width: 200 }}
+          className="sorting-options"
+          placeholder="Order by"
+          value={sort || 'Order by'}
+          onChange={(value) => {
+            this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}&sort=${value}`);
+          }}
+          filterOption={(input, option) =>
+            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
           }
-        }}
-        dataSource={posts}
-        renderItem={post => (
-          <List.Item
-            onLoad={(event) => this.colorVote(event, post.id)}
-            key={post.id}
-            actions={actions(post, this.currentUserUsername, this.deletePost, this.userIsModerator)}
-          >
-            <List.Item.Meta
-              avatar={
-                <Link to={'/post/' + post.id}>
-                  <img src={post.fileThumbnailUrl === null ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpuQW-Yaooyex01Istft3iPtUz5kSjb4UdtMrxjKp0b-JEWIMl' : post.fileThumbnailUrl} width="128px" alt="thumbnail" />
-                </Link>
-              }
-              title={<a href={'/post/' + post.id}>{post.title}</a>}
-              description={
-                <span>
-                  submitted {timeSince(post.createdOn)} by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
-                </span>
-              }
-            />
-          </List.Item>
-        )}
-      />
+        >
+          <Option value="createdOn,desc">Newest</Option>
+          <Option value="createdOn">Oldest</Option>
+          <Option value="title">Title (A &#8594; Z)</Option>
+          <Option value="title,desc">Title (Z &#8594; A)</Option>
+          <Option value="upvotes">Upvotes (Low &#8594; High)</Option>
+          <Option value="upvotes,desc">Upvotes (High &#8594; Low)</Option>
+          <Option value="downvotes">Downvotes (Low &#8594; High)</Option>
+          <Option value="downvotes,desc">Downvotes (High &#8594; Low)</Option>
+        </Select>,
+        <List
+          bordered
+          itemLayout="vertical"
+          size="large"
+          pagination={{
+            showSizeChanger: true,
+            total: totalPosts,
+            defaultCurrent: 1,
+            current: page,
+            hideOnSinglePage: true,
+            pageSize: pageSize,
+            onChange: (page, pageSize) => {
+              this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}&sort=${sort}`);
+            },
+            onShowSizeChange: (page, pageSize) => {
+              this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}&sort=${sort}`);
+            }
+          }}
+          dataSource={posts}
+          renderItem={post => (
+            <List.Item
+              onLoad={(event) => this.colorVote(event, post.id)}
+              key={post.id}
+              actions={actions(post, this.currentUserUsername, this.deletePost, this.userIsModerator)}
+            >
+              <List.Item.Meta
+                avatar={
+                  <Link to={'/post/' + post.id}>
+                    <img src={post.fileThumbnailUrl === null ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpuQW-Yaooyex01Istft3iPtUz5kSjb4UdtMrxjKp0b-JEWIMl' : post.fileThumbnailUrl} width="128px" alt="thumbnail" />
+                  </Link>
+                }
+                title={<a href={'/post/' + post.id}>{post.title}</a>}
+                description={
+                  <span>
+                    submitted {timeSince(post.createdOn)} by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
+                  </span>
+                }
+              />
+            </List.Item>
+          )}
+        />
+      </>
     );
   }
 }

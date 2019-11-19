@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './CommentList.css';
 
 import { Link } from 'react-router-dom';
-import { List, Icon, Tooltip, Avatar, Popconfirm, Modal, Form, Input } from 'antd';
+import { List, Icon, Tooltip, Avatar, Popconfirm, Modal, Form, Input, Select } from 'antd';
 
 import { IconText } from '../util/IconText';
 import { errorNotification, successNotification } from '../util/notifications';
@@ -11,13 +11,15 @@ import { voteForComment } from '../services/voteService';
 import { getUserVotesForComments } from '../services/voteService';
 import { commentsByUsername, deleteCommentById, editComment } from '../services/commentService';
 
+const { Option } = Select;
+
 class CommentList extends Component {
   constructor(props) {
     super(props)
     this._isMounted = false;
     this.username = this.props.username;
     this.currentUser = this.props.currentUser;
-    this.userIsModerator = this.currentUser.roles.includes('MODERATOR');
+    this.userIsModerator = false;
     this.votes = {};
     this.state = {
       initLoading: true,
@@ -26,10 +28,15 @@ class CommentList extends Component {
       comments: [],
       page: 0,
       pageSize: 10,
+      sort: '',
       modalIsVisible: false,
       editCommentContent: '',
       editCommentId: null
     };
+
+    if (this.currentUser !== null) {
+      this.userIsModerator = this.currentUser.roles.includes('MODERATOR');
+    }
 
     this.deleteComment = this.deleteComment.bind(this);
     this.colorVote = this.colorVote.bind(this);
@@ -46,8 +53,9 @@ class CommentList extends Component {
     const searchParams = new URLSearchParams(this.props.location.search);
     const page = searchParams.get('page') - 1 || 0;
     const pageSize = searchParams.get('pageSize') || 10;
+    const sort = searchParams.get('sort') || '';
 
-    this.loadComments(page, pageSize);
+    this.loadComments(page, pageSize, sort);
 
     if (isAuthenticated) {
       getUserVotesForComments()
@@ -65,15 +73,16 @@ class CommentList extends Component {
     this._isMounted = false;
   }
 
-  loadComments(page, pageSize) {
-    commentsByUsername(this.username, page, pageSize)
+  loadComments(page, pageSize, sort) {
+    commentsByUsername(this.username, page, pageSize, sort)
       .then(res => {
         if (this._isMounted) {
           this.setState({
             comments: res.comments,
             totalComments: res.total,
             page: page + 1,
-            pageSize: +pageSize
+            pageSize: +pageSize,
+            sort
           });
         }
       }).catch(error => errorNotification(error))
@@ -146,10 +155,30 @@ class CommentList extends Component {
   }
 
   render() {
-    const { comments, totalComments, page, pageSize } = this.state;
+    const { comments, totalComments, page, pageSize, sort } = this.state;
 
     return (
-      <div>
+      <>
+        <Select
+          showSearch
+          style={{ width: 200 }}
+          className="sorting-options"
+          placeholder="Order by"
+          value={sort || 'Order by'}
+          onChange={(value) => {
+            this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}&sort=${value}`);
+          }}
+          filterOption={(input, option) =>
+            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+        >
+          <Option value="createdOn,desc">Newest</Option>
+          <Option value="createdOn">Oldest</Option>
+          <Option value="upvotes">Upvotes (Low &#8594; High)</Option>
+          <Option value="upvotes,desc">Upvotes (High &#8594; Low)</Option>
+          <Option value="downvotes">Downvotes (Low &#8594; High)</Option>
+          <Option value="downvotes,desc">Downvotes (High &#8594; Low)</Option>
+        </Select>,
         <List
           bordered
           itemLayout="vertical"
@@ -157,6 +186,7 @@ class CommentList extends Component {
           pagination={{
             showSizeChanger: true,
             total: totalComments,
+            hideOnSinglePage: true,
             defaultCurrent: 1,
             current: page,
             pageSize: pageSize,
@@ -213,7 +243,7 @@ class CommentList extends Component {
             </Form.Item>
           </Form>
         </Modal>
-      </div>
+      </>
     );
   }
 }

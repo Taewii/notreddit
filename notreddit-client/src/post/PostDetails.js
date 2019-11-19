@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './PostDetails.css';
 
-import { List, Icon, Tooltip, Button, Form, Input, Comment, Avatar, Modal, Popconfirm } from 'antd';
+import { List, Icon, Tooltip, Button, Form, Input, Comment, Avatar, Modal, Popconfirm, Select } from 'antd';
 
 import { errorNotification, successNotification } from '../util/notifications'
 import { timeSince } from '../util/APIUtils';
@@ -10,6 +10,8 @@ import { findById, deletePostById } from '../services/postService';
 import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
 import { comment, findCommentsForPost, deleteCommentById, editComment } from '../services/commentService';
 import { getUserVotesForComments } from '../services/voteService';
+
+const { Option } = Select;
 
 class PostDetails extends Component {
   constructor(props) {
@@ -27,6 +29,7 @@ class PostDetails extends Component {
       editCommentContent: '',
       replyModalIsVisible: false,
       editModalIsVisible: false,
+      sort: ''
     }
 
     this.currentUser = this.props.currentUser;
@@ -53,7 +56,10 @@ class PostDetails extends Component {
     const { id } = this.props.match.params;
     const isAuthenticated = this.props.isAuthenticated;
 
-    const promises = [findById(id), findCommentsForPost(id)];
+    const searchParams = new URLSearchParams(this.props.location.search);
+    const sort = searchParams.get('sort') || '';
+
+    const promises = [findById(id), findCommentsForPost(id, sort)];
 
     // if user is logged in get user related properties
     if (isAuthenticated) {
@@ -75,6 +81,7 @@ class PostDetails extends Component {
         if (this._isMounted) {
           this.setState({
             post,
+            sort,
             comments,
             postId: id
           })
@@ -86,7 +93,7 @@ class PostDetails extends Component {
   colorVote(choice) {
     const icons = document.querySelectorAll('.post svg');
 
-    if (icons.length === 2) { // sometimes it the async function loads before the icons are rendered
+    if (icons.length >= 2) { // sometimes it the async function loads before the icons are rendered
       if (choice === 1) {
         icons[0].setAttribute('color', 'green');
       } else if (choice === -1) {
@@ -206,7 +213,10 @@ class PostDetails extends Component {
   }
 
   render() {
-    const { post, postId } = this.state;
+    const {
+      post, postId, sort, commentContent, replyModalIsVisible, comments,
+      replyCommentContent, editCommentContent, editModalIsVisible
+    } = this.state;
 
     let actions = [
       <span key="comment-basic-upvote">
@@ -307,14 +317,35 @@ class PostDetails extends Component {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  disabled={this.state.commentContent.trim().length === 0}
+                  disabled={commentContent.trim().length === 0}
                 >Submit comment</Button>
               </Form.Item>
             </Form>
           </List.Item>
         </List>
         {post.fileUrl ? <FileContent fileUrl={post.fileUrl} /> : null}
-        {this.state.comments.map(comment =>
+        <Select
+          showSearch
+          style={{ width: 200 }}
+          className={comments.length > 0 ? 'comment-sorting-options' : 'hidden'}
+          size="small"
+          placeholder="Order by"
+          value={sort || 'Order by'}
+          onChange={(value) => {
+            this.props.history.push(`${window.location.pathname}?&sort=${value}`);
+          }}
+          filterOption={(input, option) =>
+            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+        >
+          <Option value="createdOn,desc">Newest</Option>
+          <Option value="createdOn">Oldest</Option>
+          <Option value="upvotes">Upvotes (Low &#8594; High)</Option>
+          <Option value="upvotes,desc">Upvotes (High &#8594; Low)</Option>
+          <Option value="downvotes">Downvotes (Low &#8594; High)</Option>
+          <Option value="downvotes,desc">Downvotes (High &#8594; Low)</Option>
+        </Select>
+        {comments.map(comment =>
           <CommentComponent
             key={comment.id}
             comment={comment}
@@ -329,10 +360,10 @@ class PostDetails extends Component {
           title="Reply to comment"
           okText="Reply"
           cancelText="Discard"
-          visible={this.state.replyModalIsVisible}
+          visible={replyModalIsVisible}
           onOk={this.handleCommentReply}
           onCancel={this.hideReplyModal}
-          okButtonProps={{ disabled: this.state.replyCommentContent.trim().length === 0 }}
+          okButtonProps={{ disabled: replyCommentContent.trim().length === 0 }}
         >
           <Form>
             <Form.Item hasFeedback onSubmit={this.handleCommentReply}>
@@ -351,17 +382,17 @@ class PostDetails extends Component {
           title="Edit comment"
           okText="Edit"
           cancelText="Discard"
-          visible={this.state.editModalIsVisible}
+          visible={editModalIsVisible}
           onOk={this.handleCommentEdit}
           onCancel={this.hideEditModal}
-          okButtonProps={{ disabled: this.state.editCommentContent.trim().length === 0 }}
+          okButtonProps={{ disabled: editCommentContent.trim().length === 0 }}
         >
           <Form>
             <Form.Item hasFeedback onSubmit={this.handleCommentEdit}>
               <Input.TextArea
                 disabled={!this.props.isAuthenticated}
                 className="comment-edit-textarea"
-                value={this.state.editCommentContent}
+                value={editCommentContent}
                 size="large"
                 name="editCommentContent"
                 onChange={this.handleInputChange}

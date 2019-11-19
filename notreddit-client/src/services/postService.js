@@ -25,8 +25,8 @@ export function allPosts(page, size) {
   });
 }
 
-export function allSubscribedPosts(page, size) {
-  const url = `${API_BASE_URL}/post/subscribed?page=${page}&size=${size}`;
+export function allSubscribedPosts(page, size, sort) {
+  const url = `${API_BASE_URL}/post/subscribed?page=${page}&size=${size}&sort=${sort}`;
 
   return request({
     url,
@@ -43,8 +43,8 @@ export function allPostsFromTheDefaultSubreddits(page, size) {
   });
 }
 
-export function postsByUsername(page, size, username) {
-  const url = `${API_BASE_URL}/post/user/${username}?page=${page}&size=${size}`;
+export function postsByUsername(page, size, sort, username) {
+  const url = `${API_BASE_URL}/post/user/${username}?page=${page}&size=${size}&sort=${sort}`;
 
   return request({
     url,
@@ -52,8 +52,26 @@ export function postsByUsername(page, size, username) {
   });
 }
 
-export function postsBySubreddit(page, size, subreddit) {
-  const url = `${API_BASE_URL}/post/subreddit/${subreddit}?page=${page}&size=${size}`;
+export function postsBySubreddit(page, size, sort, subreddit) {
+  const url = `${API_BASE_URL}/post/subreddit/${subreddit}?page=${page}&size=${size}&sort=${sort}`;
+
+  return request({
+    url,
+    method: 'GET'
+  });
+}
+
+export function getUpvotedPosts(page, size, sort, username) {
+  const url = `${API_BASE_URL}/user/${username}/upvoted?page=${page}&size=${size}&sort=${sort}`;
+
+  return request({
+    url,
+    method: 'GET'
+  });
+}
+
+export function getDownvotedPosts(page, size, sort, username) {
+  const url = `${API_BASE_URL}/user/${username}/downvoted?page=${page}&size=${size}&sort=${sort}`;
 
   return request({
     url,

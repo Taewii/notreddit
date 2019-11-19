@@ -6,12 +6,14 @@ import { Layout, notification } from 'antd';
 
 import { ACCESS_TOKEN } from '../util/constants';
 import { successNotification } from '../util/notifications';
-import { getCurrentUser, getUpvotedPosts, getDownvotedPosts } from '../services/userService';
+import { getCurrentUser } from '../services/userService';
 import {
   postsByUsername,
   postsBySubreddit,
   allSubscribedPosts,
-  allPostsFromTheDefaultSubreddits
+  allPostsFromTheDefaultSubreddits,
+  getUpvotedPosts,
+  getDownvotedPosts
 } from '../services/postService';
 import { getUnreadMentionsCount } from '../services/mentionService';
 

@@ -9,9 +9,11 @@ export function comment(data) {
   });
 }
 
-export function findCommentsForPost(postId) {
+export function findCommentsForPost(postId, sort) {
+  const url = `${API_BASE_URL}/comment/post?postId=${postId}&sort=${sort}`
+
   return request({
-    url: API_BASE_URL + '/comment/post?postId=' + postId,
+    url,
     method: 'GET'
   });
 }
@@ -25,8 +27,8 @@ export function voteForCommentAPI(choice, commentId) {
   });
 }
 
-export function commentsByUsername(username, page, size) {
-  const url = `${API_BASE_URL}/comment/user/${username}?page=${page}&size=${size}`;
+export function commentsByUsername(username, page, size, sort) {
+  const url = `${API_BASE_URL}/comment/user/${username}?page=${page}&size=${size}&sort=${sort}`;
 
   return request({
     url,
