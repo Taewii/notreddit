@@ -37,7 +37,7 @@ public class PostController {
         return postService.create(request, creator);
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('MODERATOR')")
     @GetMapping("/all")
     public PostsResponseModel all(Pageable pageable) {
         return postService.allPosts(pageable);

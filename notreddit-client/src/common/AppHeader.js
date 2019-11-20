@@ -92,6 +92,9 @@ const AdminDropdownMenu = (props) => {
       <Menu.Item key="all-users" className="dropdown-item">
         <Link to="/user/all">All Users</Link>
       </Menu.Item>
+      <Menu.Item key="all-posts" className="dropdown-item">
+        <Link to="/post/all">All Posts</Link>
+      </Menu.Item>
     </Menu>
   );
 

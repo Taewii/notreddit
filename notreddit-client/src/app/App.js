@@ -13,7 +13,8 @@ import {
   allSubscribedPosts,
   allPostsFromTheDefaultSubreddits,
   getUpvotedPosts,
-  getDownvotedPosts
+  getDownvotedPosts,
+  allPosts
 } from '../services/postService';
 import { getUnreadMentionsCount } from '../services/mentionService';
 
@@ -42,7 +43,7 @@ class App extends Component {
     this.state = {
       currentUser: null,
       isAuthenticated: false,
-      isLoading: false,
+      isLoading: true,
       roles: [],
       mentionCount: 0
     }
@@ -141,6 +142,16 @@ class App extends Component {
                 component={AllUsers}
                 authenticated={this.hasRole('ADMIN')}
                 redirectPath="/home"
+              />
+              <PrivateRoute
+                path="/post/all"
+                authenticated={this.hasRole('ADMIN')}
+                redirectPath="/home"
+                isAuthenticated={isAuthenticated}
+                dataLoadingFunction={allPosts}
+                currentUser={currentUser}
+                username={null}
+                component={PostList}
               />
               <PrivateRoute
                 path="/subreddit/create"
