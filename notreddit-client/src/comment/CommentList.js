@@ -178,7 +178,8 @@ class CommentList extends Component {
           <Option value="upvotes,desc">Upvotes (High &#8594; Low)</Option>
           <Option value="downvotes">Downvotes (Low &#8594; High)</Option>
           <Option value="downvotes,desc">Downvotes (High &#8594; Low)</Option>
-        </Select>,
+        </Select>
+        <br />
         <List
           bordered
           itemLayout="vertical"

@@ -12,3 +12,27 @@
   margin-left: 19px;
   color: #1890ff
 }
+
+@media(max-width: 590px) {
+
+  .user-list .ant-list-item-meta {
+    display: block;
+    width: auto;
+  }
+
+  .user-list .ant-list-item-meta-content {
+    width: 100% !important;
+    text-align: center;
+  }
+
+  .user-list-item .ant-list-item-meta-content,
+  .user-list-item .ant-list-item-meta-description {
+    min-width: 100% !important;
+    width: 200px !important;
+  }
+
+  .user-list-item .users-dropdown,
+  .user-list-item .list-button {
+    margin: 5px auto;
+  }
+}

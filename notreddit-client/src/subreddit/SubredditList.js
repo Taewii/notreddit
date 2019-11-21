@@ -98,13 +98,13 @@ class SubredditList extends Component {
 
     return (
       <List
-        className="user-list"
+        className="subreddit-list"
         loading={initLoading}
         itemLayout="horizontal"
         bordered={true}
         dataSource={data}
         renderItem={subreddit => (
-          <List.Item>
+          <List.Item className="subreddit-list-item">
             <List.Item.Meta
               title={<a style={{ color: "#1890ff" }} href={`/subreddit/${subreddit.title}`}>{subreddit.title}</a>}
               description={`${subreddit.title} currently has ${subreddit.postCount} ${subreddit.postCount === 1 ? 'post' : 'posts'}

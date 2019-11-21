@@ -99,7 +99,7 @@ class AllUsers extends Component {
         bordered={true}
         dataSource={data}
         renderItem={user => (
-          <List.Item>
+          <List.Item className="user-list-item">
             <Skeleton avatar title={false} loading={user.loading} active>
               <List.Item.Meta
                 title={user.username}

@@ -4,7 +4,10 @@ body {
   font-family: sans-serif;
 }
 
-.ant-layout-header, .ant-layout-footer, .ant-layout-body, .ant-layout-content {
+.ant-layout-header,
+.ant-layout-footer,
+.ant-layout-body,
+.ant-layout-content {
   background: #fff !important;
 }
 

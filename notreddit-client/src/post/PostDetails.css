@@ -1,16 +1,18 @@
-.post, .container, .file-content-wrapper {
-  height:100%;
-  width:100%;
+.post,
+.container,
+.file-content-wrapper {
+  height: 100%;
+  width: 100%;
 }
 
 .file-content iframe {
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
 }
 
 .file-content {
   height: 100%;
-  width:100%;
+  width: 100%;
   display: none;
 }
 
