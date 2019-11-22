@@ -29,8 +29,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static notreddit.constants.ApiResponseMessages.*;
+import static notreddit.constants.ErrorMessages.ACCESS_FORBIDDEN;
+
 @Service
 public class CommentServiceImpl implements CommentService {
+
+    private static final String MODERATOR_ROLE = "ROLE_MODERATOR";
+    private static final String DELETED_CONTENT = "[deleted]";
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
@@ -59,7 +65,7 @@ public class CommentServiceImpl implements CommentService {
         if (post == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Post doesn't exist."));
+                    .body(new ApiResponse(false, NONEXISTENT_POST));
         }
 
         Comment comment = mapper.map(commentModel, Comment.class);
@@ -91,7 +97,7 @@ public class CommentServiceImpl implements CommentService {
 
         return ResponseEntity
                 .created(location)
-                .body(new ApiResponse(true, "Comment created successfully."));
+                .body(new ApiResponse(true, SUCCESSFUL_COMMENT_CREATION));
     }
 
     private Mention createMention(Comment comment, User receiver, User creator) {
@@ -133,33 +139,33 @@ public class CommentServiceImpl implements CommentService {
         if (comment == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Comment doesn't exist."));
+                    .body(new ApiResponse(false, NONEXISTENT_COMMENT));
         }
 
         boolean isCreatorOrModerator = user.getUsername().equals(comment.getCreator().getUsername()) ||
-                user.getRoles().stream().anyMatch(r -> r.getAuthority().equals("ROLE_MODERATOR"));
+                user.getRoles().stream().anyMatch(r -> r.getAuthority().equals(MODERATOR_ROLE));
 
         if (!isCreatorOrModerator) {
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse(false, "You don't have the authority to do that."));
+                    .body(new ApiResponse(false, ACCESS_FORBIDDEN));
         }
 
         mentionRepository.deleteAllByCommentId(commentId);
 
         if (!comment.getChildren().isEmpty()) {
-            comment.setContent("[deleted]");
+            comment.setContent(DELETED_CONTENT);
             commentRepository.saveAndFlush(comment);
 
             return ResponseEntity
-                    .ok(new ApiResponse(true, "Comment deleted successfully."));
+                    .ok(new ApiResponse(true, SUCCESSFUL_COMMENT_DELETION));
         }
 
         voteRepository.deleteAllByCommentId(commentId);
         commentRepository.delete(comment);
 
         return ResponseEntity
-                .ok(new ApiResponse(true, "Comment deleted successfully."));
+                .ok(new ApiResponse(true, SUCCESSFUL_COMMENT_DELETION));
     }
 
     @Override
@@ -169,13 +175,13 @@ public class CommentServiceImpl implements CommentService {
         if (comment == null || !user.getUsername().equals(comment.getCreator().getUsername())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Comment doesn't exist or you are not the creator."));
+                    .body(new ApiResponse(false, NONEXISTENT_COMMENT_OR_NOT_CREATOR));
         }
 
         comment.setContent(commentModel.getContent());
         commentRepository.saveAndFlush(comment);
 
         return ResponseEntity
-                .ok(new ApiResponse(true, "Comment edited successfully."));
+                .ok(new ApiResponse(true, SUCCESSFUL_COMMENT_EDITING));
     }
 }

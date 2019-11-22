@@ -1,5 +1,6 @@
 package notreddit.services;
 
+import notreddit.domain.enums.Authority;
 import notreddit.repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class RoleServiceImpl implements RoleService {
         return roleRepository
                 .findAll()
                 .stream()
-                .map(r -> r.getAuthority().substring("ROLE_".length()))
+                .map(r -> r.getAuthority().substring(Authority.ROLE_PREFIX.length()))
                 .collect(Collectors.toUnmodifiableList());
     }
 }

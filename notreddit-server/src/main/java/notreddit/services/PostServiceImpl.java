@@ -1,5 +1,7 @@
 package notreddit.services;
 
+import notreddit.constants.ApiResponseMessages;
+import notreddit.constants.ErrorMessages;
 import notreddit.domain.entities.File;
 import notreddit.domain.entities.Post;
 import notreddit.domain.entities.Subreddit;
@@ -31,6 +33,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
+
+    private static final String MODERATOR_ROLE = "ROLE_MODERATOR";
 
     private final CloudStorage cloudStorage;
     private final ThumbnailService thumbnailService;
@@ -98,16 +102,16 @@ public class PostServiceImpl implements PostService {
         if (post == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Post doesn't exist."));
+                    .body(new ApiResponse(false, ApiResponseMessages.NONEXISTENT_POST));
         }
 
         boolean isCreatorOrModerator = user.getUsername().equals(post.getCreator().getUsername()) ||
-                user.getRoles().stream().anyMatch(r -> r.getAuthority().equals("ROLE_MODERATOR"));
+                user.getRoles().stream().anyMatch(r -> r.getAuthority().equals(MODERATOR_ROLE));
 
         if (!isCreatorOrModerator) {
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse(false, "You don't have the authority to do that."));
+                    .body(new ApiResponse(false, ErrorMessages.ACCESS_FORBIDDEN));
         }
 
         voteRepository.deleteAllByPostId(post.getId());
@@ -126,7 +130,7 @@ public class PostServiceImpl implements PostService {
 
         postRepository.delete(post);
         return ResponseEntity
-                .ok(new ApiResponse(true, "Post deleted successfully."));
+                .ok(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_POST_DELETION));
     }
 
     @Override
@@ -152,7 +156,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostsResponseModel getPostsByVoteChoice(User user, String username, int choice, Pageable pageable) {
         if (!user.getUsername().equalsIgnoreCase(username)) {
-            throw new AccessForbiddenException("You are not allowed to view this content");
+            throw new AccessForbiddenException(ErrorMessages.ACCESS_FORBIDDEN);
         }
 
         PageRequest nativeQuerySorting = (PageRequest) pageable;
@@ -189,7 +193,7 @@ public class PostServiceImpl implements PostService {
         if (subreddit == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Subreddit does't exist."));
+                    .body(new ApiResponse(false, ApiResponseMessages.NONEXISTENT_SUBREDDIT));
         }
 
         Post post = mapper.map(request, Post.class);
@@ -206,7 +210,7 @@ public class PostServiceImpl implements PostService {
         } else {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "You can't have both url and uploaded image."));
+                    .body(new ApiResponse(false, ApiResponseMessages.ONLY_ONE_UPLOADED_METHOD_ALLOWED));
         }
     }
 
@@ -226,7 +230,7 @@ public class PostServiceImpl implements PostService {
         if (fileSizeInMb > 10) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "File size is over the limit of 10MB."));
+                    .body(new ApiResponse(false, ApiResponseMessages.FILE_SIZE_OVER_10MB));
         }
 
         File file = uploadFile(request.getFile());
@@ -272,7 +276,7 @@ public class PostServiceImpl implements PostService {
 
         return ResponseEntity
                 .created(location)
-                .body(new ApiResponse(true, "Post created successfully."));
+                .body(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_POST_CREATION));
     }
 
     private PostsResponseModel getPostsResponseModel(Page<Post> allByUsername) {

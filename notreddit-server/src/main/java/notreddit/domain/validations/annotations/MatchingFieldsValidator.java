@@ -58,7 +58,10 @@ public class MatchingFieldsValidator implements ConstraintValidator<MatchingFiel
         for (Field field : fields) {
             for (Field field1 : fields) {
                 try {
-                    if (!field.get(obj).equals(field1.get(obj))) {
+                    Object f1 = field.get(obj);
+                    Object f2 = field1.get(obj);
+
+                    if ((f1 == null || f2 == null) || !f1.equals(f2)) {
                         return false;
                     }
                 } catch (IllegalAccessException e) {

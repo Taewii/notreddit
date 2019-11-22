@@ -3,7 +3,7 @@ package notreddit.domain.enums;
 public enum Authority {
     ROOT, ADMIN, MODERATOR, USER;
 
-    private static final String ROLE_PREFIX = "ROLE_";
+    public static final String ROLE_PREFIX = "ROLE_";
 
     final String role;
 

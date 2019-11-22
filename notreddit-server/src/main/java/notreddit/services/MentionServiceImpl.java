@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static notreddit.constants.ApiResponseMessages.MENTION_MARKED_AS;
+import static notreddit.constants.ApiResponseMessages.NONEXISTENT_MENTION_OR_NOT_RECEIVER;
+
 @Service
 public class MentionServiceImpl implements MentionService {
 
@@ -52,13 +55,13 @@ public class MentionServiceImpl implements MentionService {
         if (mention == null || !user.getUsername().equals(mention.getReceiver().getUsername())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "No such mention, or you are not the receiver of the mention"));
+                    .body(new ApiResponse(false, NONEXISTENT_MENTION_OR_NOT_RECEIVER));
         }
 
         mention.setRead(read);
         mentionRepository.saveAndFlush(mention);
 
-        String message = String.format("Mention marked as %s.", read ? "read" : "unread");
+        String message = String.format(MENTION_MARKED_AS, read ? "read" : "unread");
         return ResponseEntity
                 .ok()
                 .body(new ApiResponse(true, message));

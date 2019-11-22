@@ -1,6 +1,7 @@
 package notreddit.web.interceptors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import notreddit.constants.ErrorMessages;
 import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.util.RateLimiter;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class VoteRateLimitingInterceptor extends HandlerInterceptorAdapter {
 
+    // TODO: 22.11.2019 г.
     private static final boolean ENABLED = true;
     private static final int CALLS_PER_SECOND = 1;
 
@@ -47,7 +49,7 @@ public class VoteRateLimitingInterceptor extends HandlerInterceptorAdapter {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
-            ApiResponse apiResponse = new ApiResponse(false, "Too many requests");
+            ApiResponse apiResponse = new ApiResponse(false, ErrorMessages.TOO_MANY_REQUESTS);
             PrintWriter out = response.getWriter();
             out.print(mapper.writeValueAsString(apiResponse));
             out.flush();

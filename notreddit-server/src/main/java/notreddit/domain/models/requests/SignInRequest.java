@@ -2,6 +2,7 @@ package notreddit.domain.models.requests;
 
 import lombok.Getter;
 import lombok.Setter;
+import notreddit.constants.ErrorMessages;
 
 import javax.validation.constraints.NotBlank;
 
@@ -9,9 +10,9 @@ import javax.validation.constraints.NotBlank;
 @Setter
 public class SignInRequest {
 
-    @NotBlank
+    @NotBlank(message = ErrorMessages.BLANK_USERNAME)
     private String usernameOrEmail;
 
-    @NotBlank
+    @NotBlank(message = ErrorMessages.BLANK_PASSWORD)
     private String password;
 }

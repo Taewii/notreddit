@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static notreddit.constants.ApiResponseMessages.*;
+
 @Service
 public class SubredditServiceImpl implements SubredditService {
 
@@ -46,7 +48,7 @@ public class SubredditServiceImpl implements SubredditService {
         if (existsByTitle(request.getTitle())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Subreddit name already exists."));
+                    .body(new ApiResponse(false, SUBREDDIT_ALREADY_EXISTS));
         }
 
         Subreddit subreddit = mapper.map(request, Subreddit.class);
@@ -59,7 +61,7 @@ public class SubredditServiceImpl implements SubredditService {
 
         return ResponseEntity
                 .created(location)
-                .body(new ApiResponse(true, "Subreddit created successfully."));
+                .body(new ApiResponse(true, SUCCESSFUL_SUBREDDIT_CREATION));
     }
 
     @Override
@@ -94,13 +96,13 @@ public class SubredditServiceImpl implements SubredditService {
         if (subreddit == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Subreddit with such name doesn't exist."));
+                    .body(new ApiResponse(false, NONEXISTENT_SUBREDDIT));
         }
 
         user.subscribe(subreddit);
         userRepository.saveAndFlush(user);
 
-        String responseMessage = String.format("Successfully subscribed to %s.", subreddit.getTitle());
+        String responseMessage = String.format(SUCCESSFUL_SUBREDDIT_SUBSCRIPTION, subreddit.getTitle());
         return ResponseEntity.ok(new ApiResponse(true, responseMessage));
     }
 
@@ -112,13 +114,13 @@ public class SubredditServiceImpl implements SubredditService {
         if (subreddit == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Subreddit with such name doesn't exist."));
+                    .body(new ApiResponse(false, NONEXISTENT_SUBREDDIT));
         }
 
         user.unsubscribe(subreddit);
         userRepository.saveAndFlush(user);
 
-        String responseMessage = String.format("Successfully unsubscribed from %s.", subreddit.getTitle());
+        String responseMessage = String.format(SUCCESSFUL_SUBREDDIT_UNSUBSCRIPTION, subreddit.getTitle());
         return ResponseEntity.ok(new ApiResponse(true, responseMessage));
     }
 

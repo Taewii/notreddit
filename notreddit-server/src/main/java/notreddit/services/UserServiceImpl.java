@@ -3,6 +3,7 @@ package notreddit.services;
 import notreddit.domain.entities.Role;
 import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
+import notreddit.domain.enums.Authority;
 import notreddit.domain.models.requests.ChangeRoleRequest;
 import notreddit.domain.models.requests.SignUpRequest;
 import notreddit.domain.models.responses.api.ApiResponse;
@@ -28,6 +29,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static notreddit.constants.ApiResponseMessages.*;
+import static notreddit.constants.ErrorMessages.ACCESS_FORBIDDEN;
 import static notreddit.services.SubredditServiceImpl.DEFAULT_SUBREDDITS;
 
 @Service
@@ -57,7 +60,7 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
         return userRepository.findByUsernameOrEmailIgnoreCase(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail)
+                        new UsernameNotFoundException(NONEXISTENT_USERNAME_OR_EMAIL + usernameOrEmail)
                 );
     }
 
@@ -73,13 +76,13 @@ public class UserServiceImpl implements UserService {
         if (existsByUsername(model.getUsername())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Username is already taken!"));
+                    .body(new ApiResponse(false, USERNAME_IS_TAKEN));
         }
 
         if (existsByEmail(model.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Email Address already in use!"));
+                    .body(new ApiResponse(false, EMAIL_IS_TAKEN));
         }
 
         User user = mapper.map(model, User.class);
@@ -101,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
         return ResponseEntity
                 .created(location)
-                .body(new ApiResponse(true, "User registered successfully"));
+                .body(new ApiResponse(true, SUCCESSFUL_USER_REGISTRATION));
     }
 
     @Override
@@ -110,7 +113,7 @@ public class UserServiceImpl implements UserService {
                 request.getCurrentRole().equalsIgnoreCase("root")) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Cannot change role form/to ROOT"));
+                    .body(new ApiResponse(false, CANNOT_CHANGE_ROLE_TO_FROM_ROOT));
         }
 
         boolean hasAdminRole = user.getAuthorities()
@@ -120,7 +123,7 @@ public class UserServiceImpl implements UserService {
         if (!hasAdminRole) {
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse(false, "You don't have permissions to do that."));
+                    .body(new ApiResponse(false, ACCESS_FORBIDDEN));
         }
 
         User affectedUser = userRepository.findByIdWithRoles(request.getUserId()).orElseThrow();
@@ -129,7 +132,7 @@ public class UserServiceImpl implements UserService {
 
         return ResponseEntity
                 .ok()
-                .body(new ApiResponse(true, String.format("Changed %s's role to %s",
+                .body(new ApiResponse(true, String.format(CHANGED_USERS_ROLE_TO,
                         affectedUser.getUsername(), request.getNewRole())));
     }
 
@@ -142,7 +145,7 @@ public class UserServiceImpl implements UserService {
         if (!isRoot) {
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse(false, "You don't have permissions to do that."));
+                    .body(new ApiResponse(false, ACCESS_FORBIDDEN));
         }
 
         User userToDelete = userRepository.findById(UUID.fromString(userId)).orElse(null);
@@ -150,14 +153,14 @@ public class UserServiceImpl implements UserService {
         if (userToDelete == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, String.format("User with id: %s doesn't exist", userId)));
+                    .body(new ApiResponse(false, String.format(NONEXISTENT_USER_WITH_ID, userId)));
         }
 
         userRepository.delete(userToDelete);
         return ResponseEntity
                 .ok()
                 .body(new ApiResponse(true,
-                        String.format("User %s deleted successfully.", userToDelete.getUsername())));
+                        String.format(SUCCESSFUL_USER_DELETION, userToDelete.getUsername())));
     }
 
     @Override
@@ -183,7 +186,7 @@ public class UserServiceImpl implements UserService {
         List<String> allRoles = roleRepository
                 .findAll()
                 .stream()
-                .map(r -> r.getAuthority().substring("ROLE_".length()))
+                .map(r -> r.getAuthority().substring(Authority.ROLE_PREFIX.length()))
                 .collect(Collectors.toUnmodifiableList());
 
         for (int i = allRoles.indexOf(role.toUpperCase()); i < allRoles.size(); i++) {

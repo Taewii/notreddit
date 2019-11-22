@@ -1,5 +1,6 @@
 package notreddit.services;
 
+import notreddit.constants.ApiResponseMessages;
 import notreddit.domain.entities.User;
 import notreddit.domain.entities.Votable;
 import notreddit.domain.entities.Vote;
@@ -49,7 +50,7 @@ public class VoteServiceImpl implements VoteService {
         if (votable == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Post/Comment does't exist."));
+                    .body(new ApiResponse(false, ApiResponseMessages.NONEXISTENT_POST_OR_COMMENT));
         }
 
         Vote vote;
@@ -66,7 +67,7 @@ public class VoteServiceImpl implements VoteService {
             voteRepository.delete(vote);
             return ResponseEntity
                     .ok()
-                    .body(new ApiResponse(true, "Vote deselected successfully."));
+                    .body(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_VOTE_DELETION));
         }
 
         // if user hasn't yet voted for the post/comment, create a new vote, else, update choice
@@ -91,7 +92,7 @@ public class VoteServiceImpl implements VoteService {
 
         return ResponseEntity
                 .ok()
-                .body(new ApiResponse(true, "Vote registered successfully."));
+                .body(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_VOTE_REGISTRATION));
     }
 
     @Override
