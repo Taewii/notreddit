@@ -40,7 +40,6 @@ public class PostServiceImpl implements PostService {
     private final ThumbnailService thumbnailService;
     private final SubredditRepository subredditRepository;
     private final PostRepository postRepository;
-    private final FileRepository fileRepository;
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
     private final MentionRepository mentionRepository;
@@ -51,7 +50,6 @@ public class PostServiceImpl implements PostService {
     public PostServiceImpl(SubredditRepository subredditRepository,
                            PostRepository postRepository,
                            @Qualifier("dropboxService") CloudStorage cloudStorage,
-                           FileRepository fileRepository,
                            ThumbnailService thumbnailService,
                            VoteRepository voteRepository,
                            CommentRepository commentRepository,
@@ -61,7 +59,6 @@ public class PostServiceImpl implements PostService {
         this.subredditRepository = subredditRepository;
         this.postRepository = postRepository;
         this.cloudStorage = cloudStorage;
-        this.fileRepository = fileRepository;
         this.thumbnailService = thumbnailService;
         this.voteRepository = voteRepository;
         this.commentRepository = commentRepository;
@@ -123,9 +120,11 @@ public class PostServiceImpl implements PostService {
                     commentRepository.deleteById(comment.getId());
                 });
 
-        String fileUrl = post.getFile().getUrl();
-        if (fileUrl.contains("dropbox")) { // if the file is uploaded to the cloud storage -> delete it
-            cloudStorage.removeFile(fileUrl);
+        if (post.getFile() != null) {
+            String fileUrl = post.getFile().getUrl();
+            if (fileUrl.contains("dropbox")) { // if the file is uploaded to the cloud storage -> delete it
+                cloudStorage.removeFile(fileUrl);
+            }
         }
 
         postRepository.delete(post);
@@ -234,8 +233,7 @@ public class PostServiceImpl implements PostService {
         }
 
         File file = uploadFile(request.getFile());
-        file.setPost(post);
-        post.setFile(file);
+        post.addFile(file);
         postRepository.saveAndFlush(post);
 
         return getCreatedResponseEntityWithPath();
@@ -243,11 +241,11 @@ public class PostServiceImpl implements PostService {
 
     private ResponseEntity<?> createPostWithWebUrl(PostCreateRequest request, Post post) {
         File file = new File();
-        file.setFileId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
-        file.setPost(post);
         file.setUrl(request.getUrl());
         file.setThumbnailUrl(thumbnailService.generateThumbnailUrl(request.getUrl()));
-        fileRepository.saveAndFlush(file);
+
+        post.addFile(file);
+        postRepository.saveAndFlush(post);
 
         return getCreatedResponseEntityWithPath();
     }
@@ -258,7 +256,6 @@ public class PostServiceImpl implements PostService {
 
         File file = new File();
         file.setUrl(fileUrl);
-        file.setFileId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
 
         if (params.get("contentType").toString().contains("image")) {
             file.setThumbnailUrl(fileUrl);

@@ -5,16 +5,16 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "files")
-public class File extends BaseUUIDEntity {
+public class File {
 
-    @NotNull
-    @Column(unique = true, nullable = false)
-    private Long fileId;
+    @Id
+    private UUID id;
 
     @Column
     private String thumbnailUrl;

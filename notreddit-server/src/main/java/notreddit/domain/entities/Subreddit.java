@@ -20,7 +20,7 @@ public class Subreddit extends BaseLongEntity {
 
     @NotBlank
     @Length(min = 3)
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String title;
 
     @OneToMany(mappedBy = "subreddit", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -64,4 +64,9 @@ public class Post extends BaseUUIDEntity implements Votable {
     public void downvote() {
         this.setDownvotes(this.getDownvotes() + 1);
     }
+
+    public void addFile(File file) {
+        this.setFile(file);
+        file.setPost(this);
+    }
 }
