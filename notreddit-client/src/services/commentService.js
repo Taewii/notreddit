@@ -1,6 +1,8 @@
 import { request } from "../util/APIUtils";
 import { API_BASE_URL } from "../util/constants";
 
+const COMMENT_API_URL = API_BASE_URL + "/comment";
+
 export function comment(data) {
   return request({
     url: API_BASE_URL + '/comment/create',
@@ -10,7 +12,7 @@ export function comment(data) {
 }
 
 export function findCommentsForPost(postId, sort) {
-  const url = `${API_BASE_URL}/comment/post?postId=${postId}&sort=${sort}`
+  const url = `${COMMENT_API_URL}/post?postId=${postId}&sort=${sort}`
 
   return request({
     url,
@@ -22,13 +24,13 @@ export function voteForCommentAPI(choice, commentId) {
   const query = `?choice=${choice}&commentId=${commentId}`;
 
   return request({
-    url: API_BASE_URL + '/comment/vote' + query,
+    url: COMMENT_API_URL + '/vote' + query,
     method: 'POST'
   });
 }
 
 export function commentsByUsername(username, page, size, sort) {
-  const url = `${API_BASE_URL}/comment/user/${username}?page=${page}&size=${size}&sort=${sort}`;
+  const url = `${COMMENT_API_URL}/user/${username}?page=${page}&size=${size}&sort=${sort}`;
 
   return request({
     url,
@@ -37,7 +39,7 @@ export function commentsByUsername(username, page, size, sort) {
 }
 
 export function deleteCommentById(commentId) {
-  const url = `${API_BASE_URL}/comment/delete?commentId=${commentId}`;
+  const url = `${COMMENT_API_URL}/delete?commentId=${commentId}`;
 
   return request({
     url,
@@ -47,7 +49,7 @@ export function deleteCommentById(commentId) {
 
 export function editComment(data) {
   return request({
-    url: API_BASE_URL + '/comment/edit',
+    url: COMMENT_API_URL + '/edit',
     method: 'PUT',
     body: JSON.stringify(data)
   });

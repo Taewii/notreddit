@@ -30,7 +30,7 @@ class PostDetails extends Component {
       replyModalIsVisible: false,
       editModalIsVisible: false,
       sort: ''
-    }
+    };
 
     this.currentUser = this.props.currentUser;
     this.currentUserUsername = '';
@@ -246,7 +246,7 @@ class PostDetails extends Component {
             : null
         }
       </span>,
-    ]
+    ];
 
     if (this.currentUserUsername === post.creatorUsername) {
       const editAndDelete = [
@@ -500,7 +500,7 @@ const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, curre
       })}
     </Comment>
   )
-}
+};
 
 const getAvatarColor = (sender) => {
   const colors = [
@@ -515,7 +515,7 @@ const getAvatarColor = (sender) => {
 
   const index = Math.abs(hash % colors.length);
   return colors[index];
-}
+};
 
 const Content = ({ content }) => (
   <List.Item>
@@ -545,7 +545,7 @@ const changeFileContentDisplay = () => {
     div.style.display = 'none';
     btn.textContent = 'Show File';
   }
-}
+};
 
 export default PostDetails;
 

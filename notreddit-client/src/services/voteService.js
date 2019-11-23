@@ -1,29 +1,32 @@
 import { request } from "../util/APIUtils";
 import { API_BASE_URL } from "../util/constants";
 
+import { LOGIN_TO_VOTE_MESSAGE } from "../util/messageConstants";
 import { errorNotification } from '../util/notifications';
 
 import { voteForCommentAPI } from "./commentService";
 import { voteForPostAPI } from '../services/postService';
 import { GREEN, RED, DEFAULT, DEFAULT_RGBA } from '../util/constants';
 
+const VOTE_API_URL = API_BASE_URL + "/vote";
+
 export function getVoteForPost(postId) {
   return request({
-    url: API_BASE_URL + '/vote/post?postId=' + postId,
+    url: VOTE_API_URL + '/post?postId=' + postId,
     method: 'GET'
   });
 }
 
 export function getUserVotesForPosts() {
   return request({
-    url: API_BASE_URL + '/vote/votes-posts',
+    url: VOTE_API_URL + '/votes-posts',
     method: 'GET'
   });
 }
 
 export function getUserVotesForComments() {
   return request({
-    url: API_BASE_URL + '/vote/votes-comments',
+    url: VOTE_API_URL + '/votes-comments',
     method: 'GET'
   });
 }
@@ -84,7 +87,7 @@ export function voteForPost(event, choice, postId) {
     .catch(error => {
       let message = '';
       if (error.status === 401) {
-        message = 'You have to be logged in to vote.'
+        message = LOGIN_TO_VOTE_MESSAGE;
       }
       errorNotification(error, message);
     });
@@ -100,7 +103,7 @@ export function voteForComment(event, choice, commentId) {
     .catch(error => {
       let message = '';
       if (error.status === 401) {
-        message = 'You have to be logged in to vote.'
+        message = LOGIN_TO_VOTE_MESSAGE;
       }
       errorNotification(error, message);
     });

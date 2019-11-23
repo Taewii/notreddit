@@ -5,6 +5,11 @@ import { Link } from 'react-router-dom';
 import { Form, Input, Button } from 'antd';
 
 import {
+  SUCCESSFUL_REGISTRATION_MESSAGE,
+  BLANK_EMAIL, INVALID_EMAIL, TAKEN_USERNAME,
+  TAKEN_EMAIL, PASSWORDS_DONT_MATCH
+} from '../util/messageConstants';
+import {
   USERNAME_MIN_LENGTH,
   PASSWORD_MIN_LENGTH
 } from '../util/constants.js';
@@ -34,7 +39,7 @@ class Signup extends Component {
       email: {
         value: ''
       }
-    }
+    };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -68,7 +73,7 @@ class Signup extends Component {
 
     signup(signupRequest)
       .then(res => {
-        successNotification('Thank you! You\'re successfully registered. Please Login to continue!')
+        successNotification(SUCCESSFUL_REGISTRATION_MESSAGE)
         this.props.history.push("/login");
       }).catch(error => errorNotification(error));
   }
@@ -162,7 +167,7 @@ class Signup extends Component {
     if (!email) {
       return {
         validateStatus: 'error',
-        errorMsg: 'Email may not be empty'
+        errorMsg: BLANK_EMAIL
       }
     }
 
@@ -170,15 +175,15 @@ class Signup extends Component {
     if (!EMAIL_REGEX.test(email)) {
       return {
         validateStatus: 'error',
-        errorMsg: 'Email not valid'
+        errorMsg: INVALID_EMAIL
       }
     }
 
     return {
       validateStatus: null,
       errorMsg: null
-    }
-  }
+    };
+  };
 
   validateUsername = (username) => {
     if (username.length < USERNAME_MIN_LENGTH) {
@@ -192,7 +197,7 @@ class Signup extends Component {
       validateStatus: null,
       errorMsg: null
     }
-  }
+  };
 
   validateUsernameAvailability() {
     // First check for client side errors in username
@@ -232,7 +237,7 @@ class Signup extends Component {
             username: {
               value: usernameValue,
               validateStatus: 'error',
-              errorMsg: 'This username is already taken'
+              errorMsg: TAKEN_USERNAME
             }
           });
         }
@@ -286,7 +291,7 @@ class Signup extends Component {
             email: {
               value: emailValue,
               validateStatus: 'error',
-              errorMsg: 'This email is already in use'
+              errorMsg: TAKEN_EMAIL
             }
           });
         }
@@ -314,14 +319,14 @@ class Signup extends Component {
       validateStatus: 'success',
       errorMsg: null,
     };
-  }
+  };
 
   validateConfirmPassword = (confirmPassword) => {
     const password = this.state.password.value;
     if (password.length && password !== confirmPassword) {
       return {
         validateStatus: 'error',
-        errorMsg: 'Passwords don\'t match'
+        errorMsg: PASSWORDS_DONT_MATCH
       }
     }
 

@@ -1,9 +1,11 @@
 import { request, requestMultipart } from "../util/APIUtils";
 import { API_BASE_URL } from "../util/constants";
 
+const POST_API_URL = API_BASE_URL + "/post";
+
 export function create(createRequest) {
   return requestMultipart({
-    url: API_BASE_URL + '/post/create',
+    url: POST_API_URL + '/create',
     method: 'POST',
     body: createRequest
   });
@@ -11,13 +13,13 @@ export function create(createRequest) {
 
 export function findById(id) {
   return request({
-    url: API_BASE_URL + '/post/' + id,
+    url: POST_API_URL + '/' + id,
     method: 'GET'
   });
 }
 
 export function allPosts(page, size) {
-  const url = `${API_BASE_URL}/post/all?page=${page}&size=${size}`;
+  const url = `${POST_API_URL}/all?page=${page}&size=${size}`;
 
   return request({
     url,
@@ -26,7 +28,7 @@ export function allPosts(page, size) {
 }
 
 export function allSubscribedPosts(page, size, sort) {
-  const url = `${API_BASE_URL}/post/subscribed?page=${page}&size=${size}&sort=${sort}`;
+  const url = `${POST_API_URL}/subscribed?page=${page}&size=${size}&sort=${sort}`;
 
   return request({
     url,
@@ -35,7 +37,7 @@ export function allSubscribedPosts(page, size, sort) {
 }
 
 export function allPostsFromTheDefaultSubreddits(page, size) {
-  const url = `${API_BASE_URL}/post/default-posts?page=${page}&size=${size}`;
+  const url = `${POST_API_URL}/default-posts?page=${page}&size=${size}`;
 
   return request({
     url,
@@ -44,7 +46,7 @@ export function allPostsFromTheDefaultSubreddits(page, size) {
 }
 
 export function postsByUsername(page, size, sort, username) {
-  const url = `${API_BASE_URL}/post/user/${username}?page=${page}&size=${size}&sort=${sort}`;
+  const url = `${POST_API_URL}/user/${username}?page=${page}&size=${size}&sort=${sort}`;
 
   return request({
     url,
@@ -53,7 +55,7 @@ export function postsByUsername(page, size, sort, username) {
 }
 
 export function postsBySubreddit(page, size, sort, subreddit) {
-  const url = `${API_BASE_URL}/post/subreddit/${subreddit}?page=${page}&size=${size}&sort=${sort}`;
+  const url = `${POST_API_URL}/subreddit/${subreddit}?page=${page}&size=${size}&sort=${sort}`;
 
   return request({
     url,
@@ -80,7 +82,7 @@ export function getDownvotedPosts(page, size, sort, username) {
 }
 
 export function voteForPostAPI(choice, postId) {
-  const url = `${API_BASE_URL}/post/vote?choice=${choice}&postId=${postId}`;
+  const url = `${POST_API_URL}/vote?choice=${choice}&postId=${postId}`;
 
   return request({
     url,
@@ -89,7 +91,7 @@ export function voteForPostAPI(choice, postId) {
 }
 
 export function deletePostById(postId) {
-  const url = `${API_BASE_URL}/post/delete?postId=${postId}`;
+  const url = `${POST_API_URL}/delete?postId=${postId}`;
   return request({
     url,
     method: 'DELETE'

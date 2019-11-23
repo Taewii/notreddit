@@ -15,7 +15,7 @@ class AppHeader extends Component {
     super(props);
     this.state = {
       visible: false
-    }
+    };
 
     this.showDrawer = this.showDrawer.bind(this);
     this.onClose = this.onClose.bind(this);
@@ -46,7 +46,7 @@ class AppHeader extends Component {
         <Menu.Item key="/post/create">
           <Link to="/post/create">Create Post</Link>
         </Menu.Item>,
-        <SubMenu title={
+        <SubMenu key="subreddit-submenu" title={
           <span>
             <span>Subreddit</span>
             <Icon style={{ marginLeft: "5px", marginRight: "0" }} className="down-arrow" type="down" />
@@ -59,7 +59,7 @@ class AppHeader extends Component {
             <Link to="/subreddit/all">All Subreddits</Link>
           </Menu.Item>
         </SubMenu>,
-        <SubMenu title={
+        <SubMenu key="profile-submenu" title={
           <span>
             <Badge count={this.props.mentionCount} dot>
               <Icon type="user" className="nav-icon" style={{ marginRight: 0 }} />
@@ -96,7 +96,7 @@ class AppHeader extends Component {
 
       if (currentUser.roles.includes('ADMIN')) {
         menuItems.splice(menuItems.length - 1, 0,
-          <SubMenu title={
+          <SubMenu key="admin-submenu" title={
             <span>
               <Icon type="safety-certificate" className="nav-icon" style={{ marginRight: 0 }} />
               <Icon type="down" className="down-arrow" />

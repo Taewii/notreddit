@@ -1,23 +1,25 @@
 import { request } from "../util/APIUtils";
 import { API_BASE_URL } from "../util/constants";
 
+const SUBREDDIT_API_URL = API_BASE_URL + "/subreddit";
+
 export function checkSubredditAvailability(subreddit) {
   return request({
-    url: API_BASE_URL + "/subreddit/check-subreddit-availability?title=" + subreddit,
+    url: SUBREDDIT_API_URL + "/check-subreddit-availability?title=" + subreddit,
     method: 'GET'
   });
 }
 
 export function isUserSubscribedToSubreddit(subreddit) {
   return request({
-    url: API_BASE_URL + "/subreddit/is-subscribed?subreddit=" + subreddit,
+    url: SUBREDDIT_API_URL + "/is-subscribed?subreddit=" + subreddit,
     method: 'GET'
   });
 }
 
 export function createSubreddit(subredditRequest) {
   return request({
-    url: API_BASE_URL + "/subreddit/create",
+    url: SUBREDDIT_API_URL + "/create",
     method: 'POST',
     body: JSON.stringify(subredditRequest)
   });
@@ -25,27 +27,27 @@ export function createSubreddit(subredditRequest) {
 
 export function getAllSubreddits() {
   return request({
-    url: API_BASE_URL + "/subreddit/all",
+    url: SUBREDDIT_API_URL + "/all",
     method: 'GET'
   });
 }
 
 export function getAllSubredditsWithPostsCount() {
   return request({
-    url: API_BASE_URL + "/subreddit/all-with-post-count",
+    url: SUBREDDIT_API_URL + "/all-with-post-count",
     method: 'GET'
   });
 }
 
 export function getUserSubscriptions() {
   return request({
-    url: API_BASE_URL + "/subreddit/subscriptions",
+    url: SUBREDDIT_API_URL + "/subscriptions",
     method: 'GET'
   });
 }
 
 export function subscribe(subreddit) {
-  const url = `${API_BASE_URL}/subreddit/subscribe?subreddit=${subreddit}`;
+  const url = `${SUBREDDIT_API_URL}/subscribe?subreddit=${subreddit}`;
 
   return request({
     url,
@@ -54,7 +56,7 @@ export function subscribe(subreddit) {
 }
 
 export function unsubscribe(subreddit) {
-  const url = `${API_BASE_URL}/subreddit/unsubscribe?subreddit=${subreddit}`;
+  const url = `${SUBREDDIT_API_URL}/unsubscribe?subreddit=${subreddit}`;
 
   return request({
     url,

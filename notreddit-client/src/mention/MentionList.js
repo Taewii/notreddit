@@ -10,7 +10,7 @@ import { getUsersMentions, markAsRead, markAsUnread } from '../services/mentionS
 
 class MentionList extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this._isMounted = false;
     this.state = {
       initLoading: true,
@@ -94,11 +94,11 @@ class MentionList extends Component {
           current: page,
           pageSize: pageSize,
           onChange: (page, pageSize) => {
-            this.loadMentions(page - 1, pageSize)
+            this.loadMentions(page - 1, pageSize);
             this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
           },
           onShowSizeChange: (page, pageSize) => {
-            this.loadMentions(page - 1, pageSize)
+            this.loadMentions(page - 1, pageSize);
             this.props.history.push(`${window.location.pathname}?page=${page}&pageSize=${pageSize}`);
           }
         }}

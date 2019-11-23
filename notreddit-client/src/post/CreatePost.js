@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './CreatePost.css';
 import { Form, Input, Button, Select, Upload, Icon } from 'antd';
 
+import { INVALID_URL, FILE_TOO_BIG } from '../util/messageConstants';
 import { successNotification, errorNotification } from '../util/notifications';
 import { TITLE_MIN_LENGTH } from '../util/constants.js';
 import { getAllSubreddits } from '../services/subredditService';
@@ -33,14 +34,14 @@ class CreatePost extends Component {
       file: {
         value: null
       }
-    }
+    };
 
     getAllSubreddits()
       .then(res => {
         res.forEach(subreddit => {
           this.options.push(<Option value={subreddit} key={subreddit}>{subreddit}</Option>)
         })
-      })
+      });
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -64,9 +65,9 @@ class CreatePost extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    this.setState({ loading: true })
+    this.setState({ loading: true });
 
-    const data = new FormData()
+    const data = new FormData();
     data.append('title', this.state.title.value);
     data.append('url', this.state.url.value);
     data.append('content', this.state.content.value);
@@ -111,7 +112,7 @@ class CreatePost extends Component {
     // Simulating Ant-Design action responses with setTimeout.
     if (sizeInMb > 10) {
       setTimeout(() => {
-        onError("file too big");
+        onError(FILE_TOO_BIG);
       }, 0);
       this.setState({
         file: {
@@ -132,7 +133,6 @@ class CreatePost extends Component {
       onSuccess("ok");
     }, 0);
   };
-
 
   isFormInvalid() {
     return !(this.state.title.validateStatus === 'success' &&
@@ -235,7 +235,7 @@ class CreatePost extends Component {
       validateStatus: 'success',
       errorMsg: null
     }
-  }
+  };
 
   validateUrl = (url) => {
     const URL_REGEX = RegExp(/(http|https):\/\/.+/gm);
@@ -250,7 +250,7 @@ class CreatePost extends Component {
     if (!URL_REGEX.test(url)) {
       return {
         validateStatus: 'error',
-        errorMsg: 'URL not valid'
+        errorMsg: INVALID_URL
       }
     }
 
@@ -258,7 +258,7 @@ class CreatePost extends Component {
       validateStatus: 'success',
       errorMsg: null
     }
-  }
+  };
 }
 
 export default CreatePost;

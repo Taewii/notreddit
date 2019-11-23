@@ -1,6 +1,8 @@
 import { request } from "../util/APIUtils";
 import { API_BASE_URL, ACCESS_TOKEN } from "../util/constants";
 
+const USER_API_URL = API_BASE_URL + "/user";
+
 export function login(loginRequest) {
   return request({
     url: API_BASE_URL + "/auth/signin",
@@ -19,14 +21,14 @@ export function signup(signupRequest) {
 
 export function checkUsernameAvailability(username) {
   return request({
-    url: API_BASE_URL + "/user/check-username-availability?username=" + username,
+    url: USER_API_URL + "/check-username-availability?username=" + username,
     method: 'GET'
   });
 }
 
 export function checkEmailAvailability(email) {
   return request({
-    url: API_BASE_URL + "/user/check-email-availability?email=" + email,
+    url: USER_API_URL + "/check-email-availability?email=" + email,
     method: 'GET'
   });
 }
@@ -37,14 +39,7 @@ export function getCurrentUser() {
   }
 
   return request({
-    url: API_BASE_URL + "/user/me",
-    method: 'GET'
-  });
-}
-
-export function getUserProfile(username) {
-  return request({
-    url: API_BASE_URL + "/users/" + username,
+    url: USER_API_URL + "/me",
     method: 'GET'
   });
 }
@@ -55,14 +50,14 @@ export function getAllUsersWithRoles() {
   }
 
   return request({
-    url: API_BASE_URL + "/user/all",
+    url: USER_API_URL + "/all",
     method: 'GET'
   });
 }
 
 export function handleRoleChange(changeRoleRequest) {
   return request({
-    url: API_BASE_URL + "/user/change-role",
+    url: USER_API_URL + "/change-role",
     method: 'POST',
     body: JSON.stringify(changeRoleRequest)
   });
@@ -77,7 +72,7 @@ export function getAllRoles() {
 
 export function deleteUser(userId) {
   return request({
-    url: API_BASE_URL + "/user/delete?id=" + userId,
+    url: USER_API_URL + "/delete?id=" + userId,
     method: 'DELETE'
   })
 }

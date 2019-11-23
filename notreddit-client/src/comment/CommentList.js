@@ -15,7 +15,7 @@ const { Option } = Select;
 
 class CommentList extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this._isMounted = false;
     this.username = this.props.username;
     this.currentUser = this.props.currentUser;
@@ -85,7 +85,7 @@ class CommentList extends Component {
             sort
           });
         }
-      }).catch(error => errorNotification(error))
+      }).catch(error => errorNotification(error));
   }
 
   deleteComment(commentId) {
@@ -102,7 +102,6 @@ class CommentList extends Component {
       content: this.state.editCommentContent,
       commentId: this.state.editCommentId
     };
-
 
     editComment(commentData)
       .then(res => {
@@ -276,7 +275,7 @@ const actions = (comment, currentUser, deleteComment, showModal, userIsModerator
         <IconText type="message" text={comment.replies} />
       </Link>
     </span>,
-  ]
+  ];
 
   if (currentUser.username === comment.creatorUsername) {
     const editAndDelete = [
@@ -308,6 +307,6 @@ const actions = (comment, currentUser, deleteComment, showModal, userIsModerator
   }
 
   return actions;
-}
+};
 
 export default CommentList;

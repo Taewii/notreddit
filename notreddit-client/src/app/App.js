@@ -4,6 +4,10 @@ import './App.css';
 import { Route, withRouter, Redirect, Switch } from 'react-router-dom';
 import { Layout, notification } from 'antd';
 
+import {
+  SUCCESSFUL_LOGOUT_MESSAGE,
+  SUCCESSFUL_LOGIN_MESSAGE
+} from '../util/messageConstants';
 import { ACCESS_TOKEN } from '../util/constants';
 import { successNotification } from '../util/notifications';
 import { getCurrentUser } from '../services/userService';
@@ -46,7 +50,7 @@ class App extends Component {
       isLoading: true,
       roles: [],
       mentionCount: 0
-    }
+    };
     this.handleLogout = this.handleLogout.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
 
@@ -70,7 +74,7 @@ class App extends Component {
       .then(response => {
 
         getUnreadMentionsCount()
-          .then(res => this.setState({ mentionCount: res }))
+          .then(res => this.setState({ mentionCount: res }));
 
         this.setState({
           currentUser: response,
@@ -93,11 +97,11 @@ class App extends Component {
     });
 
     this.props.history.push('/home');
-    successNotification('You\'re successfully logged out.')
+    successNotification(SUCCESSFUL_LOGOUT_MESSAGE)
   }
 
   handleLogin() {
-    successNotification('You\'re successfully logged in.')
+    successNotification(SUCCESSFUL_LOGIN_MESSAGE);
     this.loadCurrentUser();
     this.props.history.push('/home');
   }

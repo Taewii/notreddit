@@ -15,7 +15,7 @@ const { Option } = Select;
 
 class PostList extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.dataLoadingFunction = this.props.dataLoadingFunction;
     this.username = this.props.username;
     this.currentUser = this.props.currentUser;
@@ -207,7 +207,7 @@ const actions = (post, currentUser, deletePost, userIsModerator) => {
         <IconText type="message" text={post.commentCount} />
       </Link>
     </span>,
-  ]
+  ];
 
   if (post.creatorUsername === currentUser) {
     const editAndDelete = [
@@ -222,8 +222,7 @@ const actions = (post, currentUser, deletePost, userIsModerator) => {
           <IconText type="delete" text="Delete" />
         </span>
       </Popconfirm>
-    ]
-
+    ];
 
     actions = actions.concat(editAndDelete);
   } else if (userIsModerator) {
@@ -240,6 +239,6 @@ const actions = (post, currentUser, deletePost, userIsModerator) => {
   }
 
   return actions;
-}
+};
 
 export default PostList;

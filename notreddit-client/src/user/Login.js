@@ -2,11 +2,17 @@ import React, { Component } from 'react';
 import './Login.css';
 import { Link } from 'react-router-dom';
 
+import {
+  INCORRECT_USERNAME_OR_PASSWORD,
+  ENTER_USERNAME_OR_EMAIL,
+  ENTER_PASSWORD
+} from '../util/messageConstants';
 import { ACCESS_TOKEN } from '../util/constants';
 import { login } from '../services/userService';
 import { errorNotification } from '../util/notifications';
 
 import { Form, Input, Button, Icon } from 'antd';
+
 const FormItem = Form.Item;
 
 class Login extends Component {
@@ -42,7 +48,7 @@ class LoginForm extends Component {
           }).catch(error => {
             let message = '';
             if (error.status === 401) {
-              message = 'Your Username or Password is incorrect. Please try again!';
+              message = INCORRECT_USERNAME_OR_PASSWORD;
             }
             errorNotification(error, message);
           });
@@ -57,7 +63,7 @@ class LoginForm extends Component {
       <Form onSubmit={this.handleSubmit} className="login-form">
         <FormItem>
           {getFieldDecorator('usernameOrEmail', {
-            rules: [{ required: true, message: 'Please enter your username or email!' }],
+            rules: [{ required: true, message: ENTER_USERNAME_OR_EMAIL }],
           })(
             <Input
               className='login-form-item'
@@ -69,7 +75,7 @@ class LoginForm extends Component {
         </FormItem>
         <FormItem className='login-form-item'>
           {getFieldDecorator('password', {
-            rules: [{ required: true, message: 'Please enter your Password!' }],
+            rules: [{ required: true, message: ENTER_PASSWORD }],
           })(
             <Input
               className='login-form-item'
@@ -88,6 +94,5 @@ class LoginForm extends Component {
     );
   }
 }
-
 
 export default Login;

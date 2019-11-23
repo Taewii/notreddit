@@ -3,10 +3,10 @@ import { ACCESS_TOKEN } from './constants';
 export const request = (options) => {
   const headers = new Headers({
     'Content-Type': 'application/json',
-  })
+  });
 
   if (localStorage.getItem(ACCESS_TOKEN)) {
-    headers.append('Authorization', 'Bearer ' + localStorage.getItem(ACCESS_TOKEN))
+    headers.append('Authorization', 'Bearer ' + localStorage.getItem(ACCESS_TOKEN));
   }
 
   const defaults = { headers: headers };
@@ -103,4 +103,4 @@ export const timeSince = (time) => {
         return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
     }
   return time;
-}
+};

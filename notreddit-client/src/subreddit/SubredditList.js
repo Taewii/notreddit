@@ -94,7 +94,7 @@ class SubredditList extends Component {
           onClick={(e) => this.unsubscribe(subreddit)}>Unsubscribe</Button>
         : <Button className="subreddit-button" type="primary"
           onClick={(e) => this.subscribe(subreddit)}>Subscribe</Button>
-    }
+    };
 
     return (
       <List

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './SubredditCreate.css';
 
+import { TAKEN_SUBREDDIT_NAME } from '../util/messageConstants';
 import { SUBREDDIT_MIN_LENGTH } from '../util/constants';
 import { checkSubredditAvailability, createSubreddit } from '../services/subredditService';
 import { successNotification, errorNotification } from '../util/notifications';
@@ -15,7 +16,7 @@ class SubredditCreate extends Component {
       title: {
         value: ''
       },
-    }
+    };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -106,7 +107,7 @@ class SubredditCreate extends Component {
       validateStatus: null,
       errorMsg: null
     }
-  }
+  };
 
   validateSubredditAvailability() {
     const titleValue = this.state.title.value;
@@ -145,7 +146,7 @@ class SubredditCreate extends Component {
             title: {
               value: titleValue,
               validateStatus: 'error',
-              errorMsg: 'This subreddit is already taken.'
+              errorMsg: TAKEN_SUBREDDIT_NAME
             }
           });
         }
@@ -158,7 +159,7 @@ class SubredditCreate extends Component {
           }
         });
       });
-  }
+  };
 }
 
 export default SubredditCreate;

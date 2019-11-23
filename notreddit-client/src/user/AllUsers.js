@@ -14,7 +14,7 @@ import { List, Select, Skeleton, Popconfirm, Button } from 'antd';
 
 class AllUsers extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this._isMounted = false;
     this.roles = [];
     this.currentUser = {};
@@ -55,7 +55,7 @@ class AllUsers extends Component {
   handleChange(userId, currentRole, newRole) {
     handleRoleChange({ userId, currentRole, newRole })
       .then(res => {
-        successNotification(res.message)
+        successNotification(res.message);
         this.componentDidMount(); // reload component
       }).catch(error => errorNotification(error));
   }
@@ -67,7 +67,7 @@ class AllUsers extends Component {
     this.roles.forEach(role => {
       const shouldBeDisabled = role === currentRole || role === 'ROOT';
       optionList.push(<Select.Option key={role} disabled={shouldBeDisabled}>{role}</Select.Option>)
-    })
+    });
 
     return (
       <Select
@@ -83,7 +83,7 @@ class AllUsers extends Component {
   handleDeleteConfirm(userId) {
     deleteUser(userId)
       .then(res => {
-        successNotification(res.message)
+        successNotification(res.message);
         this.componentDidMount(); // reload component
       }).catch(error => errorNotification(error))
   }

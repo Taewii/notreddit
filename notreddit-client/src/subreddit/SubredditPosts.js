@@ -65,7 +65,7 @@ class SubredditPosts extends Component {
           onClick={(e) => this.unsubscribe(this.subreddit)}>Unsubscribe</Button>
         : <Button className="subreddit-posts-button" type="primary"
           onClick={(e) => this.subscribe(this.subreddit)}>Subscribe</Button>
-    }
+    };
 
     return (
       <>
@@ -81,7 +81,7 @@ class SubredditPosts extends Component {
         />
       </>
     )
-  }
+  };
 }
 
 export default SubredditPosts;
