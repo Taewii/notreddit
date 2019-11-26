@@ -6,6 +6,7 @@ import {
 import './AppHeader.css';
 
 import { Layout, Menu, Icon, Badge, Divider, Drawer, Button } from 'antd';
+import { IconText } from '../util/IconText';
 
 const Header = Layout.Header;
 const SubMenu = Menu.SubMenu;
@@ -41,6 +42,11 @@ class AppHeader extends Component {
         <Menu.Item key="/home">
           <Link to="/home">
             <Icon type="home" className="nav-icon" />
+          </Link>
+        </Menu.Item>,
+        <Menu.Item key="/chat">
+          <Link to="/chat">
+            <IconText type="message" text="Chat" />
           </Link>
         </Menu.Item>,
         <Menu.Item key="/post/create">

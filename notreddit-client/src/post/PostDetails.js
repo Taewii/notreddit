@@ -4,7 +4,7 @@ import './PostDetails.css';
 import { List, Icon, Tooltip, Button, Form, Input, Comment, Avatar, Modal, Popconfirm, Select } from 'antd';
 
 import { errorNotification, successNotification } from '../util/notifications'
-import { timeSince } from '../util/APIUtils';
+import { timeSince, getAvatarColor } from '../util/APIUtils';
 import { IconText } from '../util/IconText';
 import { findById, deletePostById } from '../services/postService';
 import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';
@@ -500,21 +500,6 @@ const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, curre
       })}
     </Comment>
   )
-};
-
-const getAvatarColor = (sender) => {
-  const colors = [
-    '#2196F3', '#32c787', '#00BCD4', '#ff5652',
-    '#ffc107', '#ff85af', '#FF9800', '#a0acc5'
-  ];
-
-  let hash = 0;
-  for (let i = 0; i < sender.length; i++) {
-    hash = 31 * hash + sender.charCodeAt(i);
-  }
-
-  const index = Math.abs(hash % colors.length);
-  return colors[index];
 };
 
 const Content = ({ content }) => (

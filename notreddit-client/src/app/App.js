@@ -38,6 +38,7 @@ import CreatePost from '../post/CreatePost';
 import PostList from '../post/PostList';
 import PostDetails from '../post/PostDetails';
 import MentionList from '../mention/MentionList';
+import Chat from '../chat/Chat';
 
 const { Content } = Layout;
 
@@ -70,14 +71,11 @@ class App extends Component {
       isLoading: true
     });
 
-    getCurrentUser()
-      .then(response => {
-
-        getUnreadMentionsCount()
-          .then(res => this.setState({ mentionCount: res }));
-
+    Promise.all([getCurrentUser(), getUnreadMentionsCount()])
+      .then(res => {
         this.setState({
-          currentUser: response,
+          currentUser: res[0],
+          mentionCount: res[1],
           isAuthenticated: true,
           isLoading: false
         });
@@ -171,6 +169,12 @@ class App extends Component {
                 path="/user/mentions"
                 component={MentionList}
                 authenticated={isAuthenticated}
+              />
+              <PrivateRoute
+                path="/chat"
+                currentUser={currentUser}
+                authenticated={isAuthenticated}
+                component={Chat}
               />
               <Route path="/post/:id" component={(props) =>
                 <PostDetails
