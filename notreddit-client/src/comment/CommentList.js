@@ -6,7 +6,7 @@ import { List, Icon, Tooltip, Avatar, Popconfirm, Modal, Form, Input, Select } f
 
 import { IconText } from '../util/IconText';
 import { errorNotification, successNotification } from '../util/notifications';
-import { timeSince } from '../util/APIUtils';
+import { timeSince } from '../util/util';
 import { voteForComment } from '../services/voteService';
 import { getUserVotesForComments } from '../services/voteService';
 import { commentsByUsername, deleteCommentById, editComment } from '../services/commentService';

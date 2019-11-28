@@ -1,34 +1,25 @@
-import { request } from "../util/APIUtils";
-import { API_BASE_URL } from "../util/constants";
+import { get } from '../util/APIUtils';
+import { API_BASE_URL } from '../util/constants';
 
-import { LOGIN_TO_VOTE_MESSAGE } from "../util/messageConstants";
+import { LOGIN_TO_VOTE_MESSAGE } from '../util/messageConstants';
 import { errorNotification } from '../util/notifications';
 
-import { voteForCommentAPI } from "./commentService";
+import { voteForCommentAPI } from './commentService';
 import { voteForPostAPI } from '../services/postService';
 import { GREEN, RED, DEFAULT, DEFAULT_RGBA } from '../util/constants';
 
-const VOTE_API_URL = API_BASE_URL + "/vote";
+const VOTE_API_URL = API_BASE_URL + '/vote';
 
 export function getVoteForPost(postId) {
-  return request({
-    url: VOTE_API_URL + '/post?postId=' + postId,
-    method: 'GET'
-  });
+  return get(VOTE_API_URL + '/post?postId=' + postId);
 }
 
 export function getUserVotesForPosts() {
-  return request({
-    url: VOTE_API_URL + '/votes-posts',
-    method: 'GET'
-  });
+  return get(VOTE_API_URL + '/votes-posts');
 }
 
 export function getUserVotesForComments() {
-  return request({
-    url: VOTE_API_URL + '/votes-comments',
-    method: 'GET'
-  });
+  return get(VOTE_API_URL + '/votes-comments');
 }
 
 function handleVoteChange(target, choice) {

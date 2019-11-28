@@ -5,7 +5,7 @@ import { List, Button } from 'antd';
 
 import { IconText } from '../util/IconText';
 import { errorNotification, successNotification } from '../util/notifications';
-import { timeSince } from '../util/APIUtils';
+import { timeSince } from '../util/util';
 import { getUsersMentions, markAsRead, markAsUnread } from '../services/mentionService';
 
 class MentionList extends Component {

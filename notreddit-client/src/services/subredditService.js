@@ -1,65 +1,40 @@
-import { request } from "../util/APIUtils";
-import { API_BASE_URL } from "../util/constants";
+import { get, post } from '../util/APIUtils';
+import { API_BASE_URL } from '../util/constants';
 
-const SUBREDDIT_API_URL = API_BASE_URL + "/subreddit";
-
-export function checkSubredditAvailability(subreddit) {
-  return request({
-    url: SUBREDDIT_API_URL + "/check-subreddit-availability?title=" + subreddit,
-    method: 'GET'
-  });
-}
-
-export function isUserSubscribedToSubreddit(subreddit) {
-  return request({
-    url: SUBREDDIT_API_URL + "/is-subscribed?subreddit=" + subreddit,
-    method: 'GET'
-  });
-}
+const SUBREDDIT_API_URL = API_BASE_URL + '/subreddit';
 
 export function createSubreddit(subredditRequest) {
-  return request({
-    url: SUBREDDIT_API_URL + "/create",
-    method: 'POST',
+  return post(SUBREDDIT_API_URL + '/create', {
     body: JSON.stringify(subredditRequest)
   });
 }
 
+export function checkSubredditAvailability(subreddit) {
+  return get(SUBREDDIT_API_URL + '/check-subreddit-availability?title=' + subreddit);
+}
+
+export function isUserSubscribedToSubreddit(subreddit) {
+  return get(SUBREDDIT_API_URL + '/is-subscribed?subreddit=' + subreddit);
+}
+
 export function getAllSubreddits() {
-  return request({
-    url: SUBREDDIT_API_URL + "/all",
-    method: 'GET'
-  });
+  return get(SUBREDDIT_API_URL + '/all');
 }
 
 export function getAllSubredditsWithPostsCount() {
-  return request({
-    url: SUBREDDIT_API_URL + "/all-with-post-count",
-    method: 'GET'
-  });
+  return get(SUBREDDIT_API_URL + '/all-with-post-count');
 }
 
 export function getUserSubscriptions() {
-  return request({
-    url: SUBREDDIT_API_URL + "/subscriptions",
-    method: 'GET'
-  });
+  return get(SUBREDDIT_API_URL + '/subscriptions');
 }
 
 export function subscribe(subreddit) {
   const url = `${SUBREDDIT_API_URL}/subscribe?subreddit=${subreddit}`;
-
-  return request({
-    url,
-    method: 'POST'
-  });
+  return post(url);
 }
 
 export function unsubscribe(subreddit) {
   const url = `${SUBREDDIT_API_URL}/unsubscribe?subreddit=${subreddit}`;
-
-  return request({
-    url,
-    method: 'POST'
-  });
+  return post(url);
 }

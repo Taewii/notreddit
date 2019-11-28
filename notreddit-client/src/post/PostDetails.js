@@ -4,7 +4,7 @@ import './PostDetails.css';
 import { List, Icon, Tooltip, Button, Form, Input, Comment, Avatar, Modal, Popconfirm, Select } from 'antd';
 
 import { errorNotification, successNotification } from '../util/notifications'
-import { timeSince, getAvatarColor } from '../util/APIUtils';
+import { timeSince, getAvatarColor } from '../util/util';
 import { IconText } from '../util/IconText';
 import { findById, deletePostById } from '../services/postService';
 import { getVoteForPost, voteForPost, voteForComment } from '../services/voteService';

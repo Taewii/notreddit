@@ -7,7 +7,7 @@ import { List, Icon, Tooltip, Popconfirm, Select } from 'antd';
 import { IconText } from '../util/IconText';
 import { errorNotification, successNotification } from '../util/notifications';
 import { voteForPost } from '../services/voteService';
-import { timeSince } from '../util/APIUtils';
+import { timeSince } from '../util/util';
 import { getUserVotesForPosts } from '../services/voteService';
 import { deletePostById } from '../services/postService';
 

@@ -15,41 +15,28 @@ import { List, Select, Skeleton, Popconfirm, Button } from 'antd';
 class AllUsers extends Component {
   constructor(props) {
     super(props);
-    this._isMounted = false;
-    this.roles = [];
-    this.currentUser = {};
     this.state = {
       initLoading: true,
       loading: false,
       data: [],
+      roles: [],
+      currentUser: {}
     };
-
-    getCurrentUser()
-      .then(res => this.currentUser = res);
-
-    getAllRoles()
-      .then(res => this.roles = res.roles);
 
     this.handleChange = this.handleChange.bind(this);
     this.getUserRoleOptions = this.getUserRoleOptions.bind(this);
   }
 
   componentDidMount() {
-    this._isMounted = true;
-
-    getAllUsersWithRoles()
+    Promise.all([getAllUsersWithRoles(), getCurrentUser(), getAllRoles()])
       .then(res => {
-        if (this._isMounted) {
-          this.setState({
-            initLoading: false,
-            data: res.users,
-          });
-        }
+        this.setState({
+          initLoading: false,
+          data: res[0].users,
+          currentUser: res[1],
+          roles: res[2].roles
+        });
       }).catch(error => errorNotification(error));
-  }
-
-  componentWillUnmount() {
-    this._isMounted = false;
   }
 
   handleChange(userId, currentRole, newRole) {
@@ -64,7 +51,7 @@ class AllUsers extends Component {
     const optionList = [];
     const currentRole = user.roles[0];
 
-    this.roles.forEach(role => {
+    this.state.roles.forEach(role => {
       const shouldBeDisabled = role === currentRole || role === 'ROOT';
       optionList.push(<Select.Option key={role} disabled={shouldBeDisabled}>{role}</Select.Option>)
     });
@@ -72,7 +59,7 @@ class AllUsers extends Component {
     return (
       <Select
         defaultValue={currentRole}
-        disabled={user.id === this.currentUser.id || user.roles[0] === 'ROOT'}
+        disabled={user.id === this.state.currentUser.id || user.roles[0] === 'ROOT'}
         className="users-dropdown"
         onChange={e => this.handleChange(user.id, currentRole, e)}>
         {optionList}
@@ -89,7 +76,7 @@ class AllUsers extends Component {
   }
 
   render() {
-    const { initLoading, data } = this.state;
+    const { initLoading, data, currentUser } = this.state;
 
     return (
       <List
@@ -106,7 +93,7 @@ class AllUsers extends Component {
                 description={user.id} />
               {this.getUserRoleOptions(user)}
             </Skeleton>
-            {this.currentUser.roles.includes('ROOT')
+            {currentUser.roles.includes('ROOT')
               ? <Popconfirm
                 title="Are you sure you want to delete this user?"
                 placement="topRight"

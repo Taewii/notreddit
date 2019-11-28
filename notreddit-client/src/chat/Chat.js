@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './Chat.css';
 import { Stomp } from '@stomp/stompjs';
-import { getAvatarColor } from '../util/APIUtils';
+import { getAvatarColor } from '../util/util';
 
 class Chat extends Component {
   constructor(props) {
