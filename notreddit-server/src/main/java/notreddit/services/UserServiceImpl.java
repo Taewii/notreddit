@@ -13,6 +13,8 @@ import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +37,8 @@ import static notreddit.services.SubredditServiceImpl.DEFAULT_SUBREDDITS;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final String USERS_CACHE = "users";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -66,6 +70,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @Cacheable(value = USERS_CACHE, key = "#id")
     public UserDetails loadUserById(UUID id) {
         return userRepository.findByIdWithRoles(id).orElseThrow();
     }
@@ -108,6 +113,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = USERS_CACHE, key = "#request.userId")
     public ResponseEntity<?> changeRole(ChangeRoleRequest request, User user) {
         if (request.getNewRole().equalsIgnoreCase("root") ||
                 request.getCurrentRole().equalsIgnoreCase("root")) {
@@ -137,6 +143,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = USERS_CACHE, key = "#userId")
     public ResponseEntity<?> deleteUser(String userId, User user) {
         boolean isRoot = user.getAuthorities()
                 .parallelStream()

@@ -10,6 +10,9 @@ import notreddit.repositories.CommentRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class VoteServiceImpl implements VoteService {
+
+    private static final String COMMENT_VOTES_BY_USER_CACHE = "commentVotesByUser";
+    private static final String POST_VOTES_BY_USER_CACHE = "postVotesByUser";
+    private static final String USER_CHOICE_BY_POST_CACHE = "userChoiceByPost";
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
@@ -35,9 +42,16 @@ public class VoteServiceImpl implements VoteService {
         this.voteRepository = voteRepository;
     }
 
-    // all the if (postId != null) are cus the method handles votes for both posts and comments
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = COMMENT_VOTES_BY_USER_CACHE, key = "#user.id"),
+            @CacheEvict(value = POST_VOTES_BY_USER_CACHE, key = "#user.id"),
+            @CacheEvict(value = USER_CHOICE_BY_POST_CACHE,
+                    key = "#user.id.toString().concat('-').concat(#postId)",
+                    condition = "#postId != null")
+    })
+    // all the if (postId != null) are cus the method handles votes for both posts and comments
     public ResponseEntity<?> voteForPostOrComment(byte choice, UUID postId, UUID commentId, User user) {
         Votable votable;
 
@@ -96,6 +110,7 @@ public class VoteServiceImpl implements VoteService {
     }
 
     @Override
+    @Cacheable(value = POST_VOTES_BY_USER_CACHE, key = "#user.id")
     public Map<String, Byte> findPostVotesByUser(User user) {
         return voteRepository.findPostVotesByUser(user)
                 .parallelStream()
@@ -105,6 +120,7 @@ public class VoteServiceImpl implements VoteService {
     }
 
     @Override
+    @Cacheable(value = COMMENT_VOTES_BY_USER_CACHE, key = "#user.id")
     public Map<String, Byte> findCommentVotesByUser(User user) {
         return voteRepository.findCommentVotesByUser(user)
                 .parallelStream()
@@ -114,6 +130,7 @@ public class VoteServiceImpl implements VoteService {
     }
 
     @Override
+    @Cacheable(value = USER_CHOICE_BY_POST_CACHE, key = "#user.id.toString().concat('-').concat(#postId)")
     public PostVoteUserChoiceResponse getUserChoiceForPost(User user, UUID postId) {
         Vote vote = voteRepository.findByPostIdAndUserId(postId, user.getId()).orElse(null);
 

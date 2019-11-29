@@ -9,6 +9,9 @@ import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -29,7 +32,8 @@ public class SubredditServiceImpl implements SubredditService {
         add("HumansBeingBros");
         add("EyeBleach");
     }}.stream().map(String::toLowerCase).collect(Collectors.toUnmodifiableList());
-
+    private static final String SUBREDDIT_NAMES_CACHE = "subredditNames";
+    private static final String SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE = "subredditWithPostAndSubscriberCount";
     private final SubredditRepository subredditRepository;
     private final UserRepository userRepository;
     private final ModelMapper mapper;
@@ -44,6 +48,10 @@ public class SubredditServiceImpl implements SubredditService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = SUBREDDIT_NAMES_CACHE, allEntries = true),
+            @CacheEvict(value = SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE, allEntries = true)
+    })
     public ResponseEntity<?> create(SubredditCreateRequest request, User creator) {
         if (existsByTitle(request.getTitle())) {
             return ResponseEntity
@@ -75,6 +83,7 @@ public class SubredditServiceImpl implements SubredditService {
     }
 
     @Override
+    @Cacheable(SUBREDDIT_NAMES_CACHE)
     public List<String> getAllAsStrings() {
         return subredditRepository
                 .findAll()
@@ -83,6 +92,7 @@ public class SubredditServiceImpl implements SubredditService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    @Cacheable(value = SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE, sync = true)
     @Override
     public List<SubredditWithPostCountResponse> getAllWithPostCount() {
         return subredditRepository.findAllWithPostCount();
