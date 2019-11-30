@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @MappedSuperclass
-abstract class BaseUUIDEntity {
+public abstract class BaseUUIDEntity {
 
     @Id
     @GeneratedValue(generator = "uuid2")

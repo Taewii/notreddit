@@ -1,5 +1,6 @@
 package notreddit.services;
 
+import notreddit.constants.GeneralConstants;
 import notreddit.domain.entities.Role;
 import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
@@ -33,7 +34,6 @@ import java.util.stream.Collectors;
 
 import static notreddit.constants.ApiResponseMessages.*;
 import static notreddit.constants.ErrorMessages.ACCESS_FORBIDDEN;
-import static notreddit.services.SubredditServiceImpl.DEFAULT_SUBREDDITS;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -99,7 +99,8 @@ public class UserServiceImpl implements UserService {
             user.setRoles(this.getInheritedRolesFromRole("USER"));
         }
 
-        Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(DEFAULT_SUBREDDITS);
+        Set<Subreddit> defaultSubreddits = subredditRepository
+                .findByTitleIn(GeneralConstants.DEFAULT_SUBREDDITS);
         user.setSubscriptions(defaultSubreddits);
 
         userRepository.saveAndFlush(user);

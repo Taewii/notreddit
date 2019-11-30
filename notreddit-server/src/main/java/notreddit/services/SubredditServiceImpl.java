@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,13 +26,10 @@ import static notreddit.constants.ApiResponseMessages.*;
 @Service
 public class SubredditServiceImpl implements SubredditService {
 
-    static final List<String> DEFAULT_SUBREDDITS = new ArrayList<String>() {{
-        add("aww");
-        add("HumansBeingBros");
-        add("EyeBleach");
-    }}.stream().map(String::toLowerCase).collect(Collectors.toUnmodifiableList());
     private static final String SUBREDDIT_NAMES_CACHE = "subredditNames";
     private static final String SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE = "subredditWithPostAndSubscriberCount";
+    private static final String SUBSCRIBED_POSTS_CACHE = "subscribedPosts";
+
     private final SubredditRepository subredditRepository;
     private final UserRepository userRepository;
     private final ModelMapper mapper;
@@ -99,6 +95,7 @@ public class SubredditServiceImpl implements SubredditService {
     }
 
     @Override
+    @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
     public ResponseEntity<?> subscribe(String subredditTitle, User user) {
         Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(subredditTitle).orElse(null);
         user = userRepository.getWithSubscriptions(user);
@@ -117,6 +114,7 @@ public class SubredditServiceImpl implements SubredditService {
     }
 
     @Override
+    @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
     public ResponseEntity<?> unsubscribe(String subredditTitle, User user) {
         Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(subredditTitle).orElse(null);
         user = userRepository.getWithSubscriptions(user);

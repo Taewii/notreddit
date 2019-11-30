@@ -16,6 +16,9 @@ import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -34,6 +37,9 @@ import static notreddit.constants.ErrorMessages.ACCESS_FORBIDDEN;
 
 @Service
 public class CommentServiceImpl implements CommentService {
+
+    private static final String ALL_BY_POST_CACHE = "allByPost";
+    private static final String ALL_BY_USERNAME = "allByUsername";
 
     private static final String MODERATOR_ROLE = "ROLE_MODERATOR";
     private static final String DELETED_CONTENT = "[deleted]";
@@ -58,6 +64,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = ALL_BY_POST_CACHE, allEntries = true),
+            @CacheEvict(value = ALL_BY_USERNAME, allEntries = true)
+    })
     public ResponseEntity<?> create(CommentCreateRequestModel commentModel, User creator) {
         Post post = postRepository.findById(commentModel.getPostId()).orElse(null);
         Comment parent = null;
@@ -100,17 +110,8 @@ public class CommentServiceImpl implements CommentService {
                 .body(new ApiResponse(true, SUCCESSFUL_COMMENT_CREATION));
     }
 
-    private Mention createMention(Comment comment, User receiver, User creator) {
-        Mention mention = new Mention();
-        mention.setComment(comment);
-        mention.setCreatedOn(LocalDateTime.now());
-        mention.setCreator(creator);
-        mention.setReceiver(receiver);
-
-        return mention;
-    }
-
     @Override
+    @Cacheable(value = ALL_BY_POST_CACHE, keyGenerator = "pageableKeyGenerator")
     public List<CommentListWithChildren> findAllFromPost(UUID postId, Pageable pageable) {
         return commentRepository
                 .findByPostIdWithChildren(postId, pageable.getSort())
@@ -120,6 +121,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Cacheable(value = ALL_BY_USERNAME, keyGenerator = "pageableKeyGenerator")
     public CommentsResponseModel findAllFromUsername(String username, Pageable pageable) {
         Page<Comment> byCreatorUsername = commentRepository.findByCreatorUsername(username.toLowerCase(), pageable);
         List<CommentListWithReplyCount> comments = byCreatorUsername.stream()
@@ -183,5 +185,15 @@ public class CommentServiceImpl implements CommentService {
 
         return ResponseEntity
                 .ok(new ApiResponse(true, SUCCESSFUL_COMMENT_EDITING));
+    }
+
+    private Mention createMention(Comment comment, User receiver, User creator) {
+        Mention mention = new Mention();
+        mention.setComment(comment);
+        mention.setCreatedOn(LocalDateTime.now());
+        mention.setCreator(creator);
+        mention.setReceiver(receiver);
+
+        return mention;
     }
 }

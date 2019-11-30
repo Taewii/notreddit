@@ -2,6 +2,7 @@ package notreddit.services;
 
 import notreddit.constants.ApiResponseMessages;
 import notreddit.constants.ErrorMessages;
+import notreddit.constants.GeneralConstants;
 import notreddit.domain.entities.File;
 import notreddit.domain.entities.Post;
 import notreddit.domain.entities.Subreddit;
@@ -16,6 +17,9 @@ import notreddit.web.exceptions.AccessForbiddenException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +37,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
+
+    private static final String BY_ID_CACHE = "byId";
+    private static final String BY_USERNAME_CACHE = "byUsername";
+    private static final String BY_SUBREDDIT_CACHE = "bySubreddit";
+    private static final String SUBSCRIBED_CACHE = "subscribedPosts";
 
     private static final String MODERATOR_ROLE = "ROLE_MODERATOR";
 
@@ -68,18 +77,27 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Cacheable(value = BY_ID_CACHE, key = "#id")
+    public PostDetailsResponseModel findById(UUID id) {
+        Post post = postRepository.findByIdEager(id).orElseThrow();
+        return mapper.map(post, PostDetailsResponseModel.class);
+    }
+
+    @Override
     public PostsResponseModel allPosts(Pageable pageable) {
         Page<Post> allPosts = postRepository.findAll(pageable);
         return getPostsResponseModel(allPosts);
     }
 
     @Override
+    @Cacheable(value = BY_USERNAME_CACHE, keyGenerator = "pageableKeyGenerator")
     public PostsResponseModel findAllByUsername(String username, Pageable pageable) {
         Page<Post> allByUsername = postRepository.findAllByUsername(username.toLowerCase(), pageable);
         return getPostsResponseModel(allByUsername);
     }
 
     @Override
+    @Cacheable(value = BY_SUBREDDIT_CACHE, keyGenerator = "pageableKeyGenerator")
     public PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable) {
         Page<UUID> allBySubredditTitle = postRepository.getPostIdsBySubredditTitle(subreddit.toLowerCase(), pageable);
         List<Post> postsBySubreddit = new ArrayList<>();
@@ -93,46 +111,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResponseEntity<?> delete(UUID postId, User user) {
-        Post post = postRepository.findByIdWithCreatorAndComments(postId).orElse(null);
-
-        if (post == null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new ApiResponse(false, ApiResponseMessages.NONEXISTENT_POST));
-        }
-
-        boolean isCreatorOrModerator = user.getUsername().equals(post.getCreator().getUsername()) ||
-                user.getRoles().stream().anyMatch(r -> r.getAuthority().equals(MODERATOR_ROLE));
-
-        if (!isCreatorOrModerator) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse(false, ErrorMessages.ACCESS_FORBIDDEN));
-        }
-
-        voteRepository.deleteAllByPostId(post.getId());
-        post.getComments()
-                .parallelStream()
-                .forEach(comment -> {
-                    mentionRepository.deleteAllByCommentId(comment.getId());
-                    voteRepository.deleteAllByCommentId(comment.getId());
-                    commentRepository.deleteById(comment.getId());
-                });
-
-        if (post.getFile() != null) {
-            String fileUrl = post.getFile().getUrl();
-            if (fileUrl.contains("dropbox")) { // if the file is uploaded to the cloud storage -> delete it
-                cloudStorage.removeFile(fileUrl);
-            }
-        }
-
-        postRepository.delete(post);
-        return ResponseEntity
-                .ok(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_POST_DELETION));
-    }
-
-    @Override
+    @Cacheable(value = SUBSCRIBED_CACHE, keyGenerator = "pageableKeyGenerator")
     public PostsResponseModel subscribedPosts(User user, Pageable pageable) {
         user = userRepository.getWithSubscriptions(user);
         /* Using two queries to avoid
@@ -146,7 +125,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostsResponseModel defaultPosts(Pageable pageable) {
-        Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(SubredditServiceImpl.DEFAULT_SUBREDDITS);
+        Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(GeneralConstants.DEFAULT_SUBREDDITS);
         Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(defaultSubreddits, pageable);
         List<Post> subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent(), pageable.getSort());
         return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
@@ -186,6 +165,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = BY_ID_CACHE, allEntries = true),
+            @CacheEvict(value = BY_USERNAME_CACHE, allEntries = true),
+            @CacheEvict(value = BY_SUBREDDIT_CACHE, allEntries = true),
+            @CacheEvict(value = SUBSCRIBED_CACHE, allEntries = true)
+    })
     public ResponseEntity<?> create(PostCreateRequest request, User creator) {
         Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(request.getSubreddit()).orElse(null);
 
@@ -214,9 +199,49 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDetailsResponseModel findById(UUID id) {
-        Post post = postRepository.findByIdEager(id).orElseThrow();
-        return mapper.map(post, PostDetailsResponseModel.class);
+    @Caching(evict = {
+            @CacheEvict(value = BY_ID_CACHE, allEntries = true),
+            @CacheEvict(value = BY_USERNAME_CACHE, allEntries = true),
+            @CacheEvict(value = BY_SUBREDDIT_CACHE, allEntries = true),
+            @CacheEvict(value = SUBSCRIBED_CACHE, allEntries = true)
+    })
+    public ResponseEntity<?> delete(UUID postId, User user) {
+        Post post = postRepository.findByIdWithCreatorAndComments(postId).orElse(null);
+
+        if (post == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, ApiResponseMessages.NONEXISTENT_POST));
+        }
+
+        boolean isCreatorOrModerator = user.getUsername().equals(post.getCreator().getUsername()) ||
+                user.getRoles().stream().anyMatch(r -> r.getAuthority().equals(MODERATOR_ROLE));
+
+        if (!isCreatorOrModerator) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponse(false, ErrorMessages.ACCESS_FORBIDDEN));
+        }
+
+        voteRepository.deleteAllByPostId(post.getId());
+        post.getComments()
+                .parallelStream()
+                .forEach(comment -> {
+                    mentionRepository.deleteAllByCommentId(comment.getId());
+                    voteRepository.deleteAllByCommentId(comment.getId());
+                    commentRepository.deleteById(comment.getId());
+                });
+
+        if (post.getFile() != null) {
+            String fileUrl = post.getFile().getUrl();
+            if (fileUrl.contains("dropbox")) { // if the file is uploaded to the cloud storage -> delete it
+                cloudStorage.removeFile(fileUrl);
+            }
+        }
+
+        postRepository.delete(post);
+        return ResponseEntity
+                .ok(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_POST_DELETION));
     }
 
     private ResponseEntity<?> createPostWithoutFiles(Post post) {
