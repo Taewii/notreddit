@@ -1,5 +1,6 @@
 package notreddit.services;
 
+import lombok.extern.slf4j.Slf4j;
 import notreddit.constants.ApiResponseMessages;
 import notreddit.domain.entities.User;
 import notreddit.domain.entities.Votable;
@@ -14,6 +15,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class VoteServiceImpl implements VoteService {
 
@@ -139,6 +142,12 @@ public class VoteServiceImpl implements VoteService {
         }
 
         return new PostVoteUserChoiceResponse(true, vote.getChoice());
+    }
+
+    @Scheduled(cron = "0 0/5 * * * *") // every 5 minutes
+    public void upvoteRandomPost() {
+        String postId = voteRepository.upvoteRandomPost();
+        log.info("Scheduled task executed: upvoted post: {} at: {}", postId, LocalDateTime.now());
     }
 
     private void updateVote(boolean alreadyVoted, Vote vote, Votable votable, byte choice) {

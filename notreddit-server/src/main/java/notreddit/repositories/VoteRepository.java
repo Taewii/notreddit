@@ -26,6 +26,11 @@ public interface VoteRepository extends JpaRepository<Vote, UUID> {
     @Query("SELECT v FROM Vote v JOIN FETCH v.comment WHERE v.user = :user AND v.post IS NULL ")
     List<Vote> findCommentVotesByUser(@Param("user") User user);
 
+    @Query(value = "UPDATE posts SET upvotes = upvotes + 1 " +
+            "WHERE id = (SELECT p.id FROM posts p ORDER BY RANDOM() LIMIT 1) " +
+            "RETURNING cast(id as varchar)", nativeQuery = true)
+    String upvoteRandomPost();
+
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteAllByCommentId(UUID commentId);
