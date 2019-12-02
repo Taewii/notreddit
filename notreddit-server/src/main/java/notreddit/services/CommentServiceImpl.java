@@ -34,12 +34,11 @@ import java.util.stream.Collectors;
 
 import static notreddit.constants.ApiResponseMessages.*;
 import static notreddit.constants.ErrorMessages.ACCESS_FORBIDDEN;
+import static notreddit.constants.GeneralConstants.COMMENTS_BY_POST_CACHE;
+import static notreddit.constants.GeneralConstants.COMMENTS_BY_USERNAME;
 
 @Service
 public class CommentServiceImpl implements CommentService {
-
-    private static final String ALL_BY_POST_CACHE = "allByPost";
-    private static final String ALL_BY_USERNAME = "allByUsername";
 
     private static final String MODERATOR_ROLE = "ROLE_MODERATOR";
     private static final String DELETED_CONTENT = "[deleted]";
@@ -65,8 +64,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = ALL_BY_POST_CACHE, allEntries = true),
-            @CacheEvict(value = ALL_BY_USERNAME, allEntries = true)
+            @CacheEvict(value = COMMENTS_BY_POST_CACHE, allEntries = true),
+            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true)
     })
     public ResponseEntity<?> create(CommentCreateRequestModel commentModel, User creator) {
         Post post = postRepository.findById(commentModel.getPostId()).orElse(null);
@@ -111,7 +110,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Cacheable(value = ALL_BY_POST_CACHE, keyGenerator = "pageableKeyGenerator")
+    @Cacheable(value = COMMENTS_BY_POST_CACHE, keyGenerator = "pageableKeyGenerator")
     public List<CommentListWithChildren> findAllFromPost(UUID postId, Pageable pageable) {
         return commentRepository
                 .findByPostIdWithChildren(postId, pageable.getSort())
@@ -121,7 +120,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Cacheable(value = ALL_BY_USERNAME, keyGenerator = "pageableKeyGenerator")
+    @Cacheable(value = COMMENTS_BY_USERNAME, keyGenerator = "pageableKeyGenerator")
     public CommentsResponseModel findAllFromUsername(String username, Pageable pageable) {
         Page<Comment> byCreatorUsername = commentRepository.findByCreatorUsername(username.toLowerCase(), pageable);
         List<CommentListWithReplyCount> comments = byCreatorUsername.stream()
@@ -135,6 +134,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = COMMENTS_BY_POST_CACHE, allEntries = true),
+            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true)
+    })
     public ResponseEntity<?> delete(UUID commentId, User user) {
         Comment comment = commentRepository.findById(commentId).orElse(null);
 
@@ -171,6 +174,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = COMMENTS_BY_POST_CACHE, allEntries = true),
+            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true)
+    })
     public ResponseEntity<?> edit(CommentEditRequestModel commentModel, User user) {
         Comment comment = commentRepository.findById(commentModel.getCommentId()).orElse(null);
 

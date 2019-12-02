@@ -4,7 +4,7 @@ version: '3.7'
 
 # Define services
 services:
-   # Database Service (PostgreSQL)
+  # Database Service (PostgreSQL)
   db:
     image: postgres:11
     ports:
@@ -17,7 +17,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
-      - backend  
+      - backend
 
   # App backend service
   app-server:
@@ -28,12 +28,14 @@ services:
     ports:
       - "8001:8000" # Forward the exposed port 8080 on the container to port 8080 on the host machine
     restart: always
-    depends_on: 
+    depends_on:
       - db # This service depends on mysql. Start that first.
     env_file: server-variables.env
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - backend
       - frontend
+    environment:
+      - TZ=Europe/Sofia
 
   # Frontend Service 
   app-client:
@@ -46,8 +48,10 @@ services:
     depends_on:
       - app-server
     networks:
-      - frontend  
-  
+      - frontend
+    environment:
+      - TZ=Europe/Sofia
+
 # Volumes
 volumes:
   db-data:

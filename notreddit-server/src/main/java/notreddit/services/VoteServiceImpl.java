@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static notreddit.constants.GeneralConstants.*;
+
 @Slf4j
 @Service
 public class VoteServiceImpl implements VoteService {
@@ -48,6 +50,12 @@ public class VoteServiceImpl implements VoteService {
     @Override
     @Transactional
     @Caching(evict = {
+            @CacheEvict(value = POSTS_BY_ID_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
+            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true),
+            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true),
+            @CacheEvict(value = COMMENTS_BY_POST_CACHE, allEntries = true),
             @CacheEvict(value = COMMENT_VOTES_BY_USER_CACHE, key = "#user.id"),
             @CacheEvict(value = POST_VOTES_BY_USER_CACHE, key = "#user.id"),
             @CacheEvict(value = USER_CHOICE_BY_POST_CACHE,

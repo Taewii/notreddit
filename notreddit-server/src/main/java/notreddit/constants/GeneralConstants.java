@@ -15,4 +15,12 @@ final public class GeneralConstants {
         add("HumansBeingBros");
         add("EyeBleach");
     }}.stream().map(String::toLowerCase).collect(Collectors.toUnmodifiableList());
+
+    public static final String POSTS_BY_ID_CACHE = "byId";
+    public static final String POSTS_BY_USERNAME_CACHE = "byUsername";
+    public static final String POSTS_BY_SUBREDDIT_CACHE = "bySubreddit";
+    public static final String SUBSCRIBED_POSTS_CACHE = "subscribedPosts";
+
+    public static final String COMMENTS_BY_POST_CACHE = "allByPost";
+    public static final String COMMENTS_BY_USERNAME = "allByUsername";
 }

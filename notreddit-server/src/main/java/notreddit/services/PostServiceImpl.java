@@ -35,13 +35,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static notreddit.constants.GeneralConstants.*;
+
 @Service
 public class PostServiceImpl implements PostService {
-
-    private static final String BY_ID_CACHE = "byId";
-    private static final String BY_USERNAME_CACHE = "byUsername";
-    private static final String BY_SUBREDDIT_CACHE = "bySubreddit";
-    private static final String SUBSCRIBED_CACHE = "subscribedPosts";
 
     private static final String MODERATOR_ROLE = "ROLE_MODERATOR";
 
@@ -77,7 +74,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Cacheable(value = BY_ID_CACHE, key = "#id")
+    @Cacheable(value = POSTS_BY_ID_CACHE, key = "#id")
     public PostDetailsResponseModel findById(UUID id) {
         Post post = postRepository.findByIdEager(id).orElseThrow();
         return mapper.map(post, PostDetailsResponseModel.class);
@@ -90,14 +87,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Cacheable(value = BY_USERNAME_CACHE, keyGenerator = "pageableKeyGenerator")
+    @Cacheable(value = POSTS_BY_USERNAME_CACHE, keyGenerator = "pageableKeyGenerator")
     public PostsResponseModel findAllByUsername(String username, Pageable pageable) {
         Page<Post> allByUsername = postRepository.findAllByUsername(username.toLowerCase(), pageable);
         return getPostsResponseModel(allByUsername);
     }
 
     @Override
-    @Cacheable(value = BY_SUBREDDIT_CACHE, keyGenerator = "pageableKeyGenerator")
+    @Cacheable(value = POSTS_BY_SUBREDDIT_CACHE, keyGenerator = "pageableKeyGenerator")
     public PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable) {
         Page<UUID> allBySubredditTitle = postRepository.getPostIdsBySubredditTitle(subreddit.toLowerCase(), pageable);
         List<Post> postsBySubreddit = new ArrayList<>();
@@ -111,7 +108,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Cacheable(value = SUBSCRIBED_CACHE, keyGenerator = "pageableKeyGenerator")
+    @Cacheable(value = SUBSCRIBED_POSTS_CACHE, keyGenerator = "pageableKeyGenerator")
     public PostsResponseModel subscribedPosts(User user, Pageable pageable) {
         user = userRepository.getWithSubscriptions(user);
         /* Using two queries to avoid
@@ -166,10 +163,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = BY_ID_CACHE, allEntries = true),
-            @CacheEvict(value = BY_USERNAME_CACHE, allEntries = true),
-            @CacheEvict(value = BY_SUBREDDIT_CACHE, allEntries = true),
-            @CacheEvict(value = SUBSCRIBED_CACHE, allEntries = true)
+            @CacheEvict(value = POSTS_BY_ID_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
+            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
     })
     public ResponseEntity<?> create(PostCreateRequest request, User creator) {
         Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(request.getSubreddit()).orElse(null);
@@ -200,10 +197,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = BY_ID_CACHE, allEntries = true),
-            @CacheEvict(value = BY_USERNAME_CACHE, allEntries = true),
-            @CacheEvict(value = BY_SUBREDDIT_CACHE, allEntries = true),
-            @CacheEvict(value = SUBSCRIBED_CACHE, allEntries = true)
+            @CacheEvict(value = POSTS_BY_ID_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
+            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
     })
     public ResponseEntity<?> delete(UUID postId, User user) {
         Post post = postRepository.findByIdWithCreatorAndComments(postId).orElse(null);
@@ -291,7 +288,7 @@ public class PostServiceImpl implements PostService {
         return file;
     }
 
-    private ResponseEntity getCreatedResponseEntityWithPath() {
+    private ResponseEntity<?> getCreatedResponseEntityWithPath() {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/post/create")
                 .buildAndExpand().toUri();
