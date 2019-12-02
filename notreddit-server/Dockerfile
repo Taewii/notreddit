@@ -15,7 +15,7 @@ RUN mvn -B dependency:resolve dependency:resolve-plugins
 COPY src /build/src
 
 # Build application
-RUN mvn package
+RUN mvn -Dmaven.test.skip=true package
 
 #### Stage 1: Build the application
 FROM openjdk:12-jdk-alpine as runtime
