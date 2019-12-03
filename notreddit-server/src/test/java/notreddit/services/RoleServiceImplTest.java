@@ -3,12 +3,11 @@ package notreddit.services;
 import notreddit.domain.entities.Role;
 import notreddit.domain.enums.Authority;
 import notreddit.repositories.RoleRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@RunWith(MockitoJUnitRunner.class)
 class RoleServiceImplTest {
 
     @Mock
@@ -26,6 +23,11 @@ class RoleServiceImplTest {
 
     @InjectMocks
     private RoleServiceImpl roleService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     private List<Role> getRoles() {
         Role rootRole = new Role();
