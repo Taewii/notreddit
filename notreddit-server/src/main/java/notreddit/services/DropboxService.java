@@ -30,6 +30,10 @@ public class DropboxService implements CloudStorage {
         client = new DbxClientV2(config, ACCESS_TOKEN);
     }
 
+    public DropboxService(DbxClientV2 client) {
+        this.client = client;
+    }
+
     @Override
     public Map<String, Object> uploadFileAndGetParams(MultipartFile file) {
         String imagePath = "/" + file.getOriginalFilename();
