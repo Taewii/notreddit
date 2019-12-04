@@ -2,6 +2,8 @@ package notreddit.services;
 
 import notreddit.SingletonModelMapper;
 import notreddit.domain.entities.*;
+import notreddit.domain.enums.Authority;
+import notreddit.domain.models.requests.PostCreateRequest;
 import notreddit.domain.models.responses.post.PostDetailsResponseModel;
 import notreddit.domain.models.responses.post.PostListResponseModel;
 import notreddit.domain.models.responses.post.PostsResponseModel;
@@ -11,6 +13,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -18,8 +27,7 @@ import java.util.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class PostServiceImplTest {
 
@@ -79,6 +87,7 @@ class PostServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
         cloudStorage = mock(CloudStorage.class);
         thumbnailService = mock(ThumbnailService.class);
         subredditRepository = mock(SubredditRepository.class);
@@ -287,10 +296,272 @@ class PostServiceImplTest {
     }
 
     @Test
-    void create() {
+    void create_withMultipartFile_shouldInvokeAllNeededMethods() {
+        PostCreateRequest request = new PostCreateRequest();
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("");
+        request.setFile(new MockMultipartFile("name", new byte[1]));
+
+        Map<String, Object> cloudStorageParams = new HashMap<>();
+        cloudStorageParams.put("url", "url");
+        cloudStorageParams.put("contentType", "text/html");
+
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+        when(cloudStorage.uploadFileAndGetParams(any(MultipartFile.class))).thenReturn(cloudStorageParams);
+
+        ResponseEntity<?> response = postService.create(request, new User());
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        verify(cloudStorage).uploadFileAndGetParams(any(MultipartFile.class));
+        verify(thumbnailService).generateThumbnailUrl(cloudStorageParams.get("url").toString());
+        verify(postRepository).saveAndFlush(any(Post.class));
     }
 
     @Test
-    void delete() {
+    void create_withMultipartFileThatIsNotAnImage_shouldInvokeAllNeededMethods() {
+        PostCreateRequest request = new PostCreateRequest();
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("");
+        request.setFile(new MockMultipartFile("name", new byte[1]));
+
+        Map<String, Object> cloudStorageParams = new HashMap<>();
+        cloudStorageParams.put("url", "url");
+        cloudStorageParams.put("contentType", "text/html");
+
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+        when(cloudStorage.uploadFileAndGetParams(any(MultipartFile.class))).thenReturn(cloudStorageParams);
+
+        ResponseEntity<?> response = postService.create(request, new User());
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        verify(cloudStorage).uploadFileAndGetParams(any(MultipartFile.class));
+        verify(thumbnailService).generateThumbnailUrl(cloudStorageParams.get("url").toString());
+        verify(postRepository).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void create_withMultipartFileThatInAnImage_shouldInvokeAllNeededMethods() {
+        PostCreateRequest request = new PostCreateRequest();
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("");
+        request.setFile(new MockMultipartFile("name", new byte[1]));
+
+        Map<String, Object> cloudStorageParams = new HashMap<>();
+        cloudStorageParams.put("url", "url");
+        cloudStorageParams.put("contentType", "image/jpeg");
+
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+        when(cloudStorage.uploadFileAndGetParams(any(MultipartFile.class))).thenReturn(cloudStorageParams);
+
+        ResponseEntity<?> response = postService.create(request, new User());
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        verify(cloudStorage).uploadFileAndGetParams(any(MultipartFile.class));
+        verify(postRepository).saveAndFlush(any(Post.class));
+        verify(thumbnailService, never()).generateThumbnailUrl(cloudStorageParams.get("url").toString());
+    }
+
+    @Test
+    void create_withMultipartFileThatIsLargerThant10MB_shouldDoNothing() {
+        PostCreateRequest request = new PostCreateRequest();
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("");
+        request.setFile(new MockMultipartFile("name", new byte[11 * 1024 * 1024]));
+
+        Map<String, Object> cloudStorageParams = new HashMap<>();
+        cloudStorageParams.put("url", "url");
+        cloudStorageParams.put("contentType", "image/jpeg");
+
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+        when(cloudStorage.uploadFileAndGetParams(any(MultipartFile.class))).thenReturn(cloudStorageParams);
+
+        ResponseEntity<?> response = postService.create(request, new User());
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(cloudStorage, never()).uploadFileAndGetParams(any(MultipartFile.class));
+        verify(postRepository, never()).saveAndFlush(any(Post.class));
+        verify(thumbnailService, never()).generateThumbnailUrl(cloudStorageParams.get("url").toString());
+    }
+
+    @Test
+    void create_withUrl_shouldInvokeAllNeededMethods() {
+        PostCreateRequest request = new PostCreateRequest();
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("url");
+
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+
+        ResponseEntity<?> response = postService.create(request, new User());
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        verify(thumbnailService).generateThumbnailUrl(request.getUrl());
+        verify(postRepository).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void create_withoutFileNorUrl_shouldInvokeAllNeededMethods() {
+        PostCreateRequest request = new PostCreateRequest();
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("");
+
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+
+        ResponseEntity<?> response = postService.create(request, new User());
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        verify(thumbnailService, never()).generateThumbnailUrl(request.getUrl());
+        verify(postRepository).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void create_withNonExistingSubreddit_shouldDoNothing() {
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.empty());
+
+        ResponseEntity<?> response = postService.create(new PostCreateRequest(), new User());
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(postRepository, never()).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void create_withBothFileAndUrl_shouldDoNothing() {
+        PostCreateRequest request = new PostCreateRequest();
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("url");
+        request.setFile(new MockMultipartFile("name", new byte[11 * 1024 * 1024]));
+
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+
+        ResponseEntity<?> response = postService.create(request, new User());
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(postRepository, never()).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void delete_withModeratorUser_shouldInvokeAllNeededMethods() {
+        Role role = new Role();
+        role.setAuthority(Authority.MODERATOR);
+
+        User user = new User();
+        user.setUsername("username");
+        user.getRoles().add(role);
+
+        Comment comment = new Comment();
+        comment.setId(UUID.randomUUID());
+
+        File file = new File();
+        file.setUrl("dropboxFileUrl");
+
+        Post post = new Post();
+        post.setId(UUID.randomUUID());
+        post.setCreator(new User());
+        post.setFile(file);
+        post.getComments().add(comment);
+
+        when(postRepository.findByIdWithCreatorAndComments(any(UUID.class))).thenReturn(Optional.of(post));
+
+        postService.delete(UUID.randomUUID(), user);
+
+        verify(voteRepository).deleteAllByPostId(post.getId());
+        verify(voteRepository).deleteAllByCommentId(comment.getId());
+        verify(mentionRepository).deleteAllByCommentId(comment.getId());
+        verify(commentRepository).deleteById(comment.getId());
+        verify(cloudStorage).removeFile(file.getUrl());
+        verify(postRepository).delete(post);
+    }
+
+    @Test
+    void delete_withCreatorUser_shouldInvokeAllNeededMethods() {
+        Role role = new Role();
+        role.setAuthority(Authority.USER);
+
+        User user = new User();
+        user.setUsername("username");
+        user.getRoles().add(role);
+
+        Comment comment = new Comment();
+        comment.setId(UUID.randomUUID());
+
+        File file = new File();
+        file.setUrl("dropboxFileUrl");
+
+        Post post = new Post();
+        post.setId(UUID.randomUUID());
+        post.setCreator(user);
+        post.setFile(file);
+        post.getComments().add(comment);
+
+        when(postRepository.findByIdWithCreatorAndComments(any(UUID.class))).thenReturn(Optional.of(post));
+
+        postService.delete(UUID.randomUUID(), user);
+
+        verify(voteRepository).deleteAllByPostId(post.getId());
+        verify(voteRepository).deleteAllByCommentId(comment.getId());
+        verify(mentionRepository).deleteAllByCommentId(comment.getId());
+        verify(commentRepository).deleteById(comment.getId());
+        verify(cloudStorage).removeFile(file.getUrl());
+        verify(postRepository).delete(post);
+    }
+
+    @Test
+    void delete_withUserThatIsNotModeratorAndNotTheCreator_shouldDoNothing() {
+        Role role = new Role();
+        role.setAuthority(Authority.USER);
+
+        User user = new User();
+        user.setUsername("username");
+        user.getRoles().add(role);
+
+        Comment comment = new Comment();
+        comment.setId(UUID.randomUUID());
+
+        File file = new File();
+        file.setUrl("dropboxFileUrl");
+
+        Post post = new Post();
+        post.setId(UUID.randomUUID());
+        post.setCreator(new User());
+        post.setFile(file);
+        post.getComments().add(comment);
+
+        when(postRepository.findByIdWithCreatorAndComments(any(UUID.class))).thenReturn(Optional.of(post));
+
+        postService.delete(UUID.randomUUID(), user);
+
+        verify(voteRepository, never()).deleteAllByPostId(post.getId());
+        verify(voteRepository, never()).deleteAllByCommentId(comment.getId());
+        verify(mentionRepository, never()).deleteAllByCommentId(comment.getId());
+        verify(commentRepository, never()).deleteById(comment.getId());
+        verify(cloudStorage, never()).removeFile(file.getUrl());
+        verify(postRepository, never()).delete(post);
+    }
+
+    @Test
+    void delete_withNonExistingPost_shouldDoNothing() {
+        when(postRepository.findByIdWithCreatorAndComments(any(UUID.class))).thenReturn(Optional.empty());
+
+        postService.delete(UUID.randomUUID(), new User());
+
+        verify(voteRepository, never()).deleteAllByPostId(any(UUID.class));
+        verify(voteRepository, never()).deleteAllByCommentId(any(UUID.class));
+        verify(mentionRepository, never()).deleteAllByCommentId(any(UUID.class));
+        verify(commentRepository, never()).deleteById(any(UUID.class));
+        verify(cloudStorage, never()).removeFile(any(String.class));
+        verify(postRepository, never()).delete(any(Post.class));
     }
 }
