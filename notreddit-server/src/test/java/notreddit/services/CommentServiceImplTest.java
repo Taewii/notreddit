@@ -17,6 +17,11 @@ import notreddit.repositories.VoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -35,6 +40,7 @@ class CommentServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
         commentRepository = mock(CommentRepository.class);
         postRepository = mock(PostRepository.class);
         mentionRepository = mock(MentionRepository.class);
@@ -88,12 +94,9 @@ class CommentServiceImplTest {
         when(postRepository.findById(any(UUID.class))).thenReturn(Optional.of(post));
         when(commentRepository.findById(any(UUID.class))).thenReturn(Optional.of(comment));
 
-        try {
-            commentService.create(model, user);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
+        ResponseEntity<?> result = commentService.create(model, user);
 
+        assertEquals(HttpStatus.CREATED, result.getStatusCode());
         verify(comment).addChild(any(Comment.class));
         verify(commentRepository).findById(parentId);
         verify(commentRepository).saveAndFlush(comment);
@@ -113,12 +116,9 @@ class CommentServiceImplTest {
         when(postRepository.findById(any(UUID.class))).thenReturn(Optional.of(post));
         when(commentRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
-        try {
-            commentService.create(model, user);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
+        ResponseEntity<?> result = commentService.create(model, user);
 
+        assertEquals(HttpStatus.CREATED, result.getStatusCode());
         verify(commentRepository).saveAndFlush(any(Comment.class));
         verify(commentRepository, never()).findById(any(UUID.class));
     }

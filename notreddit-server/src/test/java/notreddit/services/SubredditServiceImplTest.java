@@ -9,10 +9,15 @@ import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -24,6 +29,7 @@ class SubredditServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
         subredditRepository = mock(SubredditRepository.class);
         userRepository = mock(UserRepository.class);
         subredditService = new SubredditServiceImpl(
@@ -66,11 +72,7 @@ class SubredditServiceImplTest {
         request.setTitle("title");
         when(subredditRepository.existsByTitleIgnoreCase(any(String.class))).thenReturn(false);
 
-        try {
-            subredditService.create(request, user);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
+        subredditService.create(request, user);
 
         verify(subredditRepository).saveAndFlush(any(Subreddit.class));
     }

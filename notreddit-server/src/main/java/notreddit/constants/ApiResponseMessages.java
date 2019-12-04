@@ -32,6 +32,7 @@ final public class ApiResponseMessages {
     public static final String SUCCESSFUL_VOTE_REGISTRATION = "Vote registered successfully.";
 
     public static final String NONEXISTENT_USERNAME_OR_EMAIL = "User with such username or email doesn't exist: ";
+    public static final String NONEXISTENT_USER_ID = "User with such ID doesn't exist.";
     public static final String NONEXISTENT_USER_WITH_ID = "User with id: %s doesn't exist.";
     public static final String USERNAME_IS_TAKEN = "Username is already taken!";
     public static final String EMAIL_IS_TAKEN = "Email Address already in use!";

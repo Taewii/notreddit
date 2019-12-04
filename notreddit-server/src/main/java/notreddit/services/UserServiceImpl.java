@@ -133,7 +133,14 @@ public class UserServiceImpl implements UserService {
                     .body(new ApiResponse(false, ACCESS_FORBIDDEN));
         }
 
-        User affectedUser = userRepository.findByIdWithRoles(request.getUserId()).orElseThrow();
+        User affectedUser = userRepository.findByIdWithRoles(request.getUserId()).orElse(null);
+
+        if (affectedUser == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, NONEXISTENT_USER_ID));
+        }
+
         affectedUser.setRoles(this.getInheritedRolesFromRole(request.getNewRole()));
         userRepository.saveAndFlush(affectedUser);
 
