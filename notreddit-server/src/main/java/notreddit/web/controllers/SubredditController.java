@@ -4,7 +4,7 @@ import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.SubredditCreateRequest;
 import notreddit.domain.models.responses.subreddit.IsUserSubscribedToSubredditResponse;
 import notreddit.domain.models.responses.subreddit.SubredditAvailabilityResponse;
-import notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse;
+import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import notreddit.services.SubredditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +57,7 @@ public class SubredditController {
 
     @PreAuthorize("permitAll()")
     @GetMapping("/all-with-post-count")
-    public List<SubredditWithPostCountResponse> getAllSubredditsWithPostCount() {
+    public List<SubredditWithPostsAndSubscribersCountResponse> getAllSubredditsWithPostCount() {
         return subredditService.getAllWithPostCount();
     }
 

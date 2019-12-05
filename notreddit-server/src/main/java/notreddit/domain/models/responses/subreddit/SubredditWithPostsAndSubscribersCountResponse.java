@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubredditWithPostCountResponse {
+public class SubredditWithPostsAndSubscribersCountResponse {
 
     private String title;
     private Integer postCount;

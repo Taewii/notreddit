@@ -4,7 +4,7 @@ import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.SubredditCreateRequest;
 import notreddit.domain.models.responses.api.ApiResponse;
-import notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse;
+import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -90,8 +90,8 @@ public class SubredditServiceImpl implements SubredditService {
 
     @Cacheable(value = SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE, sync = true)
     @Override
-    public List<SubredditWithPostCountResponse> getAllWithPostCount() {
-        return subredditRepository.findAllWithPostCount();
+    public List<SubredditWithPostsAndSubscribersCountResponse> getAllWithPostCount() {
+        return subredditRepository.findAllWithPostAndSubscriberCount();
     }
 
     @Override

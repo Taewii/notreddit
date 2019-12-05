@@ -1,7 +1,7 @@
 package notreddit.repositories;
 
 import notreddit.domain.entities.Subreddit;
-import notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse;
+import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,9 +18,9 @@ public interface SubredditRepository extends JpaRepository<Subreddit, Long> {
 
     Optional<Subreddit> findByTitleIgnoreCase(@Length(min = 4) @NotBlank String title);
 
-    @Query("SELECT new notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse(s.title, s.posts.size, s.subscribers.size) " +
+    @Query("SELECT new notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse(s.title, s.posts.size, s.subscribers.size) " +
             "FROM Subreddit s ORDER BY s.title")
-    List<SubredditWithPostCountResponse> findAllWithPostCount();
+    List<SubredditWithPostsAndSubscribersCountResponse> findAllWithPostAndSubscriberCount();
 
     @Query("SELECT s FROM Subreddit s WHERE LOWER(s.title) IN :title")
     Set<Subreddit> findByTitleIn(Collection<@NotBlank @Length(min = 3) String> title);

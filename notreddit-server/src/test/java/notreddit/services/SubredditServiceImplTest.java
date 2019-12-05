@@ -4,7 +4,7 @@ import notreddit.SingletonModelMapper;
 import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.SubredditCreateRequest;
-import notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse;
+import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,11 +51,11 @@ class SubredditServiceImplTest {
         return subreddits;
     }
 
-    private List<SubredditWithPostCountResponse> createSubredditsWithPostCount(int count) {
-        List<SubredditWithPostCountResponse> subreddits = new ArrayList<>();
+    private List<SubredditWithPostsAndSubscribersCountResponse> createSubredditsWithPostCount(int count) {
+        List<SubredditWithPostsAndSubscribersCountResponse> subreddits = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
-            SubredditWithPostCountResponse subreddit = new SubredditWithPostCountResponse();
+            SubredditWithPostsAndSubscribersCountResponse subreddit = new SubredditWithPostsAndSubscribersCountResponse();
             subreddit.setTitle("title" + i);
             subreddit.setSubscriberCount(i);
             subreddit.setPostCount(i);
@@ -144,11 +144,11 @@ class SubredditServiceImplTest {
 
     @Test
     void getAllWithPostCount_shouldWorkCorrectly() {
-        when(subredditRepository.findAllWithPostCount()).thenReturn(createSubredditsWithPostCount(3));
-        List<SubredditWithPostCountResponse> result = subredditService.getAllWithPostCount();
+        when(subredditRepository.findAllWithPostAndSubscriberCount()).thenReturn(createSubredditsWithPostCount(3));
+        List<SubredditWithPostsAndSubscribersCountResponse> result = subredditService.getAllWithPostCount();
 
         assertEquals(3, result.size());
-        assertEquals(SubredditWithPostCountResponse.class, result.get(0).getClass());
+        assertEquals(SubredditWithPostsAndSubscribersCountResponse.class, result.get(0).getClass());
         for (int i = 0; i < result.size(); i++) {
             assertEquals("title" + i, result.get(i).getTitle());
             assertEquals((Integer) i, result.get(i).getPostCount());
@@ -158,8 +158,8 @@ class SubredditServiceImplTest {
 
     @Test
     void getAllWithPostCount_withNoSubreddits_returnsEmptyList() {
-        when(subredditRepository.findAllWithPostCount()).thenReturn(new ArrayList<>());
-        List<SubredditWithPostCountResponse> result = subredditService.getAllWithPostCount();
+        when(subredditRepository.findAllWithPostAndSubscriberCount()).thenReturn(new ArrayList<>());
+        List<SubredditWithPostsAndSubscribersCountResponse> result = subredditService.getAllWithPostCount();
 
         assertTrue(result.isEmpty());
     }

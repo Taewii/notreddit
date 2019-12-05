@@ -2,7 +2,7 @@ package notreddit.services;
 
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.SubredditCreateRequest;
-import notreddit.domain.models.responses.subreddit.SubredditWithPostCountResponse;
+import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public interface SubredditService {
 
     List<String> getAllAsStrings();
 
-    List<SubredditWithPostCountResponse> getAllWithPostCount();
+    List<SubredditWithPostsAndSubscribersCountResponse> getAllWithPostCount();
 
     ResponseEntity<?> subscribe(String subreddit, User user);
 
