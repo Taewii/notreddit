@@ -223,10 +223,10 @@ COPY public.user_subscriptions (user_id, subreddit_id) FROM stdin;
 \.
 
 COPY public.users (id, email, password, username) FROM stdin;
-0cd5ebf9-1023-4164-81ad-e09e92f9cff2	email@abv.bg	$2a$10$cD.vLzkwwG6o.oI0nx/p2eLjA4afG6fOM6EgiR9qZg7..CpmgBeZ6	root
-46cf2027-3503-4168-9d58-c5f4b81db30a	email1@abv.bg	$2a$10$Vh5MSLMEAmyDLq2DIuSPcO8hOJeYB9TKJWAXxlxrCPC3b7tQyEMFm	admin
-6f912194-dda1-4ad1-ac4c-846071dc11ad	email2@abv.bg	$2a$10$nv/gtHboKQ5NUiNAnuDuKepBUL/9TO4eRH70WTWLavh2mDQyapi1.	moderator
-24cc00bb-7b43-4e69-ac5c-f0b85d5fdc71	email3@abv.bg	$2a$10$Ge3P58.Toijpawas2rWf9OW7Ey.oi5boBCfGQaMoCdomxLt5k9lt2	user
+0cd5ebf9-1023-4164-81ad-e09e92f9cff2	email@abv.bg	$2y$10$rg502wzMJV3RpQXl/lua1.XutQE2GnxQUUNWcn45xelCxgScVGERu	root
+46cf2027-3503-4168-9d58-c5f4b81db30a	email1@abv.bg	$2y$10$nLNM7DsL0yxMnlSVuO8bje4Si29aEK45UPWQhl5tEkWwamh1cjeb6	admin
+6f912194-dda1-4ad1-ac4c-846071dc11ad	email2@abv.bg	$2y$10$M1koOpzgFp/pmdjCOdW8UOgPq.FTza7bNm6T2HN8TR7afoptcux2q	moderator
+24cc00bb-7b43-4e69-ac5c-f0b85d5fdc71	email3@abv.bg	$2y$10$mbnM2PGX87NFc8DEskOy5OBSz7YpWAL8Rx5mIvQ51iqUqLgGofYiy	user
 \.
 
 COPY public.users_roles (user_id, role_id) FROM stdin;

@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByIdWithRoles(id).orElseThrow();
     }
 
+
     @Override
     @Transactional
     public ResponseEntity<?> register(SignUpRequest model) {
