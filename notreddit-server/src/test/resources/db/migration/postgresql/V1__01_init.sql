@@ -181,6 +181,8 @@ afa404b9-c5d0-48de-85a5-77ffafadb941		2019-09-27 16:10:35.059637	0	web page	2	0c
 965c0aa7-0fec-421c-a11e-57bd4266465f	cnt	2019-09-27 20:57:39.221701	2	videotest	2	0cd5ebf9-1023-4164-81ad-e09e92f9cff2	7
 b6f9ee49-88b7-438b-aa90-a978fe8ff973	text	2019-09-27 16:11:40.073301	0	just text	1	0cd5ebf9-1023-4164-81ad-e09e92f9cff2	7
 f6ccac45-2b61-41be-aa14-eab19d2a1379	pic	2019-09-27 20:22:18.928161	0	some new picture	1	0cd5ebf9-1023-4164-81ad-e09e92f9cff2	7
+821c2de8-d9ec-4e07-9c00-c8095eb27ed4	pic	2019-09-28 20:22:18.928161	0	some new picture	0	24cc00bb-7b43-4e69-ac5c-f0b85d5fdc71	482
+ca95bfad-f810-4cda-965c-154a86761cf9	pic	2019-09-28 20:22:18.928161	0	some new picture	0	24cc00bb-7b43-4e69-ac5c-f0b85d5fdc71	482
 \.
 
 COPY public.roles (id, authority) FROM stdin;

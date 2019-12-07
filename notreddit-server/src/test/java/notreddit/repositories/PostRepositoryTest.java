@@ -45,7 +45,7 @@ class PostRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdOn"));
 
         Page<Post> page = postRepository.findAll(pageable);
-        assertEquals(13, page.getTotalElements());
+        assertEquals(15, page.getTotalElements());
         assertEquals(3, page.getTotalPages());
 
         assertPostsPageable(page);

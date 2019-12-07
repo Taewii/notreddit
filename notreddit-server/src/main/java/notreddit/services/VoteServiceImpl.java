@@ -18,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -115,8 +117,12 @@ public class VoteServiceImpl implements VoteService {
         vote.setCreatedOn(LocalDateTime.now());
         voteRepository.saveAndFlush(vote);
 
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/api/comment/vote")
+                .buildAndExpand().toUri();
+
         return ResponseEntity
-                .ok()
+                .created(location)
                 .body(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_VOTE_REGISTRATION));
     }
 

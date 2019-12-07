@@ -14,11 +14,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class VoteControllerTest extends AbstractIntegrationTest {
 
     @Test
-    @WithMockCustomUser("root")
+    @WithMockCustomUser("admin")
     void getCurrentUserVotesForPosts() throws Exception {
         mockMvc.perform(get("/api/vote/votes-posts"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(7)));
+                .andExpect(jsonPath("$.length()", is(1)));
     }
 
     @Test

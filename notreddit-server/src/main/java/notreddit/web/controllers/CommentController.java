@@ -68,8 +68,8 @@ public class CommentController {
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/edit")
-    public ResponseEntity<?> delete(@Valid @RequestBody CommentEditRequestModel comment,
-                                    @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> edit(@Valid @RequestBody CommentEditRequestModel comment,
+                                  @AuthenticationPrincipal User user) {
         return commentService.edit(comment, user);
     }
 }
