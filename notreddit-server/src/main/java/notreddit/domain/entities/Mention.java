@@ -26,7 +26,6 @@ public class Mention extends BaseUUIDEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Comment comment;
 
-    @NotNull
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean isRead;
 

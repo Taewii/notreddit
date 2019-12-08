@@ -12,6 +12,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
 
+import static notreddit.constants.ErrorMessages.*;
+
 @Getter
 @Setter
 @Entity
@@ -19,16 +21,17 @@ import java.util.*;
 public class User extends BaseUUIDEntity implements UserDetails {
 
     @NotBlank
-    @Length
+    @Length(min = 4, message = USERNAME_LENGTH_VIOLATION_MESSAGE)
     @Column(nullable = false, unique = true)
     private String username;
 
     @NotBlank
+    @Length(min = 6, message = PASSWORD_LENGTH_VIOLATION_MESSAGE)
     @Column(nullable = false)
     private String password;
 
-    @Email
     @NotBlank
+    @Email(message = INVALID_EMAIL)
     @Column(nullable = false)
     private String email;
 

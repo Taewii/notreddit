@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import static notreddit.constants.ErrorMessages.FIELDS_ARE_NOT_MATCHING;
+
 @Slf4j
 @Component
 public class MatchingFieldsValidator implements ConstraintValidator<MatchingFieldsConstraint, Object> {
@@ -42,7 +44,7 @@ public class MatchingFieldsValidator implements ConstraintValidator<MatchingFiel
 
         for (String field : fields) {
             context
-                    .buildConstraintViolationWithTemplate("Fields are not matching.")
+                    .buildConstraintViolationWithTemplate(FIELDS_ARE_NOT_MATCHING)
                     .addPropertyNode(field).addConstraintViolation();
         }
     }

@@ -1,8 +1,8 @@
 package notreddit.web.controllers;
 
-import notreddit.AbstractIntegrationTest;
 import notreddit.domain.models.requests.CommentCreateRequestModel;
 import notreddit.domain.models.requests.CommentEditRequestModel;
+import notreddit.web.controllers.utils.AbstractIntegrationTest;
 import notreddit.web.controllers.utils.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

@@ -1,7 +1,7 @@
 package notreddit.web.controllers;
 
-import notreddit.AbstractIntegrationTest;
 import notreddit.domain.models.requests.SubredditCreateRequest;
+import notreddit.web.controllers.utils.AbstractIntegrationTest;
 import notreddit.web.controllers.utils.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

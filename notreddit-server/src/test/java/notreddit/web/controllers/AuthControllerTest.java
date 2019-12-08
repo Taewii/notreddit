@@ -1,8 +1,8 @@
 package notreddit.web.controllers;
 
-import notreddit.AbstractIntegrationTest;
 import notreddit.domain.models.requests.SignInRequest;
 import notreddit.domain.models.requests.SignUpRequest;
+import notreddit.web.controllers.utils.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;

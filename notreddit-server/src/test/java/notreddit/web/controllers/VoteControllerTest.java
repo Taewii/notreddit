@@ -1,6 +1,6 @@
 package notreddit.web.controllers;
 
-import notreddit.AbstractIntegrationTest;
+import notreddit.web.controllers.utils.AbstractIntegrationTest;
 import notreddit.web.controllers.utils.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -33,7 +33,7 @@ class VoteControllerTest extends AbstractIntegrationTest {
     void getCurrentUserVotesForComments() throws Exception {
         mockMvc.perform(get("/api/vote/votes-comments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(9)));
+                .andExpect(jsonPath("$.length()", is(8)));
     }
 
     @Test

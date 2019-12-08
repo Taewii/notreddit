@@ -2,6 +2,7 @@ package notreddit.domain.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import notreddit.constants.ErrorMessages;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -27,7 +28,7 @@ public class Post extends BaseUUIDEntity implements Votable {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Subreddit subreddit;
 
-    @Length(min = 4)
+    @Length(min = 4, message = ErrorMessages.TITLE_LENGTH_VIOLATION_MESSAGE)
     @NotBlank
     @Column(nullable = false)
     private String title;

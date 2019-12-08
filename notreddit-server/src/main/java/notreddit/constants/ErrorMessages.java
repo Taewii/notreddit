@@ -8,6 +8,7 @@ final public class ErrorMessages {
 
     public static final String ACCESS_FORBIDDEN = "You don't have the authority to do that.";
     public static final String TOO_MANY_REQUESTS = "Too many requests.";
+    public static final String FIELDS_ARE_NOT_MATCHING = "Fields are not matching.";
 
     public static final String BLANK_TITLE = "Title must not be blank.";
     public static final String BLANK_USERNAME = "Username must not be blank.";

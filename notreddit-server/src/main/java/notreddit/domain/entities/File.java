@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -19,10 +20,11 @@ public class File {
     @Column
     private String thumbnailUrl;
 
-    @NotNull
+    @NotBlank
     @Column(nullable = false)
     private String url;
 
+    @NotNull
     @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private Post post;
