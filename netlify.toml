@@ -1,6 +1,7 @@
 [build]
-  command = "npm run build"
   base = "notreddit-client/"
+  publish = "notreddit-client/build/"
+  command = "npm run build"
   
 [[redirects]]
   from = "/*"
