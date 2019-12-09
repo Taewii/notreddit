@@ -16,7 +16,6 @@ import notreddit.repositories.*;
 import notreddit.web.exceptions.AccessForbiddenException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -55,7 +54,7 @@ public class PostServiceImpl implements PostService {
     @Autowired
     public PostServiceImpl(SubredditRepository subredditRepository,
                            PostRepository postRepository,
-                           @Qualifier("dropboxService") CloudStorage cloudStorage,
+                           CloudStorage cloudStorage,
                            ThumbnailService thumbnailService,
                            VoteRepository voteRepository,
                            CommentRepository commentRepository,
