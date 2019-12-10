@@ -7,3 +7,8 @@
   from = "/*"
   to = "/index.html"
   status = 200
+  
+[[redirects]]
+  from = "/api/*"
+  to = "http://notreddit-env.fspzgqurca.us-east-1.elasticbeanstalk.com/api"
+  status = 200
