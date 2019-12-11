@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -65,10 +66,9 @@ class PostRepositoryTest {
     @Test
     void getPostsFromIdList() {
         List<UUID> postIds =
-                List.of("965c0aa7-0fec-421c-a11e-57bd4266465f",
+                Stream.of("965c0aa7-0fec-421c-a11e-57bd4266465f",
                         "21c8152f-61cc-4b88-a48d-0771e1396abb",
                         "d007bf28-190b-4123-ae10-69b8e8bd226f")
-                        .stream()
                         .map(UUID::fromString)
                         .collect(Collectors.toList());
 
@@ -96,7 +96,7 @@ class PostRepositoryTest {
     @Test
     void getSubscribedPostsIds() {
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "title"));
-        Set<Subreddit> subreddits = subredditRepository.findByTitleIn(List.of("aww", "eli5", "bjj"));
+        Set<Subreddit> subreddits = subredditRepository.findByTitleIn(Arrays.asList("aww", "eli5", "bjj"));
         Page<UUID> posts = postRepository.getSubscribedPostsIds(subreddits, pageable);
 
         assertEquals(9, posts.getTotalElements());

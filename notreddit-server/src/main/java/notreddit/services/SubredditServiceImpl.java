@@ -85,7 +85,7 @@ public class SubredditServiceImpl implements SubredditService {
                 .findAll()
                 .stream()
                 .map(subreddit -> mapper.map(subreddit, String.class))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
     }
 
     @Cacheable(value = SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE, sync = true)
@@ -138,6 +138,6 @@ public class SubredditServiceImpl implements SubredditService {
         return user.getSubscriptions()
                 .parallelStream()
                 .map(Subreddit::getTitle)
-                .collect(Collectors.toUnmodifiableSet());
+                .collect(Collectors.toSet());
     }
 }

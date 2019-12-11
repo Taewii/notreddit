@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -26,7 +27,7 @@ public class PageableKeyGenerator implements KeyGenerator {
         for (Object param : params) {
             if (param instanceof Pageable) {
                 Pageable pageable = (Pageable) param;
-                objects.addAll(List.of(
+                objects.addAll(Arrays.asList(
                         pageable.getPageNumber(),
                         pageable.getPageSize(),
                         pageable.getSort().toString()));

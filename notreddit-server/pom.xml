@@ -15,7 +15,7 @@
     <description>Not Reddit</description>
 
     <properties>
-        <java.version>12</java.version>
+        <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
@@ -104,22 +104,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>jcenter</id>
-            <name>bintray</name>
-            <url>https://jcenter.bintray.com/</url>
-        </repository>
-        <repository>
-            <id>spring-boot-throttling-repo</id>
-            <url>https://raw.github.com/weddini/spring-boot-throttling/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -128,5 +112,38 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>prod</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>
+                    prod
+                </spring.profiles.active>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>1.8</source>
+                            <target>1.8</target>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

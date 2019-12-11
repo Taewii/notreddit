@@ -43,7 +43,7 @@ public class MentionServiceImpl implements MentionService {
         Page<Mention> usersMentions = mentionRepository.getUsersMentions(user, pageable);
         List<MentionResponseModel> mentions = usersMentions.stream()
                 .map(m -> mapper.map(m, MentionResponseModel.class))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         return new MentionResponse(usersMentions.getTotalElements(), mentions);
     }

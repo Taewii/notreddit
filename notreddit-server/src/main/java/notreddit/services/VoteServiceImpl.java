@@ -131,7 +131,7 @@ public class VoteServiceImpl implements VoteService {
     public Map<String, Byte> findPostVotesByUser(User user) {
         return voteRepository.findPostVotesByUser(user)
                 .parallelStream()
-                .collect(Collectors.toUnmodifiableMap(
+                .collect(Collectors.toMap(
                         v -> v.getPost().getId().toString(),
                         Vote::getChoice));
     }
@@ -141,7 +141,7 @@ public class VoteServiceImpl implements VoteService {
     public Map<String, Byte> findCommentVotesByUser(User user) {
         return voteRepository.findCommentVotesByUser(user)
                 .parallelStream()
-                .collect(Collectors.toUnmodifiableMap(
+                .collect(Collectors.toMap(
                         v -> v.getComment().getId().toString(),
                         Vote::getChoice));
     }

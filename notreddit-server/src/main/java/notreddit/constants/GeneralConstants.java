@@ -14,7 +14,7 @@ final public class GeneralConstants {
         add("aww");
         add("HumansBeingBros");
         add("EyeBleach");
-    }}.stream().map(String::toLowerCase).collect(Collectors.toUnmodifiableList());
+    }}.stream().map(String::toLowerCase).collect(Collectors.toList());
 
     public static final String POSTS_BY_ID_CACHE = "byId";
     public static final String POSTS_BY_USERNAME_CACHE = "byUsername";

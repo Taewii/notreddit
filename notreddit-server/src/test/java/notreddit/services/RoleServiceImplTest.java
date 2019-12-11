@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +40,7 @@ class RoleServiceImplTest {
         Role userRole = new Role();
         userRole.setAuthority(Authority.USER);
 
-        return List.of(rootRole, adminRole, moderatorRole, userRole);
+        return Arrays.asList(rootRole, adminRole, moderatorRole, userRole);
     }
 
     @Test

@@ -24,6 +24,6 @@ public class RoleServiceImpl implements RoleService {
                 .findAll()
                 .stream()
                 .map(r -> r.getAuthority().substring(Authority.ROLE_PREFIX.length()))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
     }
 }

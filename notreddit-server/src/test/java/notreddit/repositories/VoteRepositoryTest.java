@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,7 +70,7 @@ class VoteRepositoryTest {
     @Test
     void findPostVotesByUser_shouldReturnCorrectData() {
         UUID userId = UUID.fromString("0cd5ebf9-1023-4164-81ad-e09e92f9cff2");
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
 
         List<Vote> votes = voteRepository.findPostVotesByUser(user);
         assertEquals(7, votes.size());
@@ -79,7 +80,7 @@ class VoteRepositoryTest {
     @Test
     void findCommentVotesByUser_shouldReturnCorrectData() {
         UUID userId = UUID.fromString("0cd5ebf9-1023-4164-81ad-e09e92f9cff2");
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
 
         List<Vote> votes = voteRepository.findCommentVotesByUser(user);
         assertEquals(9, votes.size());

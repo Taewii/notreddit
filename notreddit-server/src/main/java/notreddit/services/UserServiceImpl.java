@@ -26,10 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static notreddit.constants.ApiResponseMessages.*;
@@ -72,9 +69,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Cacheable(value = USERS_CACHE, key = "#id")
     public UserDetails loadUserById(UUID id) {
-        return userRepository.findByIdWithRoles(id).orElseThrow();
+        return userRepository.findByIdWithRoles(id).orElseThrow(NoSuchElementException::new);
     }
-
 
     @Override
     @Transactional
@@ -194,7 +190,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAllWithRoles()
                 .stream()
                 .map(u -> mapper.map(u, UserSummaryResponse.class))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
     }
 
     private Set<Role> getInheritedRolesFromRole(String role) {
@@ -203,10 +199,10 @@ public class UserServiceImpl implements UserService {
                 .findAll()
                 .stream()
                 .map(r -> r.getAuthority().substring(Authority.ROLE_PREFIX.length()))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         for (int i = allRoles.indexOf(role.toUpperCase()); i < allRoles.size(); i++) {
-            roles.add(roleRepository.findById(i + 1L).orElseThrow());
+            roles.add(roleRepository.findById(i + 1L).orElseThrow(NoSuchElementException::new));
         }
 
         return roles;

@@ -41,10 +41,11 @@ public class DropboxService implements CloudStorage {
         log.info("File upload successful.");
 
         SharedLinkMetadata sharedLinkWithSettings = createSharedLinkFromPath(imagePath);
-        return new HashMap<>() {{
-            put("url", sharedLinkWithSettings.getUrl() + RAW_TYPE_POSTFIX);
-            put("contentType", file.getContentType());
-        }};
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("url", sharedLinkWithSettings.getUrl() + RAW_TYPE_POSTFIX);
+        params.put("contentType", file.getContentType());
+        return params;
     }
 
     @Override

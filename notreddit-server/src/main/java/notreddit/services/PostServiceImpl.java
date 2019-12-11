@@ -75,7 +75,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Cacheable(value = POSTS_BY_ID_CACHE, key = "#id")
     public PostDetailsResponseModel findById(UUID id) {
-        Post post = postRepository.findByIdEager(id).orElseThrow();
+        Post post = postRepository.findByIdEager(id).orElseThrow(NoSuchElementException::new);
         return mapper.map(post, PostDetailsResponseModel.class);
     }
 
@@ -115,7 +115,12 @@ public class PostServiceImpl implements PostService {
          * warning message, taken from https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
          */
         Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(user.getSubscriptions(), pageable);
-        List<Post> subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent(), pageable.getSort());
+        List<Post> subscribedPosts = new ArrayList<>();
+
+        if (!subscribedPostsIds.isEmpty()) {
+            subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent(), pageable.getSort());
+        }
+
         return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
     }
 
@@ -123,7 +128,12 @@ public class PostServiceImpl implements PostService {
     public PostsResponseModel defaultPosts(Pageable pageable) {
         Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(GeneralConstants.DEFAULT_SUBREDDITS);
         Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(defaultSubreddits, pageable);
-        List<Post> subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent(), pageable.getSort());
+        List<Post> subscribedPosts = new ArrayList<>();
+
+        if (!subscribedPostsIds.isEmpty()) {
+            subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent(), pageable.getSort());
+        }
+
         return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
     }
 
@@ -181,11 +191,11 @@ public class PostServiceImpl implements PostService {
         post.setSubreddit(subreddit);
         post.setCreatedOn(LocalDateTime.now());
 
-        if (request.getFile() == null && request.getUrl().isBlank()) {
+        if (request.getFile() == null && request.getUrl().isEmpty()) {
             return createPostWithoutFiles(post);
-        } else if (request.getFile() != null && request.getUrl().isBlank()) {
+        } else if (request.getFile() != null && request.getUrl().isEmpty()) {
             return createPostWithUploadedFile(request, post);
-        } else if (request.getFile() == null && !request.getUrl().isBlank()) {
+        } else if (request.getFile() == null && !request.getUrl().isEmpty()) {
             return createPostWithWebUrl(request, post);
         } else {
             return ResponseEntity
@@ -304,7 +314,7 @@ public class PostServiceImpl implements PostService {
                     model.setCommentCount(p.getComments().size());
                     return model;
                 })
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         return new PostsResponseModel(allByUsername.getTotalElements(), posts);
     }
@@ -316,7 +326,7 @@ public class PostServiceImpl implements PostService {
                     model.setCommentCount(p.getComments().size());
                     return model;
                 })
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         return new PostsResponseModel(total, mappedPosts);
     }

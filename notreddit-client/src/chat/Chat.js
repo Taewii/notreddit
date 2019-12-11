@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './Chat.css';
 import { Stomp } from '@stomp/stompjs';
 import { getAvatarColor } from '../util/util';
+import { WEBSOCKET_URL } from '../util/constants';
 
 class Chat extends Component {
   constructor(props) {
@@ -25,7 +26,9 @@ class Chat extends Component {
   }
 
   connect() {
-    this.client = Stomp.client('ws://localhost:8000/stomp/websocket');
+    // 'ws://localhost:8000/stomp/websocket'
+    // 'wss://notreddit-env.fspzgqurca.us-east-1.elasticbeanstalk.com/stomp/websocket'
+    this.client = Stomp.client(WEBSOCKET_URL);
     this.client.debug = () => { }; // disable console messages
     this.client.connect({}, this.onConnected, this.onError);
     this.setState({ connected: true });

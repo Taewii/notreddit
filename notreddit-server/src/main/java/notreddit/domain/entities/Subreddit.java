@@ -7,7 +7,6 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,8 +16,7 @@ import java.util.Set;
 @Table(name = "subreddits")
 public class Subreddit extends BaseLongEntity {
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User creator;
 
     @NotBlank

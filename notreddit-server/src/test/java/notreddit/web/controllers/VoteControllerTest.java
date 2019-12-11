@@ -29,11 +29,11 @@ class VoteControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockCustomUser("root")
+    @WithMockCustomUser("user")
     void getCurrentUserVotesForComments() throws Exception {
         mockMvc.perform(get("/api/vote/votes-comments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(8)));
+                .andExpect(jsonPath("$.length()", is(0)));
     }
 
     @Test

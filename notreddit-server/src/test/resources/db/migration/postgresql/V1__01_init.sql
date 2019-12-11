@@ -73,7 +73,7 @@ CREATE TABLE public.subreddits
 (
     id         bigint                 NOT NULL,
     title      character varying(255) NOT NULL,
-    creator_id uuid                   NOT NULL
+    creator_id uuid
 );
 
 CREATE SEQUENCE public.subreddits_id_seq

@@ -6,7 +6,8 @@ import notreddit.validations.HibernateValidatorTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
+import java.util.Collections;
+import java.util.HashSet;
 
 import static notreddit.constants.ErrorMessages.INVALID_EMAIL;
 
@@ -24,7 +25,7 @@ public class UserValidationTests extends HibernateValidatorTest {
         target.setUsername("username");
         target.setPassword("password");
         target.setEmail("email@abv.bg");
-        target.setRoles(Set.of(new Role()));
+        target.setRoles(new HashSet<>(Collections.singletonList(new Role())));
 
         isValid(target);
     }
@@ -34,7 +35,7 @@ public class UserValidationTests extends HibernateValidatorTest {
         target.setUsername("");
         target.setPassword("password");
         target.setEmail("email@abv.bg");
-        target.setRoles(Set.of(new Role()));
+        target.setRoles(new HashSet<>(Collections.singletonList(new Role())));
 
         isInvalid(target);
         assertMessage(target, "username", "must not be blank");
@@ -45,7 +46,7 @@ public class UserValidationTests extends HibernateValidatorTest {
         target.setUsername("123");
         target.setPassword("password");
         target.setEmail("email@abv.bg");
-        target.setRoles(Set.of(new Role()));
+        target.setRoles(new HashSet<>(Collections.singletonList(new Role())));
 
         isInvalid(target);
         assertMessage(target, "username", "Username length must be more or equal to 4.");
@@ -56,7 +57,7 @@ public class UserValidationTests extends HibernateValidatorTest {
         target.setUsername("username");
         target.setPassword("");
         target.setEmail("email@abv.bg");
-        target.setRoles(Set.of(new Role()));
+        target.setRoles(new HashSet<>(Collections.singletonList(new Role())));
 
         isInvalid(target);
         assertMessage(target, "password", "Password length must be more or equal to 6.");
@@ -67,7 +68,7 @@ public class UserValidationTests extends HibernateValidatorTest {
         target.setUsername("username");
         target.setPassword("password");
         target.setEmail("");
-        target.setRoles(Set.of(new Role()));
+        target.setRoles(new HashSet<>(Collections.singletonList(new Role())));
 
         isInvalid(target);
         assertMessage(target, "email", "must not be blank");
@@ -78,7 +79,7 @@ public class UserValidationTests extends HibernateValidatorTest {
         target.setUsername("username");
         target.setPassword("");
         target.setEmail("invalid");
-        target.setRoles(Set.of(new Role()));
+        target.setRoles(new HashSet<>(Collections.singletonList(new Role())));
 
         isInvalid(target);
         assertMessage(target, "email", INVALID_EMAIL);

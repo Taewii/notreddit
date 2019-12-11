@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -96,7 +97,7 @@ class UserRepositoryTest {
     @Test
     void getWithSubscriptions_withValidData_shouldWorkCorrectly() {
         UUID userId = UUID.fromString("0cd5ebf9-1023-4164-81ad-e09e92f9cff2");
-        User user = userRepository.findByIdWithRoles(userId).orElseThrow();
+        User user = userRepository.findByIdWithRoles(userId).orElseThrow(NoSuchElementException::new);
 
         User withSubscriptions = userRepository.getWithSubscriptions(user);
 

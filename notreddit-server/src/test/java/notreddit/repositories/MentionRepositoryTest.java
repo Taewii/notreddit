@@ -12,10 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -50,7 +47,7 @@ class MentionRepositoryTest {
     @Test
     void getUnreadMentionCountByUser_shouldReturnCorrectUnreadMentionCount() {
         UUID userId = UUID.fromString("0cd5ebf9-1023-4164-81ad-e09e92f9cff2");
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
 
         int unreadMentions = mentionRepository.getUnreadMentionCountByUser(user);
 
@@ -61,7 +58,7 @@ class MentionRepositoryTest {
     void getUsersMentions_shouldReturnCorrectlyOrderedAndPagedEntities() {
         Pageable pageable = PageRequest.of(0, 5);
         UUID userId = UUID.fromString("0cd5ebf9-1023-4164-81ad-e09e92f9cff2");
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
 
         Page<Mention> usersMentions = mentionRepository.getUsersMentions(user, pageable);
 

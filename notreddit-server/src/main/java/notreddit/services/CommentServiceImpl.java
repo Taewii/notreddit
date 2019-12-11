@@ -116,7 +116,7 @@ public class CommentServiceImpl implements CommentService {
                 .findByPostIdWithChildren(postId, pageable.getSort())
                 .parallelStream()
                 .map(c -> mapper.map(c, CommentListWithChildren.class))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -128,7 +128,7 @@ public class CommentServiceImpl implements CommentService {
                     CommentListWithReplyCount model = mapper.map(c, CommentListWithReplyCount.class);
                     model.setReplies(c.getChildren().size());
                     return model;
-                }).collect(Collectors.toUnmodifiableList());
+                }).collect(Collectors.toList());
 
         return new CommentsResponseModel(byCreatorUsername.getTotalElements(), comments);
     }

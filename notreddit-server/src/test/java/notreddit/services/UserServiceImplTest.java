@@ -50,7 +50,7 @@ class UserServiceImplTest {
         userRole.setId(4L);
         userRole.setAuthority(Authority.USER);
 
-        return List.of(rootRole, adminRole, modRole, userRole);
+        return Arrays.asList(rootRole, adminRole, modRole, userRole);
     }
 
     private List<User> createUsers(int count) {

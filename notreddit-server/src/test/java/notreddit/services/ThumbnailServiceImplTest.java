@@ -30,10 +30,10 @@ class ThumbnailServiceImplTest {
 
     @Test
     void generateScreenshotApiUrl() throws UnsupportedEncodingException {
-        Map<String, String> options = new HashMap<>() {{
-            put("url", url);
-            put("title", "title");
-        }};
+        Map<String, String> options = new HashMap<>();
+        options.put("url", url);
+        options.put("title", "title");
+
 
         String expected = PDF_API_BASE_URL + "key=null&title=title&url=https%3A%2F%2Frandom-url.com";
         String url = thumbnailService.generatePdfApiUrl(options);
@@ -42,10 +42,10 @@ class ThumbnailServiceImplTest {
 
     @Test
     void generatePdfApiUrl() throws UnsupportedEncodingException {
-        Map<String, String> options = new HashMap<>() {{
-            put("url", url);
-            put("title", "title");
-        }};
+        Map<String, String> options = new HashMap<>();
+        options.put("url", url);
+        options.put("title", "title");
+
 
         String expected = API_BASE_URL + "key=null&title=title&url=https%3A%2F%2Frandom-url.com";
         String url = thumbnailService.generateScreenshotApiUrl(options);

@@ -24,12 +24,11 @@ public class SubredditValidationTests extends HibernateValidatorTest {
     }
 
     @Test
-    public void notValid_withNullCreator() {
+    public void isValid_withNullCreator() {
         target.setTitle("title");
         target.setCreator(null);
 
-        isInvalid(target);
-        assertMessage(target, "creator", "must not be null");
+        isValid(target);
     }
 
     @Test

@@ -61,7 +61,7 @@ class PostServiceImplTest {
             post.setCreator(user);
             post.setFile(file);
             post.setSubreddit(subreddit);
-            post.setComments(List.of(new Comment()));
+            post.setComments(Collections.singletonList(new Comment()));
 
             posts.add(post);
         }
@@ -169,7 +169,7 @@ class PostServiceImplTest {
     void findAllBySubreddit_withExistingPosts_returnsCorrectlyMappedObjects() {
         Pageable pageable = PageRequest.of(0, 3, Sort.unsorted());
         when(postRepository.getPostIdsBySubredditTitle(any(String.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(UUID.randomUUID())));
+                .thenReturn(new PageImpl<>(Collections.singletonList(UUID.randomUUID())));
         when(postRepository.getPostsFromIdList(any(), any(Sort.class)))
                 .thenReturn(createPosts(3, pageable).getContent());
 
@@ -192,12 +192,12 @@ class PostServiceImplTest {
     @Test
     void subscribedPosts_withExistingPosts_returnsCorrectlyMappedObjects() {
         User user = mock(User.class);
-        when(user.getSubscriptions()).thenReturn(Set.of(new Subreddit()));
+        when(user.getSubscriptions()).thenReturn(new HashSet<>(Collections.singletonList(new Subreddit())));
         when(userRepository.getWithSubscriptions(any(User.class))).thenReturn(user);
 
         Pageable pageable = PageRequest.of(0, 3, Sort.unsorted());
         when(postRepository.getSubscribedPostsIds(any(), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(UUID.randomUUID())));
+                .thenReturn(new PageImpl<>(Collections.singletonList(UUID.randomUUID())));
         when(postRepository.getPostsFromIdList(any(), any(Sort.class)))
                 .thenReturn(createPosts(3, pageable).getContent());
 
@@ -208,7 +208,7 @@ class PostServiceImplTest {
     @Test
     void subscribedPosts_withNoExistingPosts_returnsCorrectObject() {
         User user = mock(User.class);
-        when(user.getSubscriptions()).thenReturn(Set.of(new Subreddit()));
+        when(user.getSubscriptions()).thenReturn(new HashSet<>(Collections.singletonList(new Subreddit())));
         when(userRepository.getWithSubscriptions(any(User.class))).thenReturn(user);
 
         Pageable pageable = PageRequest.of(0, 3, Sort.unsorted());
@@ -228,7 +228,7 @@ class PostServiceImplTest {
         Pageable pageable = PageRequest.of(0, 3, Sort.unsorted());
         when(subredditRepository.findByTitleIn(any())).thenReturn(new HashSet<>());
         when(postRepository.getSubscribedPostsIds(any(), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(UUID.randomUUID())));
+                .thenReturn(new PageImpl<>(Collections.singletonList(UUID.randomUUID())));
         when(postRepository.getPostsFromIdList(any(), any(Sort.class)))
                 .thenReturn(createPosts(3, pageable).getContent());
 
@@ -258,7 +258,7 @@ class PostServiceImplTest {
         when(user.getUsername()).thenReturn("username");
 
         when(postRepository.findPostIdsByUserAndVoteChoice(any(UUID.class), any(byte.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(UUID.randomUUID().toString())));
+                .thenReturn(new PageImpl<>(Collections.singletonList(UUID.randomUUID().toString())));
         when(postRepository.getPostsFromIdList(any(), any(Sort.class)))
                 .thenReturn(createPosts(3, pageable).getContent());
 

@@ -10,9 +10,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -67,27 +65,29 @@ class SubredditRepositoryTest {
 
     @Test
     void findByTitleIn_with2Items_returnsTheWantedSubreddits() {
-        Set<Subreddit> subreddits = subredditRepository.findByTitleIn(List.of("aww", "eli5"));
+        Set<Subreddit> subreddits = subredditRepository.findByTitleIn(Arrays.asList("aww", "eli5"));
         assertEquals(2, subreddits.size());
     }
 
     @Test
     void findByTitleIn_with1Item_returnsTheWantedSubreddit() {
-        Set<Subreddit> subreddits = subredditRepository.findByTitleIn(List.of("aww"));
+        Set<Subreddit> subreddits = subredditRepository.findByTitleIn(Collections.singletonList("aww"));
         assertEquals(1, subreddits.size());
         subreddits.forEach(s -> assertEquals("aww", s.getTitle()));
     }
 
     @Test
     void isUserSubscribedToSubreddit_withSubscribedUser_returnsTrue() {
-        User user = userRepository.findByUsernameOrEmailIgnoreCase("user", "nonexistent@email.bg").orElseThrow();
+        User user = userRepository.findByUsernameOrEmailIgnoreCase("user", "nonexistent@email.bg")
+                .orElseThrow(NoSuchElementException::new);
         Boolean result = subredditRepository.isUserSubscribedToSubreddit("aww", user.getId());
         assertTrue(result);
     }
 
     @Test
     void isUserSubscribedToSubreddit_withNotSubscribedUser_returnsFalse() {
-        User user = userRepository.findByUsernameOrEmailIgnoreCase("user", "nonexistent@email.bg").orElseThrow();
+        User user = userRepository.findByUsernameOrEmailIgnoreCase("user", "nonexistent@email.bg")
+                .orElseThrow(NoSuchElementException::new);
         Boolean result = subredditRepository.isUserSubscribedToSubreddit("eli5", user.getId());
         assertFalse(result);
     }

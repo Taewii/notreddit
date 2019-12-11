@@ -194,7 +194,7 @@ class CommentServiceImplTest {
 
         User user = mock(User.class);
         when(user.getUsername()).thenReturn("random");
-        when(user.getRoles()).thenReturn(Set.of(mod));
+        when(user.getRoles()).thenReturn(new HashSet<>(Collections.singletonList(mod)));
 
         User creator = mock(User.class);
         when(user.getUsername()).thenReturn("creator");
@@ -222,14 +222,14 @@ class CommentServiceImplTest {
 
         User user = mock(User.class);
         when(user.getUsername()).thenReturn("random");
-        when(user.getRoles()).thenReturn(Set.of(mod));
+        when(user.getRoles()).thenReturn(new HashSet<>(Collections.singletonList(mod)));
 
         User creator = mock(User.class);
         when(user.getUsername()).thenReturn("creator");
 
         Comment comment = mock(Comment.class);
         when(comment.getCreator()).thenReturn(creator);
-        when(comment.getChildren()).thenReturn(List.of(new Comment()));
+        when(comment.getChildren()).thenReturn(Collections.singletonList(new Comment()));
 
         when(commentRepository.findById(any(UUID.class))).thenReturn(Optional.of(comment));
 
@@ -271,7 +271,7 @@ class CommentServiceImplTest {
 
         Comment comment = mock(Comment.class);
         when(comment.getCreator()).thenReturn(user);
-        when(comment.getChildren()).thenReturn(List.of(new Comment()));
+        when(comment.getChildren()).thenReturn(Collections.singletonList(new Comment()));
 
         when(commentRepository.findById(any(UUID.class))).thenReturn(Optional.of(comment));
 

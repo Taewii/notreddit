@@ -2,9 +2,9 @@ package notreddit.config;
 
 import notreddit.domain.entities.Role;
 import notreddit.domain.entities.Subreddit;
-import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,27 +21,26 @@ public class BeanConfig {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setAmbiguityIgnored(true);
 
-        Converter<LocalDateTime, Long> toInstant = new AbstractConverter<>() {
-            @Override
-            protected Long convert(LocalDateTime localDateTime) {
-                return localDateTime == null ? null : localDateTime
+        // if I do em with lambda functions it breaks...
+        Converter<LocalDateTime, Long> toInstant = new Converter<LocalDateTime, Long>() {
+            public Long convert(MappingContext<LocalDateTime, Long> context) {
+                return context.getSource() == null ? null : context.getSource()
                         .atZone(ZoneId.of("Europe/Sofia"))
                         .toInstant()
                         .getEpochSecond();
             }
         };
 
-        Converter<Subreddit, String> toSubredditTitle = new AbstractConverter<>() {
-            @Override
-            protected String convert(Subreddit role) {
-                return role == null ? null : role.getTitle();
+        Converter<Subreddit, String> toSubredditTitle = new Converter<Subreddit, String>() {
+            public String convert(MappingContext<Subreddit, String> context) {
+                return context.getSource() == null ? null : context.getSource().getTitle();
             }
         };
 
-        Converter<Role, String> toAuthorityString = new AbstractConverter<>() {
-            @Override
-            protected String convert(Role role) {
-                return role == null ? null : role.getAuthority().substring("ROLE_".length());
+        Converter<Role, String> toAuthorityString = new Converter<Role, String>() {
+            public String convert(MappingContext<Role, String> context) {
+                return context.getSource() == null ? null : context.getSource()
+                        .getAuthority().substring("ROLE_".length());
             }
         };
 
