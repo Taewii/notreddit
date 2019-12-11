@@ -1,11 +1,11 @@
 package notreddit.web.controllers;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.auth.JwtTokenProvider;
 import notreddit.domain.models.requests.SignInRequest;
 import notreddit.domain.models.requests.SignUpRequest;
 import notreddit.domain.models.responses.api.JwtAuthenticationResponse;
 import notreddit.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,20 +22,12 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
     private final JwtTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
-
-    @Autowired
-    public AuthController(UserService userService,
-                          JwtTokenProvider tokenProvider,
-                          AuthenticationManager authenticationManager) {
-        this.userService = userService;
-        this.tokenProvider = tokenProvider;
-        this.authenticationManager = authenticationManager;
-    }
 
     @PreAuthorize("isAnonymous()")
     @PostMapping("/signup")

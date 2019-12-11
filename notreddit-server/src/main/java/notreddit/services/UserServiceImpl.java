@@ -1,5 +1,6 @@
 package notreddit.services;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.constants.GeneralConstants;
 import notreddit.domain.entities.Role;
 import notreddit.domain.entities.Subreddit;
@@ -13,7 +14,6 @@ import notreddit.repositories.RoleRepository;
 import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -33,6 +33,7 @@ import static notreddit.constants.ApiResponseMessages.*;
 import static notreddit.constants.ErrorMessages.ACCESS_FORBIDDEN;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private static final String USERS_CACHE = "users";
@@ -42,19 +43,6 @@ public class UserServiceImpl implements UserService {
     private final SubredditRepository subredditRepository;
     private final PasswordEncoder encoder;
     private final ModelMapper mapper;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository,
-                           RoleRepository roleRepository,
-                           SubredditRepository subredditRepository,
-                           PasswordEncoder encoder,
-                           ModelMapper mapper) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.subredditRepository = subredditRepository;
-        this.encoder = encoder;
-        this.mapper = mapper;
-    }
 
     @Override
     @Transactional

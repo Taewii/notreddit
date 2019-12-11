@@ -1,5 +1,6 @@
 package notreddit.services;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.SubredditCreateRequest;
@@ -8,7 +9,6 @@ import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscrib
 import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import static notreddit.constants.ApiResponseMessages.*;
 
 @Service
+@RequiredArgsConstructor
 public class SubredditServiceImpl implements SubredditService {
 
     private static final String SUBREDDIT_NAMES_CACHE = "subredditNames";
@@ -33,15 +34,6 @@ public class SubredditServiceImpl implements SubredditService {
     private final SubredditRepository subredditRepository;
     private final UserRepository userRepository;
     private final ModelMapper mapper;
-
-    @Autowired
-    public SubredditServiceImpl(SubredditRepository subredditRepository,
-                                UserRepository userRepository,
-                                ModelMapper mapper) {
-        this.subredditRepository = subredditRepository;
-        this.userRepository = userRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     @Caching(evict = {

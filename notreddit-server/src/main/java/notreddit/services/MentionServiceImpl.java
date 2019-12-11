@@ -1,5 +1,6 @@
 package notreddit.services;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.Mention;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.responses.api.ApiResponse;
@@ -7,7 +8,6 @@ import notreddit.domain.models.responses.mention.MentionResponse;
 import notreddit.domain.models.responses.mention.MentionResponseModel;
 import notreddit.repositories.MentionRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +21,11 @@ import static notreddit.constants.ApiResponseMessages.MENTION_MARKED_AS;
 import static notreddit.constants.ApiResponseMessages.NONEXISTENT_MENTION_OR_NOT_RECEIVER;
 
 @Service
+@RequiredArgsConstructor
 public class MentionServiceImpl implements MentionService {
 
     private final MentionRepository mentionRepository;
     private final ModelMapper mapper;
-
-    @Autowired
-    public MentionServiceImpl(MentionRepository mentionRepository,
-                              ModelMapper mapper) {
-        this.mentionRepository = mentionRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     public int getUnreadMentionCountByUser(User user) {

@@ -1,5 +1,6 @@
 package notreddit.web.controllers;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.CommentCreateRequestModel;
 import notreddit.domain.models.requests.CommentEditRequestModel;
@@ -7,7 +8,6 @@ import notreddit.domain.models.responses.comment.CommentListWithChildren;
 import notreddit.domain.models.responses.comment.CommentsResponseModel;
 import notreddit.services.CommentService;
 import notreddit.services.VoteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,17 +20,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/comment")
+@RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
     private final VoteService voteService;
-
-    @Autowired
-    public CommentController(CommentService commentService,
-                             VoteService voteService) {
-        this.commentService = commentService;
-        this.voteService = voteService;
-    }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")

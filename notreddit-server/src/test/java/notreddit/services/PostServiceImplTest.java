@@ -96,7 +96,7 @@ class PostServiceImplTest {
         commentRepository = mock(CommentRepository.class);
         mentionRepository = mock(MentionRepository.class);
         userRepository = mock(UserRepository.class);
-        postService = new PostServiceImpl(subredditRepository, postRepository, cloudStorage, thumbnailService,
+        postService = new PostServiceImpl(cloudStorage, thumbnailService, subredditRepository, postRepository,
                 voteRepository, commentRepository, mentionRepository, userRepository, SingletonModelMapper.mapper());
     }
 

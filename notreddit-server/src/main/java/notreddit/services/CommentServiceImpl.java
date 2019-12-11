@@ -1,5 +1,6 @@
 package notreddit.services;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.Comment;
 import notreddit.domain.entities.Mention;
 import notreddit.domain.entities.Post;
@@ -15,7 +16,6 @@ import notreddit.repositories.MentionRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -38,6 +38,7 @@ import static notreddit.constants.GeneralConstants.COMMENTS_BY_POST_CACHE;
 import static notreddit.constants.GeneralConstants.COMMENTS_BY_USERNAME;
 
 @Service
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
     private static final String MODERATOR_ROLE = "ROLE_MODERATOR";
@@ -48,19 +49,6 @@ public class CommentServiceImpl implements CommentService {
     private final MentionRepository mentionRepository;
     private final VoteRepository voteRepository;
     private final ModelMapper mapper;
-
-    @Autowired
-    public CommentServiceImpl(PostRepository postRepository,
-                              CommentRepository commentRepository,
-                              MentionRepository mentionRepository,
-                              VoteRepository voteRepository,
-                              ModelMapper mapper) {
-        this.postRepository = postRepository;
-        this.commentRepository = commentRepository;
-        this.mentionRepository = mentionRepository;
-        this.voteRepository = voteRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     @Caching(evict = {

@@ -1,9 +1,9 @@
 package notreddit.web.controllers;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.responses.mention.MentionResponse;
 import notreddit.services.MentionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,14 +14,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/mention")
+@RequiredArgsConstructor
 public class MentionController {
 
     private final MentionService mentionService;
-
-    @Autowired
-    public MentionController(MentionService mentionService) {
-        this.mentionService = mentionService;
-    }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/unread-mentions-count")

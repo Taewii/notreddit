@@ -27,7 +27,6 @@ class Chat extends Component {
 
   connect() {
     // 'ws://localhost:8000/stomp/websocket'
-    // 'wss://notreddit-env.fspzgqurca.us-east-1.elasticbeanstalk.com/stomp/websocket'
     this.client = Stomp.client(WEBSOCKET_URL);
     this.client.debug = () => { }; // disable console messages
     this.client.connect({}, this.onConnected, this.onError);

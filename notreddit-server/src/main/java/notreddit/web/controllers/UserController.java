@@ -1,5 +1,6 @@
 package notreddit.web.controllers;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.ChangeRoleRequest;
 import notreddit.domain.models.responses.post.PostsResponseModel;
@@ -9,7 +10,6 @@ import notreddit.domain.models.responses.user.UsersResponse;
 import notreddit.services.PostService;
 import notreddit.services.UserService;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,20 +21,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final PostService postService;
     private final ModelMapper mapper;
-
-    @Autowired
-    public UserController(UserService userService,
-                          PostService postService,
-                          ModelMapper mapper) {
-        this.userService = userService;
-        this.postService = postService;
-        this.mapper = mapper;
-    }
 
     @PreAuthorize("isAnonymous()")
     @GetMapping("/check-username-availability")

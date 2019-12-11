@@ -1,12 +1,12 @@
 package notreddit.web.controllers;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.SubredditCreateRequest;
 import notreddit.domain.models.responses.subreddit.IsUserSubscribedToSubredditResponse;
 import notreddit.domain.models.responses.subreddit.SubredditAvailabilityResponse;
 import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import notreddit.services.SubredditService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,14 +18,10 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/subreddit")
+@RequiredArgsConstructor
 public class SubredditController {
 
     private final SubredditService subredditService;
-
-    @Autowired
-    public SubredditController(SubredditService subredditService) {
-        this.subredditService = subredditService;
-    }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/check-subreddit-availability")

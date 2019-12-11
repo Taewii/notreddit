@@ -1,9 +1,9 @@
 package notreddit.web.controllers;
 
+import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.responses.post.PostVoteUserChoiceResponse;
 import notreddit.services.VoteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,14 +16,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/vote")
+@RequiredArgsConstructor
 public class VoteController {
 
     private final VoteService voteService;
-
-    @Autowired
-    public VoteController(VoteService voteService) {
-        this.voteService = voteService;
-    }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/votes-posts")

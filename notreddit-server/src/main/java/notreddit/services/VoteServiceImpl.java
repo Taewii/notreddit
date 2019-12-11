@@ -1,5 +1,6 @@
 package notreddit.services;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import notreddit.constants.ApiResponseMessages;
 import notreddit.domain.entities.User;
@@ -10,7 +11,6 @@ import notreddit.domain.models.responses.post.PostVoteUserChoiceResponse;
 import notreddit.repositories.CommentRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -30,6 +30,7 @@ import static notreddit.constants.GeneralConstants.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class VoteServiceImpl implements VoteService {
 
     private static final String COMMENT_VOTES_BY_USER_CACHE = "commentVotesByUser";
@@ -39,15 +40,6 @@ public class VoteServiceImpl implements VoteService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final VoteRepository voteRepository;
-
-    @Autowired
-    public VoteServiceImpl(PostRepository postRepository,
-                           CommentRepository commentRepository,
-                           VoteRepository voteRepository) {
-        this.postRepository = postRepository;
-        this.commentRepository = commentRepository;
-        this.voteRepository = voteRepository;
-    }
 
     @Override
     @Transactional
