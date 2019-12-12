@@ -73,6 +73,11 @@ class App extends Component {
 
     Promise.all([getCurrentUser(), getUnreadMentionsCount()])
       .then(res => {
+        if (!res[0].enabled) {
+          this.handleLogout();
+          return; //TODO: do I need to return?
+        }
+
         this.setState({
           currentUser: res[0],
           mentionCount: res[1],

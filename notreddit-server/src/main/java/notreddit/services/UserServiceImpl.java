@@ -16,6 +16,7 @@ import notreddit.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static notreddit.constants.ApiResponseMessages.*;
 import static notreddit.constants.ErrorMessages.ACCESS_FORBIDDEN;
+import static notreddit.constants.GeneralConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -136,7 +138,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(value = USERS_CACHE, key = "#userId")
+    @Caching(evict = {
+            @CacheEvict(value = POSTS_BY_ID_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
+            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true),
+            @CacheEvict(value = USERS_CACHE, key = "#userId"),
+            @CacheEvict(value = COMMENTS_BY_POST_CACHE, allEntries = true),
+            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true)
+    })
     public ResponseEntity<?> deleteUser(String userId, User user) {
         boolean isRoot = user.getAuthorities()
                 .parallelStream()
@@ -156,7 +166,8 @@ public class UserServiceImpl implements UserService {
                     .body(new ApiResponse(false, String.format(NONEXISTENT_USER_WITH_ID, userId)));
         }
 
-        userRepository.delete(userToDelete);
+        userToDelete.setEnabled(false);
+        userRepository.saveAndFlush(userToDelete);
         return ResponseEntity
                 .ok()
                 .body(new ApiResponse(true,

@@ -128,9 +128,14 @@ class MentionList extends Component {
                   <span className={"is-read" + (!mention.read ? ' hidden' : '')}>read</span>
                 </span>}
               description={
-                <span>
-                  from <a href={'/user/' + mention.creatorUsername}>{mention.creatorUsername}</a> sent {(timeSince(mention.createdOn)).slice(0, -4)}
-                </span>
+                mention.creatorEnabled ?
+                  <span>
+                    from <a href={'/user/' + mention.creatorUsername}>{mention.creatorUsername}</a> sent {(timeSince(mention.createdOn))}
+                  </span>
+                  :
+                  <span>
+                    from <span className="deleted-creator">[deleted]</span> sent {(timeSince(mention.createdOn))}
+                  </span>
               }
             />
             <span className="content">{mention.commentContent}</span>

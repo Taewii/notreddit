@@ -14,4 +14,5 @@ public class MentionResponseModel extends Identifiable {
     private String creatorUsername;
     private boolean isRead;
     private long createdOn;
+    private boolean creatorEnabled;
 }

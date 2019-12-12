@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 import {
   INCORRECT_USERNAME_OR_PASSWORD,
   ENTER_USERNAME_OR_EMAIL,
-  ENTER_PASSWORD
+  ENTER_PASSWORD,
+  BANNED_OR_DELETED_MESSAGE
 } from '../util/messageConstants';
 import { ACCESS_TOKEN } from '../util/constants';
 import { login } from '../services/userService';
@@ -48,7 +49,11 @@ class LoginForm extends Component {
           }).catch(error => {
             let message = '';
             if (error.status === 401) {
-              message = INCORRECT_USERNAME_OR_PASSWORD;
+              if (error.message === 'Bad credentials') {
+                message = INCORRECT_USERNAME_OR_PASSWORD;
+              } else {
+                message = BANNED_OR_DELETED_MESSAGE;
+              }
             }
             errorNotification(error, message);
           });

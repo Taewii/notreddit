@@ -4,6 +4,7 @@ export const SUCCESSFUL_REGISTRATION_MESSAGE = 'Thank you! You have successfully
 
 export const LOGIN_TO_VOTE_MESSAGE = 'You must be logged in to vote.';
 export const INCORRECT_USERNAME_OR_PASSWORD = 'Your Username or Password is incorrect. Please try again.';
+export const BANNED_OR_DELETED_MESSAGE = 'The account is either banned or deleted.';
 export const ENTER_USERNAME_OR_EMAIL = 'Please enter your username or email!';
 export const ENTER_PASSWORD = 'Please enter your Password!';
 export const TAKEN_SUBREDDIT_NAME = 'This subreddit is already taken.';

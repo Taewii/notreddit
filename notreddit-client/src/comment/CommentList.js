@@ -213,9 +213,14 @@ class CommentList extends Component {
                 }
                 title={<a href={'/post/' + comment.postId}>{comment.postTitle}</a>}
                 description={
-                  <span>
-                    submitted {timeSince(comment.createdOn)} by <a href={'/user/' + comment.creatorUsername}>{comment.creatorUsername}</a>
-                  </span>
+                  comment.creatorEnabled ?
+                    <span>
+                      submitted {timeSince(comment.createdOn)} by <a href={'/user/' + comment.creatorUsername}>{comment.creatorUsername}</a>
+                    </span>
+                    :
+                    <span>
+                      submitted {timeSince(comment.createdOn)} by <span className="deleted-creator">[deleted]</span>
+                    </span>
                 }
               />
               <span className="content">{comment.content}</span>

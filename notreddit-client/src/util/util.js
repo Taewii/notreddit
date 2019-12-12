@@ -32,8 +32,7 @@ export const timeSince = (time) => {
   ];
 
   let seconds = (+new Date() - time) / 1000;
-  let token = 'ago';
-  let list_choice = 1;
+  let listChoice = 1;
 
   if (seconds === 0) {
     return 'Just now'
@@ -41,8 +40,7 @@ export const timeSince = (time) => {
 
   if (seconds < 0) {
     seconds = Math.abs(seconds);
-    token = 'from now';
-    list_choice = 2;
+    listChoice = 2;
   }
 
   let i = 0;
@@ -52,9 +50,9 @@ export const timeSince = (time) => {
   while (format = timeFormats[i++])
     if (seconds < format[0]) {
       if (typeof format[2] == 'string')
-        return format[list_choice];
+        return format[listChoice];
       else
-        return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
+        return Math.floor(seconds / format[2]) + ' ' + format[1];
     }
   return time;
 };

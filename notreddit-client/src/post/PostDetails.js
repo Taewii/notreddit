@@ -295,9 +295,14 @@ class PostDetails extends Component {
                 </a>
               }
               description={
-                <span>
-                  submitted {timeSince(post.createdOn)} by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
-                </span>
+                post.creatorEnabled ?
+                  <span>
+                    submitted {timeSince(post.createdOn)} by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
+                  </span>
+                  :
+                  <span>
+                    submitted {timeSince(post.createdOn)} by <span className="deleted-creator">[deleted]</span> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
+                  </span>
               }
             />
           </List.Item>
@@ -476,7 +481,11 @@ const CommentComponent = ({ comment, votes, showReplyModal, showEditModal, curre
   return (
     <Comment
       key={comment.id}
-      author={<a href={`/user/${comment.creatorUsername}`}>{comment.creatorUsername}</a>}
+      author={
+        comment.creatorEnabled
+          ? <a href={`/user/${comment.creatorUsername}`}>{comment.creatorUsername}</a>
+          : <span className="deleted-creator">[deleted]</span>
+      }
       content={comment.content}
       datetime={timeSince(comment.createdOn).replace('ago', '')}
       actions={actions}

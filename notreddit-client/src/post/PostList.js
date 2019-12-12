@@ -167,9 +167,14 @@ class PostList extends Component {
                 }
                 title={<a href={'/post/' + post.id}>{post.title}</a>}
                 description={
-                  <span>
-                    submitted {timeSince(post.createdOn)} by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
-                  </span>
+                  post.creatorEnabled ?
+                    <span>
+                      submitted {timeSince(post.createdOn)} by <a href={'/user/' + post.creatorUsername}>{post.creatorUsername}</a> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
+                    </span>
+                    :
+                    <span>
+                      submitted {timeSince(post.createdOn)} by <span className="deleted-creator">[deleted]</span> to <a href={'/subreddit/' + post.subredditTitle}>{'r/' + post.subredditTitle}</a>
+                    </span>
                 }
               />
             </List.Item>

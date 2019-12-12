@@ -14,5 +14,6 @@ import java.util.List;
 public class UserSummaryResponse extends Identifiable {
 
     private String username;
+    private boolean enabled;
     private List<String> roles = new ArrayList<>();
 }

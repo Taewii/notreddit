@@ -35,6 +35,9 @@ public class User extends BaseUUIDEntity implements UserDetails {
     @Column(nullable = false)
     private String email;
 
+    @Column
+    private boolean enabled = true;
+
     @NotEmpty
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -73,7 +76,7 @@ public class User extends BaseUUIDEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 
     @Transient

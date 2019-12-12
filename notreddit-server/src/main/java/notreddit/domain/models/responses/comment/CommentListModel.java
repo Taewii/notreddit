@@ -15,4 +15,5 @@ abstract class CommentListModel extends Identifiable {
     private int upvotes;
     private int downvotes;
     private long createdOn;
+    private boolean creatorEnabled;
 }

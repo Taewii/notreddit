@@ -286,7 +286,7 @@ class UserServiceImplTest {
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(userToDelete));
         userService.deleteUser(UUID.randomUUID().toString(), user);
 
-        verify(userRepository).delete(userToDelete);
+        verify(userRepository).saveAndFlush(userToDelete);
     }
 
     @Test
@@ -295,7 +295,7 @@ class UserServiceImplTest {
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
         userService.deleteUser(UUID.randomUUID().toString(), user);
 
-        verify(userRepository, never()).delete(any(User.class));
+        verify(userRepository, never()).saveAndFlush(any(User.class));
     }
 
     @Test
@@ -305,7 +305,7 @@ class UserServiceImplTest {
         userService.deleteUser(UUID.randomUUID().toString(), user);
 
         verify(userRepository, never()).findById(any(UUID.class));
-        verify(userRepository, never()).delete(any(User.class));
+        verify(userRepository, never()).saveAndFlush(any(User.class));
     }
 
     @Test

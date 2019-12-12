@@ -16,4 +16,5 @@ abstract class PostListModel {
     private int upvotes;
     private int downvotes;
     private long createdOn;
+    private boolean creatorEnabled;
 }
