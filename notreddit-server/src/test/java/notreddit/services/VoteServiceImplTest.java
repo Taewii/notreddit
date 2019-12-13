@@ -5,6 +5,7 @@ import notreddit.domain.models.responses.post.PostVoteUserChoiceResponse;
 import notreddit.repositories.CommentRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
+import notreddit.services.implementations.VoteServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

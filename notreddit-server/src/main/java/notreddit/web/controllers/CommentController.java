@@ -2,8 +2,8 @@ package notreddit.web.controllers;
 
 import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.CommentCreateRequestModel;
-import notreddit.domain.models.requests.CommentEditRequestModel;
+import notreddit.domain.models.requests.CommentCreateRequest;
+import notreddit.domain.models.requests.CommentEditRequest;
 import notreddit.domain.models.responses.comment.CommentListWithChildren;
 import notreddit.domain.models.responses.comment.CommentsResponseModel;
 import notreddit.services.CommentService;
@@ -28,9 +28,31 @@ public class CommentController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
-    public ResponseEntity<?> createComment(@Valid @RequestBody CommentCreateRequestModel comment,
-                                           @AuthenticationPrincipal User creator) {
+    public ResponseEntity<?> create(@Valid @RequestBody CommentCreateRequest comment,
+                                    @AuthenticationPrincipal User creator) {
         return commentService.create(comment, creator);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/edit")
+    public ResponseEntity<?> edit(@Valid @RequestBody CommentEditRequest comment,
+                                  @AuthenticationPrincipal User user) {
+        return commentService.edit(comment, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delete(@RequestParam UUID commentId,
+                                    @AuthenticationPrincipal User user) {
+        return commentService.delete(commentId, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/vote")
+    public ResponseEntity<?> vote(@RequestParam byte choice,
+                                  @RequestParam UUID commentId,
+                                  @AuthenticationPrincipal User user) {
+        return voteService.voteForPostOrComment(choice, null, commentId, user);
     }
 
     @PreAuthorize("permitAll()")
@@ -43,27 +65,5 @@ public class CommentController {
     @GetMapping("/user/{username}")
     public CommentsResponseModel findAllByUsername(@PathVariable String username, Pageable pageable) {
         return commentService.findAllFromUsername(username, pageable);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/vote")
-    public ResponseEntity<?> vote(@RequestParam byte choice,
-                                  @RequestParam UUID commentId,
-                                  @AuthenticationPrincipal User user) {
-        return voteService.voteForPostOrComment(choice, null, commentId, user);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> delete(@RequestParam UUID commentId,
-                                    @AuthenticationPrincipal User user) {
-        return commentService.delete(commentId, user);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PutMapping("/edit")
-    public ResponseEntity<?> edit(@Valid @RequestBody CommentEditRequestModel comment,
-                                  @AuthenticationPrincipal User user) {
-        return commentService.edit(comment, user);
     }
 }

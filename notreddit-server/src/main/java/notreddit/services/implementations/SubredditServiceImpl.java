@@ -1,4 +1,4 @@
-package notreddit.services;
+package notreddit.services.implementations;
 
 import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.Subreddit;
@@ -8,6 +8,7 @@ import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
+import notreddit.services.SubredditService;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,6 +37,16 @@ public class SubredditServiceImpl implements SubredditService {
     private final ModelMapper mapper;
 
     @Override
+    public Boolean existsByTitle(String title) {
+        return subredditRepository.existsByTitleIgnoreCase(title);
+    }
+
+    @Override
+    public Boolean isUserSubscribedToSubreddit(String subreddit, User user) {
+        return subredditRepository.isUserSubscribedToSubreddit(subreddit, user.getId());
+    }
+
+    @Override
     @Caching(evict = {
             @CacheEvict(value = SUBREDDIT_NAMES_CACHE, allEntries = true),
             @CacheEvict(value = SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE, allEntries = true)
@@ -52,38 +63,13 @@ public class SubredditServiceImpl implements SubredditService {
         subredditRepository.saveAndFlush(subreddit);
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/api/subreddit/create")
+                .fromCurrentContextPath()
+                .path("/api/subreddit/create")
                 .buildAndExpand().toUri();
 
         return ResponseEntity
                 .created(location)
                 .body(new ApiResponse(true, SUCCESSFUL_SUBREDDIT_CREATION));
-    }
-
-    @Override
-    public Boolean existsByTitle(String title) {
-        return subredditRepository.existsByTitleIgnoreCase(title);
-    }
-
-    @Override
-    public Boolean isUserSubscribedToSubreddit(String subreddit, User user) {
-        return subredditRepository.isUserSubscribedToSubreddit(subreddit, user.getId());
-    }
-
-    @Override
-    @Cacheable(SUBREDDIT_NAMES_CACHE)
-    public List<String> getAllAsStrings() {
-        return subredditRepository
-                .findAll()
-                .stream()
-                .map(subreddit -> mapper.map(subreddit, String.class))
-                .collect(Collectors.toList());
-    }
-
-    @Cacheable(value = SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE, sync = true)
-    @Override
-    public List<SubredditWithPostsAndSubscribersCountResponse> getAllWithPostCount() {
-        return subredditRepository.findAllWithPostAndSubscriberCount();
     }
 
     @Override
@@ -122,6 +108,22 @@ public class SubredditServiceImpl implements SubredditService {
 
         String responseMessage = String.format(SUCCESSFUL_SUBREDDIT_UNSUBSCRIPTION, subreddit.getTitle());
         return ResponseEntity.ok(new ApiResponse(true, responseMessage));
+    }
+
+    @Override
+    @Cacheable(SUBREDDIT_NAMES_CACHE)
+    public List<String> getAllAsStrings() {
+        return subredditRepository
+                .findAll()
+                .stream()
+                .map(subreddit -> mapper.map(subreddit, String.class))
+                .collect(Collectors.toList());
+    }
+
+    @Cacheable(value = SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE, sync = true)
+    @Override
+    public List<SubredditWithPostsAndSubscribersCountResponse> getAllWithPostCount() {
+        return subredditRepository.findAllWithPostAndSubscriberCount();
     }
 
     @Override

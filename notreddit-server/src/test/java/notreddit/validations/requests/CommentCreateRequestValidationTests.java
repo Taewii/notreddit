@@ -1,6 +1,6 @@
 package notreddit.validations.requests;
 
-import notreddit.domain.models.requests.CommentCreateRequestModel;
+import notreddit.domain.models.requests.CommentCreateRequest;
 import notreddit.validations.HibernateValidatorTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,11 +12,11 @@ import static notreddit.constants.ErrorMessages.BLANK_POST_ID;
 
 public class CommentCreateRequestValidationTests extends HibernateValidatorTest {
 
-    private CommentCreateRequestModel target;
+    private CommentCreateRequest target;
 
     @BeforeEach
     public void setUp() {
-        target = new CommentCreateRequestModel();
+        target = new CommentCreateRequest();
     }
 
     @Test

@@ -16,6 +16,8 @@ final public class GeneralConstants {
         add("EyeBleach");
     }}.stream().map(String::toLowerCase).collect(Collectors.toList());
 
+
+    // caching constants
     public static final String POSTS_BY_ID_CACHE = "byId";
     public static final String POSTS_BY_USERNAME_CACHE = "byUsername";
     public static final String POSTS_BY_SUBREDDIT_CACHE = "bySubreddit";

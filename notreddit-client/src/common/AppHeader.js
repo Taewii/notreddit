@@ -105,7 +105,7 @@ class AppHeader extends Component {
           <SubMenu key="admin-submenu" title={
             <span>
               <Icon type="safety-certificate" className="nav-icon" style={{ marginRight: 0 }} />
-              <Icon type="down" className="down-arrow" />
+              <Icon style={{marginLeft: "5px", marginRight: "0" }} type="down" className="down-arrow" />
             </span>
           }>
             <Menu.Item key="all-users" className="dropdown-item">

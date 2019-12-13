@@ -42,10 +42,10 @@ class PostRepositoryTest {
     }
 
     @Test
-    void findAll() {
+    void findAllPageable() {
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdOn"));
 
-        Page<Post> page = postRepository.findAll(pageable);
+        Page<Post> page = postRepository.findAllPageable(pageable);
         assertEquals(15, page.getTotalElements());
         assertEquals(3, page.getTotalPages());
 

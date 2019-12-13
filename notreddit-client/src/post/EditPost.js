@@ -241,7 +241,7 @@ class EditPost extends Component {
                 value={url.value}
                 onChange={(event) => this.handleInputChange(event, this.validateUrl)} />
             </FormItem>
-            <div className="file-content" style={{ display: imageUrl ? 'block' : 'none'}}>
+            <div className="file-content" style={{ display: imageUrl ? 'block' : 'none' }}>
               <iframe src={imageUrl}
                 title="unique?"
                 allowFullScreen="yes"

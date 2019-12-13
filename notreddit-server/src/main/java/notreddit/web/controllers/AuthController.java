@@ -1,6 +1,7 @@
 package notreddit.web.controllers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import notreddit.auth.JwtTokenProvider;
 import notreddit.domain.models.requests.SignInRequest;
 import notreddit.domain.models.requests.SignUpRequest;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -49,6 +51,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.generateToken(authentication);
+        log.info("User logged in: {}", model.getUsernameOrEmail());
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 }

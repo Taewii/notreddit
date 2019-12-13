@@ -10,19 +10,19 @@ import java.util.Set;
 
 public interface SubredditService {
 
-    ResponseEntity<?> create(SubredditCreateRequest request, User creator);
-
     Boolean existsByTitle(String title);
 
-    List<String> getAllAsStrings();
+    Boolean isUserSubscribedToSubreddit(String subreddit, User user);
 
-    List<SubredditWithPostsAndSubscribersCountResponse> getAllWithPostCount();
+    ResponseEntity<?> create(SubredditCreateRequest request, User creator);
 
     ResponseEntity<?> subscribe(String subreddit, User user);
 
     ResponseEntity<?> unsubscribe(String subreddit, User user);
 
-    Set<String> getUserSubscriptions(User user);
+    List<String> getAllAsStrings();
 
-    Boolean isUserSubscribedToSubreddit(String subreddit, User user);
+    List<SubredditWithPostsAndSubscribersCountResponse> getAllWithPostCount();
+
+    Set<String> getUserSubscriptions(User user);
 }

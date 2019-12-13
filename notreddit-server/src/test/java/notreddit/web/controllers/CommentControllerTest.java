@@ -1,7 +1,7 @@
 package notreddit.web.controllers;
 
-import notreddit.domain.models.requests.CommentCreateRequestModel;
-import notreddit.domain.models.requests.CommentEditRequestModel;
+import notreddit.domain.models.requests.CommentCreateRequest;
+import notreddit.domain.models.requests.CommentEditRequest;
 import notreddit.web.controllers.utils.AbstractIntegrationTest;
 import notreddit.web.controllers.utils.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class CommentControllerTest extends AbstractIntegrationTest {
     @Test
     @WithMockCustomUser("root")
     void createComment() throws Exception {
-        CommentCreateRequestModel request = new CommentCreateRequestModel();
+        CommentCreateRequest request = new CommentCreateRequest();
         request.setContent("content");
         request.setParentId(null);
         request.setPostId(UUID.fromString("d92e1999-fd40-4ed8-b72a-faa16b54da4f"));
@@ -39,7 +39,7 @@ class CommentControllerTest extends AbstractIntegrationTest {
     @Test
     @WithMockCustomUser("root")
     void createComment_withNonExistentPost_returnsCorrectStatusAndMessage() throws Exception {
-        CommentCreateRequestModel request = new CommentCreateRequestModel();
+        CommentCreateRequest request = new CommentCreateRequest();
         request.setContent("content");
         request.setParentId(null);
         request.setPostId(UUID.randomUUID());
@@ -55,7 +55,7 @@ class CommentControllerTest extends AbstractIntegrationTest {
     @Test
     @WithAnonymousUser
     void createComment_withAnonymousUser_returnsUnauthorizedStatus() throws Exception {
-        CommentCreateRequestModel request = new CommentCreateRequestModel();
+        CommentCreateRequest request = new CommentCreateRequest();
         request.setContent("content");
         request.setParentId(null);
         request.setPostId(UUID.fromString("d92e1999-fd40-4ed8-b72a-faa16b54da4f"));
@@ -133,11 +133,11 @@ class CommentControllerTest extends AbstractIntegrationTest {
     @Test
     @WithMockCustomUser("user")
     void edit_withCreatorUser_editsCommentAndReturnsCorrectStatusAndMessage() throws Exception {
-        CommentEditRequestModel requestModel = new CommentEditRequestModel();
+        CommentEditRequest requestModel = new CommentEditRequest();
         requestModel.setContent("content");
         requestModel.setCommentId(UUID.fromString("fb7315c8-65ec-417f-8b75-eabf98fd3eca"));
 
-        mockMvc.perform(put("/api/comment/edit")
+        mockMvc.perform(patch("/api/comment/edit")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestModel)))
                 .andExpect(status().isOk())
@@ -148,11 +148,11 @@ class CommentControllerTest extends AbstractIntegrationTest {
     @Test
     @WithMockCustomUser("moderator")
     void edit_withUserThatIsNotTheCreator_returnsCorrectStatusAndMessage() throws Exception {
-        CommentEditRequestModel requestModel = new CommentEditRequestModel();
+        CommentEditRequest requestModel = new CommentEditRequest();
         requestModel.setContent("content");
         requestModel.setCommentId(UUID.fromString("fb7315c8-65ec-417f-8b75-eabf98fd3eca"));
 
-        mockMvc.perform(put("/api/comment/edit")
+        mockMvc.perform(patch("/api/comment/edit")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestModel)))
                 .andExpect(status().isBadRequest())
@@ -163,11 +163,11 @@ class CommentControllerTest extends AbstractIntegrationTest {
     @Test
     @WithMockCustomUser("user")
     void edit_withNonExistentCommentId_returnsCorrectStatusAndMessage() throws Exception {
-        CommentEditRequestModel requestModel = new CommentEditRequestModel();
+        CommentEditRequest requestModel = new CommentEditRequest();
         requestModel.setContent("content");
         requestModel.setCommentId(UUID.randomUUID());
 
-        mockMvc.perform(put("/api/comment/edit")
+        mockMvc.perform(patch("/api/comment/edit")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestModel)))
                 .andExpect(status().isBadRequest())

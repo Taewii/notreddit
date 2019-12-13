@@ -10,6 +10,7 @@ import notreddit.domain.models.responses.post.PostEditResponseModel;
 import notreddit.domain.models.responses.post.PostListResponseModel;
 import notreddit.domain.models.responses.post.PostsResponseModel;
 import notreddit.repositories.*;
+import notreddit.services.implementations.PostServiceImpl;
 import notreddit.web.exceptions.AccessForbiddenException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -158,7 +159,7 @@ class PostServiceImplTest {
     @Test
     void allPosts_withExistingPosts_returnsCorrectlyMappedObjects() {
         Pageable pageable = PageRequest.of(0, 3, Sort.unsorted());
-        when(postRepository.findAll(any(Pageable.class))).thenReturn(createPosts(3, pageable));
+        when(postRepository.findAllPageable(any(Pageable.class))).thenReturn(createPosts(3, pageable));
 
         PostsResponseModel response = postService.allPosts(pageable);
         assertPostResponseModel(response);
@@ -167,7 +168,7 @@ class PostServiceImplTest {
     @Test
     void allPosts_withNoExistingPosts_returnsCorrectObject() {
         Pageable pageable = PageRequest.of(0, 3, Sort.unsorted());
-        when(postRepository.findAll(any(Pageable.class))).thenReturn(createPosts(0, pageable));
+        when(postRepository.findAllPageable(any(Pageable.class))).thenReturn(createPosts(0, pageable));
 
         PostsResponseModel response = postService.allPosts(pageable);
 
@@ -294,7 +295,7 @@ class PostServiceImplTest {
         when(postRepository.getPostsFromIdList(any(), any(Sort.class)))
                 .thenReturn(createPosts(3, pageable).getContent());
 
-        PostsResponseModel response = postService.getPostsByVoteChoice(user, "username", 1, pageable);
+        PostsResponseModel response = postService.findPostsByVoteChoice(user, "username", 1, pageable);
         assertPostResponseModel(response);
     }
 
@@ -310,7 +311,7 @@ class PostServiceImplTest {
         when(postRepository.getPostsFromIdList(any(), any(Sort.class)))
                 .thenReturn(createPosts(0, pageable).getContent());
 
-        PostsResponseModel response = postService.getPostsByVoteChoice(user, "username", 1, pageable);
+        PostsResponseModel response = postService.findPostsByVoteChoice(user, "username", 1, pageable);
 
         assertEquals(0, response.getTotal());
         assertTrue(response.getPosts().isEmpty());
@@ -324,7 +325,7 @@ class PostServiceImplTest {
         when(user.getUsername()).thenReturn("username");
 
         Assertions.assertThrows(AccessForbiddenException.class,
-                () -> postService.getPostsByVoteChoice(user, "otherUsername", 1, pageable));
+                () -> postService.findPostsByVoteChoice(user, "otherUsername", 1, pageable));
     }
 
     @Test

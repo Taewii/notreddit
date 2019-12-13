@@ -24,6 +24,27 @@ public class SubredditController {
     private final SubredditService subredditService;
 
     @PreAuthorize("isAuthenticated()")
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody @Valid SubredditCreateRequest request,
+                                    @AuthenticationPrincipal User creator) {
+        return subredditService.create(request, creator);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/subscribe")
+    public ResponseEntity<?> subscribe(@RequestParam String subreddit,
+                                       @AuthenticationPrincipal User user) {
+        return subredditService.subscribe(subreddit, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/unsubscribe")
+    public ResponseEntity<?> unsubscribe(@RequestParam String subreddit,
+                                         @AuthenticationPrincipal User user) {
+        return subredditService.unsubscribe(subreddit, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/check-subreddit-availability")
     public SubredditAvailabilityResponse checkNameAvailability(@RequestParam String title) {
         Boolean available = !subredditService.existsByTitle(title);
@@ -39,13 +60,6 @@ public class SubredditController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody @Valid SubredditCreateRequest request,
-                                    @AuthenticationPrincipal User creator) {
-        return subredditService.create(request, creator);
-    }
-
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/all")
     public List<String> getAllSubredditNames() {
         return subredditService.getAllAsStrings();
@@ -55,20 +69,6 @@ public class SubredditController {
     @GetMapping("/all-with-post-count")
     public List<SubredditWithPostsAndSubscribersCountResponse> getAllSubredditsWithPostCount() {
         return subredditService.getAllWithPostCount();
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/subscribe")
-    public ResponseEntity<?> subscribe(@RequestParam String subreddit,
-                                       @AuthenticationPrincipal User user) {
-        return subredditService.subscribe(subreddit, user);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/unsubscribe")
-    public ResponseEntity<?> unsubscribe(@RequestParam String subreddit,
-                                         @AuthenticationPrincipal User user) {
-        return subredditService.unsubscribe(subreddit, user);
     }
 
     @PreAuthorize("isAuthenticated()")

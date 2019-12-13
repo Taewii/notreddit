@@ -59,7 +59,11 @@ class AllUsers extends Component {
     return (
       <Select
         defaultValue={currentRole}
-        disabled={user.id === this.state.currentUser.id || user.roles[0] === 'ROOT'}
+        disabled={
+          user.id === this.state.currentUser.id
+          || user.roles[0] === 'ROOT'
+          || (!this.state.currentUser.roles.includes('ROOT') && user.roles[0] === 'ADMIN')
+        }
         className="users-dropdown"
         onChange={e => this.handleChange(user.id, currentRole, e)}>
         {optionList}

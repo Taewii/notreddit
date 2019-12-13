@@ -57,6 +57,10 @@ export const put = function (url, data) {
   return request('PUT', url, data);
 };
 
+export const patch = function (url, data) {
+  return request('PATCH', url, data);
+};
+
 export const remove = function (url, data) {
   return request('DELETE', url, data);
 };

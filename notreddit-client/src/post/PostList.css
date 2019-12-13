@@ -12,3 +12,7 @@
 .deleted-creator {
   color: red;
 }
+
+.ant-list-item-meta-title {
+  margin-top: 0;
+}

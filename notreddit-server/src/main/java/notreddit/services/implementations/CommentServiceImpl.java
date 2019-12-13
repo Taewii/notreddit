@@ -1,12 +1,12 @@
-package notreddit.services;
+package notreddit.services.implementations;
 
 import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.Comment;
 import notreddit.domain.entities.Mention;
 import notreddit.domain.entities.Post;
 import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.CommentCreateRequestModel;
-import notreddit.domain.models.requests.CommentEditRequestModel;
+import notreddit.domain.models.requests.CommentCreateRequest;
+import notreddit.domain.models.requests.CommentEditRequest;
 import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.domain.models.responses.comment.CommentListWithChildren;
 import notreddit.domain.models.responses.comment.CommentListWithReplyCount;
@@ -15,6 +15,7 @@ import notreddit.repositories.CommentRepository;
 import notreddit.repositories.MentionRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
+import notreddit.services.CommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,8 +35,7 @@ import java.util.stream.Collectors;
 
 import static notreddit.constants.ApiResponseMessages.*;
 import static notreddit.constants.ErrorMessages.ACCESS_FORBIDDEN;
-import static notreddit.constants.GeneralConstants.COMMENTS_BY_POST_CACHE;
-import static notreddit.constants.GeneralConstants.COMMENTS_BY_USERNAME;
+import static notreddit.constants.GeneralConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -53,9 +53,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = COMMENTS_BY_POST_CACHE, allEntries = true),
-            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true)
+            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true),
+            @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
+            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
     })
-    public ResponseEntity<?> create(CommentCreateRequestModel commentModel, User creator) {
+    public ResponseEntity<?> create(CommentCreateRequest commentModel, User creator) {
         Post post = postRepository.findById(commentModel.getPostId()).orElse(null);
         Comment parent = null;
 
@@ -98,33 +101,33 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Cacheable(value = COMMENTS_BY_POST_CACHE, keyGenerator = "pageableKeyGenerator")
-    public List<CommentListWithChildren> findAllFromPost(UUID postId, Pageable pageable) {
-        return commentRepository
-                .findByPostIdWithChildren(postId, pageable.getSort())
-                .parallelStream()
-                .map(c -> mapper.map(c, CommentListWithChildren.class))
-                .collect(Collectors.toList());
-    }
+    @Caching(evict = {
+            @CacheEvict(value = COMMENTS_BY_POST_CACHE, allEntries = true),
+            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true)
+    })
+    public ResponseEntity<?> edit(CommentEditRequest commentModel, User user) {
+        Comment comment = commentRepository.findById(commentModel.getCommentId()).orElse(null);
 
-    @Override
-    @Cacheable(value = COMMENTS_BY_USERNAME, keyGenerator = "pageableKeyGenerator")
-    public CommentsResponseModel findAllFromUsername(String username, Pageable pageable) {
-        Page<Comment> byCreatorUsername = commentRepository.findByCreatorUsername(username.toLowerCase(), pageable);
-        List<CommentListWithReplyCount> comments = byCreatorUsername.stream()
-                .map(c -> {
-                    CommentListWithReplyCount model = mapper.map(c, CommentListWithReplyCount.class);
-                    model.setReplies(c.getChildren().size());
-                    return model;
-                }).collect(Collectors.toList());
+        if (comment == null || !user.getUsername().equals(comment.getCreator().getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, NONEXISTENT_COMMENT_OR_NOT_CREATOR));
+        }
 
-        return new CommentsResponseModel(byCreatorUsername.getTotalElements(), comments);
+        comment.setContent(commentModel.getContent());
+        commentRepository.saveAndFlush(comment);
+
+        return ResponseEntity
+                .ok(new ApiResponse(true, SUCCESSFUL_COMMENT_EDITING));
     }
 
     @Override
     @Caching(evict = {
             @CacheEvict(value = COMMENTS_BY_POST_CACHE, allEntries = true),
-            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true)
+            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true),
+            @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
+            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
     })
     public ResponseEntity<?> delete(UUID commentId, User user) {
         Comment comment = commentRepository.findById(commentId).orElse(null);
@@ -162,24 +165,27 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = COMMENTS_BY_POST_CACHE, allEntries = true),
-            @CacheEvict(value = COMMENTS_BY_USERNAME, allEntries = true)
-    })
-    public ResponseEntity<?> edit(CommentEditRequestModel commentModel, User user) {
-        Comment comment = commentRepository.findById(commentModel.getCommentId()).orElse(null);
+    @Cacheable(value = COMMENTS_BY_POST_CACHE, keyGenerator = "pageableKeyGenerator")
+    public List<CommentListWithChildren> findAllFromPost(UUID postId, Pageable pageable) {
+        return commentRepository
+                .findByPostIdWithChildren(postId, pageable.getSort())
+                .parallelStream()
+                .map(c -> mapper.map(c, CommentListWithChildren.class))
+                .collect(Collectors.toList());
+    }
 
-        if (comment == null || !user.getUsername().equals(comment.getCreator().getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new ApiResponse(false, NONEXISTENT_COMMENT_OR_NOT_CREATOR));
-        }
+    @Override
+    @Cacheable(value = COMMENTS_BY_USERNAME, keyGenerator = "pageableKeyGenerator")
+    public CommentsResponseModel findAllFromUsername(String username, Pageable pageable) {
+        Page<Comment> byCreatorUsername = commentRepository.findByCreatorUsername(username.toLowerCase(), pageable);
+        List<CommentListWithReplyCount> comments = byCreatorUsername.stream()
+                .map(c -> {
+                    CommentListWithReplyCount model = mapper.map(c, CommentListWithReplyCount.class);
+                    model.setReplies(c.getChildren().size());
+                    return model;
+                }).collect(Collectors.toList());
 
-        comment.setContent(commentModel.getContent());
-        commentRepository.saveAndFlush(comment);
-
-        return ResponseEntity
-                .ok(new ApiResponse(true, SUCCESSFUL_COMMENT_EDITING));
+        return new CommentsResponseModel(byCreatorUsername.getTotalElements(), comments);
     }
 
     private Mention createMention(Comment comment, User receiver, User creator) {

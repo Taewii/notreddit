@@ -1,4 +1,4 @@
-import { get, post, put, remove } from '../util/APIUtils';
+import { get, post, remove, patch } from '../util/APIUtils';
 import { API_BASE_URL } from '../util/constants';
 
 const COMMENT_API_URL = API_BASE_URL + '/comment';
@@ -10,7 +10,7 @@ export function comment(data) {
 }
 
 export function editComment(data) {
-  return put(COMMENT_API_URL + '/edit', {
+  return patch(COMMENT_API_URL + '/edit', {
     body: JSON.stringify(data)
   });
 }

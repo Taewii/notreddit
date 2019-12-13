@@ -1,4 +1,4 @@
-package notreddit.services;
+package notreddit.services.implementations;
 
 import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.Mention;
@@ -7,6 +7,7 @@ import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.domain.models.responses.mention.MentionResponse;
 import notreddit.domain.models.responses.mention.MentionResponseModel;
 import notreddit.repositories.MentionRepository;
+import notreddit.services.MentionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,16 +34,6 @@ public class MentionServiceImpl implements MentionService {
     }
 
     @Override
-    public MentionResponse getMentionByUser(User user, Pageable pageable) {
-        Page<Mention> usersMentions = mentionRepository.getUsersMentions(user, pageable);
-        List<MentionResponseModel> mentions = usersMentions.stream()
-                .map(m -> mapper.map(m, MentionResponseModel.class))
-                .collect(Collectors.toList());
-
-        return new MentionResponse(usersMentions.getTotalElements(), mentions);
-    }
-
-    @Override
     public ResponseEntity<?> mark(boolean read, User user, UUID mentionId) {
         Mention mention = mentionRepository.findByIdWithReceiver(mentionId).orElse(null);
 
@@ -59,5 +50,15 @@ public class MentionServiceImpl implements MentionService {
         return ResponseEntity
                 .ok()
                 .body(new ApiResponse(true, message));
+    }
+
+    @Override
+    public MentionResponse getMentionByUser(User user, Pageable pageable) {
+        Page<Mention> usersMentions = mentionRepository.getUsersMentions(user, pageable);
+        List<MentionResponseModel> mentions = usersMentions.stream()
+                .map(m -> mapper.map(m, MentionResponseModel.class))
+                .collect(Collectors.toList());
+
+        return new MentionResponse(usersMentions.getTotalElements(), mentions);
     }
 }

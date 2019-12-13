@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class VoteRateLimitingInterceptor extends HandlerInterceptorAdapter {
 
-    // TODO: 22.11.2019 г.
     private static final boolean ENABLED = true;
     private static final int CALLS_PER_SECOND = 1;
 

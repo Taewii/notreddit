@@ -10,6 +10,7 @@ import notreddit.domain.models.responses.user.UserSummaryResponse;
 import notreddit.repositories.RoleRepository;
 import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
+import notreddit.services.implementations.UserServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

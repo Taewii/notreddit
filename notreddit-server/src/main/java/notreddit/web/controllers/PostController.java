@@ -33,6 +33,40 @@ public class PostController {
         return postService.create(request, creator);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/edit")
+    public ResponseEntity<?> edit(@Valid @ModelAttribute PostEditRequest request,
+                                  @AuthenticationPrincipal User user) {
+        return postService.edit(request, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delete(@RequestParam UUID postId,
+                                    @AuthenticationPrincipal User user) {
+        return postService.delete(postId, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/vote")
+    public ResponseEntity<?> vote(@RequestParam byte choice,
+                                  @RequestParam UUID postId,
+                                  @AuthenticationPrincipal User user) {
+        return voteService.voteForPostOrComment(choice, postId, null, user);
+    }
+
+    @PreAuthorize("permitAll()")
+    @GetMapping("/{id}")
+    public PostDetailsResponseModel findById(@PathVariable UUID id) {
+        return postService.findById(id);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/edit/{id}")
+    public PostEditResponseModel getPostEditDetails(@PathVariable UUID id) {
+        return postService.getPostEditDetails(id);
+    }
+
     @PreAuthorize("hasRole('MODERATOR')")
     @GetMapping("/all")
     public PostsResponseModel all(Pageable pageable) {
@@ -62,39 +96,5 @@ public class PostController {
     @GetMapping("/subreddit/{subreddit}")
     public PostsResponseModel findAllBySubreddit(@PathVariable String subreddit, Pageable pageable) {
         return postService.findAllBySubreddit(subreddit.toLowerCase(), pageable);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/edit/{id}")
-    public PostEditResponseModel getPostEditDetails(@PathVariable UUID id) {
-        return postService.getPostEditDetails(id);
-    }
-
-    @PreAuthorize("permitAll()")
-    @GetMapping("/{id}")
-    public PostDetailsResponseModel findById(@PathVariable UUID id) {
-        return postService.findById(id);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/vote")
-    public ResponseEntity<?> vote(@RequestParam byte choice,
-                                  @RequestParam UUID postId,
-                                  @AuthenticationPrincipal User user) {
-        return voteService.voteForPostOrComment(choice, postId, null, user);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/edit")
-    public ResponseEntity<?> edit(@Valid @ModelAttribute PostEditRequest request,
-                                  @AuthenticationPrincipal User user) {
-        return postService.edit(request, user);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> delete(@RequestParam UUID postId,
-                                    @AuthenticationPrincipal User user) {
-        return postService.delete(postId, user);
     }
 }

@@ -74,7 +74,7 @@ public class UserController {
     public PostsResponseModel getUpvotedPosts(@AuthenticationPrincipal User user,
                                               @PathVariable String username,
                                               Pageable pageable) {
-        return postService.getPostsByVoteChoice(user, username, 1, pageable);
+        return postService.findPostsByVoteChoice(user, username, 1, pageable);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -82,6 +82,6 @@ public class UserController {
     public PostsResponseModel getDownvotedPosts(@AuthenticationPrincipal User user,
                                                 @PathVariable String username,
                                                 Pageable pageable) {
-        return postService.getPostsByVoteChoice(user, username, -1, pageable);
+        return postService.findPostsByVoteChoice(user, username, -1, pageable);
     }
 }

@@ -1,8 +1,8 @@
 package notreddit.services;
 
 import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.CommentCreateRequestModel;
-import notreddit.domain.models.requests.CommentEditRequestModel;
+import notreddit.domain.models.requests.CommentCreateRequest;
+import notreddit.domain.models.requests.CommentEditRequest;
 import notreddit.domain.models.responses.comment.CommentListWithChildren;
 import notreddit.domain.models.responses.comment.CommentsResponseModel;
 import org.springframework.data.domain.Pageable;
@@ -13,13 +13,14 @@ import java.util.UUID;
 
 public interface CommentService {
 
-    ResponseEntity<?> create(CommentCreateRequestModel commentModel, User creator);
+    ResponseEntity<?> create(CommentCreateRequest commentModel, User creator);
+
+    ResponseEntity<?> edit(CommentEditRequest commentModel, User user);
+
+    ResponseEntity<?> delete(UUID commentId, User user);
 
     List<CommentListWithChildren> findAllFromPost(UUID postId, Pageable pageable);
 
     CommentsResponseModel findAllFromUsername(String username, Pageable pageable);
 
-    ResponseEntity<?> delete(UUID commentId, User user);
-
-    ResponseEntity<?> edit(CommentEditRequestModel commentModel, User user);
 }

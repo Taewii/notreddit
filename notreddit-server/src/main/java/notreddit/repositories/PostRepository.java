@@ -23,7 +23,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             "LEFT JOIN FETCH p.subreddit " +
             "LEFT JOIN FETCH p.comments ",
             countQuery = "SELECT COUNT(p) FROM Post p")
-    Page<Post> findAll(Pageable pageable);
+    Page<Post> findAllPageable(Pageable pageable);
 
     @Query(value = "SELECT DISTINCT p FROM Post p " +
             "JOIN FETCH p.creator c " +

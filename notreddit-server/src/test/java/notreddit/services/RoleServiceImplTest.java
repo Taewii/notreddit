@@ -3,6 +3,7 @@ package notreddit.services;
 import notreddit.domain.entities.Role;
 import notreddit.domain.enums.Authority;
 import notreddit.repositories.RoleRepository;
+import notreddit.services.implementations.RoleServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

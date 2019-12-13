@@ -15,15 +15,15 @@ public interface UserService extends UserDetailsService {
 
     UserDetails loadUserById(UUID id);
 
+    Boolean existsByUsername(String username);
+
+    Boolean existsByEmail(String email);
+
     ResponseEntity<?> register(SignUpRequest model);
 
     ResponseEntity<?> changeRole(ChangeRoleRequest request, User user);
 
     ResponseEntity<?> deleteUser(String userId, User user);
-
-    Boolean existsByUsername(String username);
-
-    Boolean existsByEmail(String email);
 
     List<UserSummaryResponse> findAllWithRoles();
 }

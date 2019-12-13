@@ -10,13 +10,11 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class CommentCreateRequestModel {
+public class CommentEditRequest {
 
-    @NotNull(message = ErrorMessages.BLANK_POST_ID)
-    private UUID postId;
+    @NotNull(message = ErrorMessages.BLANK_COMMENT_ID)
+    private UUID commentId;
 
     @NotBlank(message = ErrorMessages.BLANK_CONTENT)
     private String content;
-
-    private UUID parentId;
 }

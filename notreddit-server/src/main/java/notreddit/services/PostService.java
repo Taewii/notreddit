@@ -13,25 +13,25 @@ import java.util.UUID;
 
 public interface PostService {
 
-    PostsResponseModel allPosts(Pageable pageable);
-
     ResponseEntity<?> create(PostCreateRequest request, User creator);
 
-    PostDetailsResponseModel findById(UUID id);
-
-    PostsResponseModel findAllByUsername(String username, Pageable pageable);
-
-    PostsResponseModel defaultPosts(Pageable pageable);
-
-    PostsResponseModel getPostsByVoteChoice(User user, String username, int choice, Pageable pageable);
-
-    PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable);
+    ResponseEntity<?> edit(PostEditRequest request, User user);
 
     ResponseEntity<?> delete(UUID postId, User user);
 
-    PostsResponseModel subscribedPosts(User user, Pageable pageable);
+    PostDetailsResponseModel findById(UUID id);
 
     PostEditResponseModel getPostEditDetails(UUID id);
 
-    ResponseEntity<?> edit(PostEditRequest request, User user);
+    PostsResponseModel allPosts(Pageable pageable);
+
+    PostsResponseModel defaultPosts(Pageable pageable);
+
+    PostsResponseModel subscribedPosts(User user, Pageable pageable);
+
+    PostsResponseModel findAllByUsername(String username, Pageable pageable);
+
+    PostsResponseModel findPostsByVoteChoice(User user, String username, int choice, Pageable pageable);
+
+    PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable);
 }

@@ -8,6 +8,7 @@ import notreddit.domain.entities.User;
 import notreddit.domain.models.responses.mention.MentionResponse;
 import notreddit.domain.models.responses.mention.MentionResponseModel;
 import notreddit.repositories.MentionRepository;
+import notreddit.services.implementations.MentionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;

@@ -7,6 +7,7 @@ import notreddit.domain.models.requests.SubredditCreateRequest;
 import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
+import notreddit.services.implementations.SubredditServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

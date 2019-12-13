@@ -1,4 +1,4 @@
-package notreddit.services;
+package notreddit.services.implementations;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +11,7 @@ import notreddit.domain.models.responses.post.PostVoteUserChoiceResponse;
 import notreddit.repositories.CommentRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
+import notreddit.services.VoteService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -85,8 +86,7 @@ public class VoteServiceImpl implements VoteService {
 
             voteRepository.delete(vote);
             return ResponseEntity
-                    .ok()
-                    .body(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_VOTE_DELETION));
+                    .ok(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_VOTE_DELETION));
         }
 
         // if user hasn't yet voted for the post/comment, create a new vote, else, update choice

@@ -6,14 +6,15 @@ import notreddit.domain.entities.Post;
 import notreddit.domain.entities.Role;
 import notreddit.domain.entities.User;
 import notreddit.domain.enums.Authority;
-import notreddit.domain.models.requests.CommentCreateRequestModel;
-import notreddit.domain.models.requests.CommentEditRequestModel;
+import notreddit.domain.models.requests.CommentCreateRequest;
+import notreddit.domain.models.requests.CommentEditRequest;
 import notreddit.domain.models.responses.comment.CommentListWithChildren;
 import notreddit.domain.models.responses.comment.CommentsResponseModel;
 import notreddit.repositories.CommentRepository;
 import notreddit.repositories.MentionRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;
+import notreddit.services.implementations.CommentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
@@ -86,7 +87,7 @@ class CommentServiceImplTest {
         when(post.getCreator()).thenReturn(user);
         Comment comment = mock(Comment.class);
 
-        CommentCreateRequestModel model = mock(CommentCreateRequestModel.class);
+        CommentCreateRequest model = mock(CommentCreateRequest.class);
         UUID parentId = UUID.randomUUID();
         when(model.getParentId()).thenReturn(parentId);
         when(model.getPostId()).thenReturn(UUID.randomUUID());
@@ -109,7 +110,7 @@ class CommentServiceImplTest {
         Post post = mock(Post.class);
         when(post.getCreator()).thenReturn(user);
 
-        CommentCreateRequestModel model = mock(CommentCreateRequestModel.class);
+        CommentCreateRequest model = mock(CommentCreateRequest.class);
         when(model.getParentId()).thenReturn(null);
         when(model.getPostId()).thenReturn(UUID.randomUUID());
 
@@ -125,7 +126,7 @@ class CommentServiceImplTest {
 
     @Test
     void create_withNoSuchPost_shouldDoNothing() {
-        CommentCreateRequestModel model = mock(CommentCreateRequestModel.class);
+        CommentCreateRequest model = mock(CommentCreateRequest.class);
         when(model.getPostId()).thenReturn(UUID.randomUUID());
         when(postRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
         commentService.create(model, new User());
@@ -329,7 +330,7 @@ class CommentServiceImplTest {
         Comment comment = mock(Comment.class);
         when(comment.getCreator()).thenReturn(user);
 
-        CommentEditRequestModel request = new CommentEditRequestModel();
+        CommentEditRequest request = new CommentEditRequest();
         request.setCommentId(UUID.randomUUID());
         request.setContent("new content");
 
@@ -343,7 +344,7 @@ class CommentServiceImplTest {
 
     @Test
     void edit_withNonExistingComment_shouldDoNothing() {
-        CommentEditRequestModel request = new CommentEditRequestModel();
+        CommentEditRequest request = new CommentEditRequest();
         request.setCommentId(UUID.randomUUID());
         request.setContent("new content");
         when(commentRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
@@ -364,7 +365,7 @@ class CommentServiceImplTest {
         Comment comment = mock(Comment.class);
         when(comment.getCreator()).thenReturn(creator);
 
-        CommentEditRequestModel request = new CommentEditRequestModel();
+        CommentEditRequest request = new CommentEditRequest();
         request.setCommentId(UUID.randomUUID());
 
         when(commentRepository.findById(any(UUID.class))).thenReturn(Optional.of(comment));

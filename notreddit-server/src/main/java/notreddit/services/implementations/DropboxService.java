@@ -1,4 +1,4 @@
-package notreddit.services;
+package notreddit.services.implementations;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
@@ -6,6 +6,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.sharing.SharedLinkMetadata;
 import lombok.extern.slf4j.Slf4j;
+import notreddit.services.CloudStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

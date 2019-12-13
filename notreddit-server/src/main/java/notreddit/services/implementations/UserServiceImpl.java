@@ -1,4 +1,4 @@
-package notreddit.services;
+package notreddit.services.implementations;
 
 import lombok.RequiredArgsConstructor;
 import notreddit.constants.GeneralConstants;
@@ -13,6 +13,7 @@ import notreddit.domain.models.responses.user.UserSummaryResponse;
 import notreddit.repositories.RoleRepository;
 import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;
+import notreddit.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -48,6 +49,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @Cacheable(value = USERS_CACHE, key = "#id")
+    public UserDetails loadUserById(UUID id) {
+        return userRepository.findByIdWithRoles(id).orElseThrow(NoSuchElementException::new);
+    }
+
+    @Override
+    @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
         return userRepository.findByUsernameOrEmailIgnoreCase(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() ->
@@ -56,10 +64,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    @Cacheable(value = USERS_CACHE, key = "#id")
-    public UserDetails loadUserById(UUID id) {
-        return userRepository.findByIdWithRoles(id).orElseThrow(NoSuchElementException::new);
+    public Boolean existsByUsername(String username) {
+        return userRepository.existsByUsernameIgnoreCase(username);
+    }
+
+    @Override
+    public Boolean existsByEmail(String email) {
+        return userRepository.existsByEmailIgnoreCase(email);
     }
 
     @Override
@@ -169,19 +180,8 @@ public class UserServiceImpl implements UserService {
         userToDelete.setEnabled(false);
         userRepository.saveAndFlush(userToDelete);
         return ResponseEntity
-                .ok()
-                .body(new ApiResponse(true,
+                .ok(new ApiResponse(true,
                         String.format(SUCCESSFUL_USER_DELETION, userToDelete.getUsername())));
-    }
-
-    @Override
-    public Boolean existsByUsername(String username) {
-        return userRepository.existsByUsernameIgnoreCase(username);
-    }
-
-    @Override
-    public Boolean existsByEmail(String email) {
-        return userRepository.existsByEmailIgnoreCase(email);
     }
 
     @Override

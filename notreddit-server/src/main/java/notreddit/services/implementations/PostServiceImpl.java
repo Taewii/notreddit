@@ -1,4 +1,4 @@
-package notreddit.services;
+package notreddit.services.implementations;
 
 import lombok.RequiredArgsConstructor;
 import notreddit.constants.ApiResponseMessages;
@@ -16,6 +16,9 @@ import notreddit.domain.models.responses.post.PostEditResponseModel;
 import notreddit.domain.models.responses.post.PostListResponseModel;
 import notreddit.domain.models.responses.post.PostsResponseModel;
 import notreddit.repositories.*;
+import notreddit.services.CloudStorage;
+import notreddit.services.PostService;
+import notreddit.services.ThumbnailService;
 import notreddit.web.exceptions.AccessForbiddenException;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -55,110 +58,6 @@ public class PostServiceImpl implements PostService {
     private final ModelMapper mapper;
 
     @Override
-    @Cacheable(value = POSTS_BY_ID_CACHE, key = "#id")
-    public PostDetailsResponseModel findById(UUID id) {
-        Post post = postRepository.findByIdEager(id).orElseThrow(NoSuchElementException::new);
-        return mapper.map(post, PostDetailsResponseModel.class);
-    }
-
-    @Override
-    public PostEditResponseModel getPostEditDetails(UUID id) {
-        Post post = postRepository.findByIdWithFileAnSubreddit(id).orElseThrow(NoSuchElementException::new);
-        return mapper.map(post, PostEditResponseModel.class);
-    }
-
-    @Override
-    public PostsResponseModel allPosts(Pageable pageable) {
-        Page<Post> allPosts = postRepository.findAll(pageable);
-        return getPostsResponseModel(allPosts);
-    }
-
-    @Override
-    @Cacheable(value = POSTS_BY_USERNAME_CACHE, keyGenerator = "pageableKeyGenerator")
-    public PostsResponseModel findAllByUsername(String username, Pageable pageable) {
-        Page<Post> allByUsername = postRepository.findAllByUsername(username.toLowerCase(), pageable);
-        return getPostsResponseModel(allByUsername);
-    }
-
-    @Override
-    @Cacheable(value = POSTS_BY_SUBREDDIT_CACHE, keyGenerator = "pageableKeyGenerator")
-    public PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable) {
-        Page<UUID> allBySubredditTitle = postRepository.getPostIdsBySubredditTitle(subreddit.toLowerCase(), pageable);
-        List<Post> postsBySubreddit = new ArrayList<>();
-
-        // if I call the method with an empty array the IN statement in the sql throws an exception
-        if (allBySubredditTitle.getTotalElements() > 0) {
-            postsBySubreddit = postRepository.getPostsFromIdList(allBySubredditTitle.getContent(), pageable.getSort());
-        }
-
-        return getPostsResponseModel(allBySubredditTitle.getTotalElements(), postsBySubreddit);
-    }
-
-    @Override
-    @Cacheable(value = SUBSCRIBED_POSTS_CACHE, keyGenerator = "pageableKeyGenerator")
-    public PostsResponseModel subscribedPosts(User user, Pageable pageable) {
-        user = userRepository.getWithSubscriptions(user);
-        /* Using two queries to avoid
-         * Hibernate “HHH000104: firstResult/maxResults specified with collection fetch; applying in memory!”
-         * warning message, taken from https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
-         */
-        Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(user.getSubscriptions(), pageable);
-        List<Post> subscribedPosts = new ArrayList<>();
-
-        if (!subscribedPostsIds.isEmpty()) {
-            subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent(), pageable.getSort());
-        }
-
-        return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
-    }
-
-    @Override
-    public PostsResponseModel defaultPosts(Pageable pageable) {
-        Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(GeneralConstants.DEFAULT_SUBREDDITS);
-        Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(defaultSubreddits, pageable);
-        List<Post> subscribedPosts = new ArrayList<>();
-
-        if (!subscribedPostsIds.isEmpty()) {
-            subscribedPosts = postRepository.getPostsFromIdList(subscribedPostsIds.getContent(), pageable.getSort());
-        }
-
-        return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
-    }
-
-    @Override
-    public PostsResponseModel getPostsByVoteChoice(User user, String username, int choice, Pageable pageable) {
-        if (!user.getUsername().equalsIgnoreCase(username)) {
-            throw new AccessForbiddenException(ErrorMessages.ACCESS_FORBIDDEN);
-        }
-
-        PageRequest nativeQuerySorting = (PageRequest) pageable;
-
-        // changing the sorting param from createdOn -> created_on, cus its a native query
-        if (pageable.getSort().isSorted()) {
-            Sort.Order createdOn = pageable.getSort().getOrderFor("createdOn");
-            if (createdOn != null) {
-                Sort createdOnNativeQuery = Sort.by("created_on");
-                if (createdOn.getDirection().isAscending()) {
-                    createdOnNativeQuery = createdOnNativeQuery.ascending();
-                } else {
-                    createdOnNativeQuery = createdOnNativeQuery.descending();
-                }
-                nativeQuerySorting = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), createdOnNativeQuery);
-            }
-        }
-
-        Page<String> postIdsByVoteChoice = postRepository.findPostIdsByUserAndVoteChoice(user.getId(), (byte) choice, nativeQuerySorting);
-        List<UUID> postIds = postIdsByVoteChoice.getContent().stream().map(UUID::fromString).collect(Collectors.toList());
-        List<Post> posts = new ArrayList<>();
-
-        if (!postIds.isEmpty()) {
-            posts = postRepository.getPostsFromIdList(postIds, pageable.getSort());
-        }
-
-        return getPostsResponseModel(postIdsByVoteChoice.getTotalElements(), posts);
-    }
-
-    @Override
     @Caching(evict = {
             @CacheEvict(value = POSTS_BY_ID_CACHE, allEntries = true),
             @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
@@ -179,13 +78,13 @@ public class PostServiceImpl implements PostService {
         post.setSubreddit(subreddit);
         post.setCreatedOn(LocalDateTime.now());
 
-        if (request.getFile() == null && request.getUrl().isEmpty()) {
+        if (request.getFile() == null && request.getUrl().isEmpty()) { // text upload
             return createPostWithoutFiles(post);
-        } else if (request.getFile() != null && request.getUrl().isEmpty()) {
+        } else if (request.getFile() != null && request.getUrl().isEmpty()) { // file upload
             return createPostWithUploadedFile(request, post);
-        } else if (request.getFile() == null && !request.getUrl().isEmpty()) {
+        } else if (request.getFile() == null && !request.getUrl().isEmpty()) { // url upload
             return createPostWithWebUrl(request, post);
-        } else {
+        } else { // file and url -> not allowed
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, ApiResponseMessages.ONLY_ONE_UPLOADED_METHOD_ALLOWED));
@@ -218,13 +117,14 @@ public class PostServiceImpl implements PostService {
         post.setContent(request.getContent());
         post.setSubreddit(subreddit);
 
+        // no post, url, but post has existing file uploaded
         if (request.getFile() == null && request.getUrl().isEmpty() && !request.isHasUploadedFile()) {
             post.setFile(null);
-        } else if (request.getFile() != null && request.getUrl().isEmpty()) {
+        } else if (request.getFile() != null && request.getUrl().isEmpty()) { // file upload
             editPostWithUploadedFile(request, post);
-        } else if (request.getFile() == null && !request.getUrl().isEmpty()) {
+        } else if (request.getFile() == null && !request.getUrl().isEmpty()) { // url upload
             editPostWithWebUrl(request, post);
-        } else if (request.getFile() != null && !request.getUrl().isEmpty()) {
+        } else if (request.getFile() != null && !request.getUrl().isEmpty()) { // file and url -> not allowed
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, ApiResponseMessages.ONLY_ONE_UPLOADED_METHOD_ALLOWED));
@@ -281,6 +181,78 @@ public class PostServiceImpl implements PostService {
                 .ok(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_POST_DELETION));
     }
 
+    @Override
+    @Cacheable(value = POSTS_BY_ID_CACHE, key = "#id")
+    public PostDetailsResponseModel findById(UUID id) {
+        Post post = postRepository.findByIdEager(id).orElseThrow(NoSuchElementException::new);
+        return mapper.map(post, PostDetailsResponseModel.class);
+    }
+
+    @Override
+    public PostEditResponseModel getPostEditDetails(UUID id) {
+        Post post = postRepository.findByIdWithFileAnSubreddit(id).orElseThrow(NoSuchElementException::new);
+        return mapper.map(post, PostEditResponseModel.class);
+    }
+
+    @Override
+    public PostsResponseModel allPosts(Pageable pageable) {
+        Page<Post> allPosts = postRepository.findAllPageable(pageable);
+        return getPostsResponseModel(allPosts);
+    }
+
+    @Override
+    public PostsResponseModel defaultPosts(Pageable pageable) {
+        Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(GeneralConstants.DEFAULT_SUBREDDITS);
+        Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(defaultSubreddits, pageable);
+        List<Post> subscribedPosts = getPostsOrEmptyList(subscribedPostsIds.getContent(), pageable);
+
+        return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
+    }
+
+    @Override
+    @Cacheable(value = SUBSCRIBED_POSTS_CACHE, keyGenerator = "pageableKeyGenerator")
+    public PostsResponseModel subscribedPosts(User user, Pageable pageable) {
+        user = userRepository.getWithSubscriptions(user);
+        /* Using two queries to avoid
+         * Hibernate “HHH000104: firstResult/maxResults specified with collection fetch; applying in memory!”
+         * warning message, taken from https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
+         */
+        Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(user.getSubscriptions(), pageable);
+        List<Post> subscribedPosts = getPostsOrEmptyList(subscribedPostsIds.getContent(), pageable);
+
+        return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
+    }
+
+    @Override
+    @Cacheable(value = POSTS_BY_USERNAME_CACHE, keyGenerator = "pageableKeyGenerator")
+    public PostsResponseModel findAllByUsername(String username, Pageable pageable) {
+        Page<Post> allByUsername = postRepository.findAllByUsername(username.toLowerCase(), pageable);
+        return getPostsResponseModel(allByUsername);
+    }
+
+    @Override
+    @Cacheable(value = POSTS_BY_SUBREDDIT_CACHE, keyGenerator = "pageableKeyGenerator")
+    public PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable) {
+        Page<UUID> allBySubredditTitle = postRepository.getPostIdsBySubredditTitle(subreddit.toLowerCase(), pageable);
+        List<Post> postsBySubreddit = getPostsOrEmptyList(allBySubredditTitle.getContent(), pageable);
+
+        return getPostsResponseModel(allBySubredditTitle.getTotalElements(), postsBySubreddit);
+    }
+
+    @Override
+    public PostsResponseModel findPostsByVoteChoice(User user, String username, int choice, Pageable pageable) {
+        if (!user.getUsername().equalsIgnoreCase(username)) {
+            throw new AccessForbiddenException(ErrorMessages.ACCESS_FORBIDDEN);
+        }
+
+        Pageable pageRequest = convertToNativePageRequest(pageable);
+        Page<String> postIdsByVoteChoice = postRepository.findPostIdsByUserAndVoteChoice(user.getId(), (byte) choice, pageRequest);
+        List<UUID> postIds = postIdsByVoteChoice.getContent().stream().map(UUID::fromString).collect(Collectors.toList());
+        List<Post> posts = getPostsOrEmptyList(postIds, pageable);
+
+        return getPostsResponseModel(postIdsByVoteChoice.getTotalElements(), posts);
+    }
+
     private ResponseEntity<?> createPostWithoutFiles(Post post) {
         postRepository.saveAndFlush(post);
         return getCreatedResponseEntityWithPath();
@@ -332,6 +304,8 @@ public class PostServiceImpl implements PostService {
             String fileUrl = params.get("url").toString();
 
             file.setUrl(fileUrl);
+
+            // if file is not an image -> create thumbnail, else use the image
             if (params.get("contentType").toString().contains("image")) {
                 file.setThumbnailUrl(fileUrl);
             } else {
@@ -391,5 +365,26 @@ public class PostServiceImpl implements PostService {
                 .collect(Collectors.toList());
 
         return new PostsResponseModel(total, mappedPosts);
+    }
+
+    private Pageable convertToNativePageRequest(Pageable pageable) {
+        if (pageable.getSort().isSorted()) {
+            Sort.Order createdOn = pageable.getSort().getOrderFor("createdOn");
+            if (createdOn != null) {
+                Sort createdOnNativeQuery = Sort.by("created_on");
+                if (createdOn.getDirection().isAscending()) {
+                    createdOnNativeQuery = createdOnNativeQuery.ascending();
+                } else {
+                    createdOnNativeQuery = createdOnNativeQuery.descending();
+                }
+                return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), createdOnNativeQuery);
+            }
+        }
+        return pageable;
+    }
+
+    private List<Post> getPostsOrEmptyList(List<UUID> postIds, Pageable pageable) {
+        if (postIds.isEmpty()) return new ArrayList<>();
+        return postRepository.getPostsFromIdList(postIds, pageable.getSort());
     }
 }
