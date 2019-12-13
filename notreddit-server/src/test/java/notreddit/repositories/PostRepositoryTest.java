@@ -134,4 +134,15 @@ class PostRepositoryTest {
         assertNotNull(post.get().getComments());
         assertNotNull(post.get().getCreator());
     }
+
+    @Test
+    void findByIdWithFileAnSubreddit() {
+        UUID postId = UUID.fromString("d92e1999-fd40-4ed8-b72a-faa16b54da4f");
+        Optional<Post> post = postRepository.findByIdWithFileAnSubreddit(postId);
+
+        assertTrue(post.isPresent());
+        assertNotNull(post.get().getSubreddit());
+        assertNotNull(post.get().getCreator());
+        assertNotNull(post.get().getFile());
+    }
 }

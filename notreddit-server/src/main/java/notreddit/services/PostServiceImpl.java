@@ -9,8 +9,10 @@ import notreddit.domain.entities.Post;
 import notreddit.domain.entities.Subreddit;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.PostCreateRequest;
+import notreddit.domain.models.requests.PostEditRequest;
 import notreddit.domain.models.responses.api.ApiResponse;
 import notreddit.domain.models.responses.post.PostDetailsResponseModel;
+import notreddit.domain.models.responses.post.PostEditResponseModel;
 import notreddit.domain.models.responses.post.PostListResponseModel;
 import notreddit.domain.models.responses.post.PostsResponseModel;
 import notreddit.repositories.*;
@@ -57,6 +59,12 @@ public class PostServiceImpl implements PostService {
     public PostDetailsResponseModel findById(UUID id) {
         Post post = postRepository.findByIdEager(id).orElseThrow(NoSuchElementException::new);
         return mapper.map(post, PostDetailsResponseModel.class);
+    }
+
+    @Override
+    public PostEditResponseModel getPostEditDetails(UUID id) {
+        Post post = postRepository.findByIdWithFileAnSubreddit(id).orElseThrow(NoSuchElementException::new);
+        return mapper.map(post, PostEditResponseModel.class);
     }
 
     @Override
@@ -191,6 +199,49 @@ public class PostServiceImpl implements PostService {
             @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
             @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
     })
+    public ResponseEntity<?> edit(PostEditRequest request, User user) {
+        Post post = postRepository.findByIdWithFileAnSubreddit(request.getPostId()).orElse(null);
+        if (post == null || !post.getCreator().getUsername().equalsIgnoreCase(user.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, ApiResponseMessages.NONEXISTENT_POST_OR_NOT_CREATOR));
+        }
+
+        Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(request.getSubreddit()).orElse(null);
+        if (subreddit == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, ApiResponseMessages.NONEXISTENT_SUBREDDIT));
+        }
+
+        post.setTitle(request.getTitle());
+        post.setContent(request.getContent());
+        post.setSubreddit(subreddit);
+
+        if (request.getFile() == null && request.getUrl().isEmpty() && !request.isHasUploadedFile()) {
+            post.setFile(null);
+        } else if (request.getFile() != null && request.getUrl().isEmpty()) {
+            editPostWithUploadedFile(request, post);
+        } else if (request.getFile() == null && !request.getUrl().isEmpty()) {
+            editPostWithWebUrl(request, post);
+        } else if (request.getFile() != null && !request.getUrl().isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, ApiResponseMessages.ONLY_ONE_UPLOADED_METHOD_ALLOWED));
+        }
+
+        postRepository.saveAndFlush(post);
+        return ResponseEntity
+                .ok(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_POST_EDITION));
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = POSTS_BY_ID_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
+            @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
+            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
+    })
     public ResponseEntity<?> delete(UUID postId, User user) {
         Post post = postRepository.findByIdWithCreatorAndComments(postId).orElse(null);
 
@@ -259,6 +310,37 @@ public class PostServiceImpl implements PostService {
         postRepository.saveAndFlush(post);
 
         return getCreatedResponseEntityWithPath();
+    }
+
+    private void editPostWithWebUrl(PostEditRequest request, Post post) {
+        File file = new File();
+
+        if (post.getFile() != null) {
+            file = post.getFile();
+        } else {
+            post.addFile(file);
+        }
+
+        file.setUrl(request.getUrl());
+        file.setThumbnailUrl(thumbnailService.generateThumbnailUrl(request.getUrl()));
+    }
+
+    private void editPostWithUploadedFile(PostEditRequest request, Post post) {
+        if (post.getFile() != null) {
+            File file = post.getFile();
+            Map<String, Object> params = cloudStorage.updateFile(request.getFile(), post.getFile().getUrl());
+            String fileUrl = params.get("url").toString();
+
+            file.setUrl(fileUrl);
+            if (params.get("contentType").toString().contains("image")) {
+                file.setThumbnailUrl(fileUrl);
+            } else {
+                file.setThumbnailUrl(thumbnailService.generateThumbnailUrl(fileUrl));
+            }
+        } else {
+            File file = uploadFile(request.getFile());
+            post.addFile(file);
+        }
     }
 
     private File uploadFile(MultipartFile multipartFile) {

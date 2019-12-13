@@ -216,9 +216,11 @@ const actions = (post, currentUser, deletePost, userIsModerator) => {
 
   if (post.creatorUsername === currentUser) {
     const editAndDelete = [
-      // <span key="edit-comment">
-      //   <IconText type="edit" text="Edit" />
-      // </span>,
+      <span key="edit-comment">
+        <Link style={{ color: "inherit" }} to={`/post/edit/${post.id}`}>
+          <IconText type="edit" text="Edit" />
+        </Link>
+      </span>,
       <Popconfirm
         title="Are you sure you want to delete this post?"
         onConfirm={deletePost.bind(this, post.id)}

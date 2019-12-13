@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './PostDetails.css';
 
+import { Link } from 'react-router-dom';
 import { List, Icon, Tooltip, Button, Form, Input, Comment, Avatar, Modal, Popconfirm, Select } from 'antd';
 
 import { errorNotification, successNotification } from '../util/notifications'
@@ -250,9 +251,11 @@ class PostDetails extends Component {
 
     if (this.currentUserUsername === post.creatorUsername) {
       const editAndDelete = [
-        // <span key="edit-comment" onClick={() => this.props.history.push(`/post/edit/${postId}`)}>
-        //   <IconText type="edit" text="Edit" />
-        // </span>,
+        <span key="edit-comment">
+          <Link style={{ color: "inherit" }} to={`/post/edit/${postId}`}>
+            <IconText type="edit" text="Edit" />
+          </Link>
+        </span>,
         <Popconfirm
           title="Are you sure you want to delete this post?"
           onConfirm={this.deletePost.bind(this, postId)}

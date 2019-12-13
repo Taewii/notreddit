@@ -35,6 +35,7 @@ import SubredditCreate from '../subreddit/SubredditCreate';
 import SubredditPosts from '../subreddit/SubredditPosts';
 import SubredditList from '../subreddit/SubredditList';
 import CreatePost from '../post/CreatePost';
+import EditPost from '../post/EditPost';
 import PostList from '../post/PostList';
 import PostDetails from '../post/PostDetails';
 import MentionList from '../mention/MentionList';
@@ -181,11 +182,16 @@ class App extends Component {
                 authenticated={isAuthenticated}
                 component={Chat}
               />
-              <Route path="/post/:id" component={(props) =>
+              <Route exact path="/post/:id" component={(props) =>
                 <PostDetails
                   isAuthenticated={isAuthenticated}
                   currentUser={currentUser}
                   {...props} />}
+              />
+              <PrivateRoute
+                path="/post/edit/:id"
+                authenticated={isAuthenticated}
+                component={EditPost}
               />
               <Route exact path="/home" component={(props) =>
                 <PostList

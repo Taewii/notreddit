@@ -50,7 +50,7 @@ class DropboxServiceTest {
                 new FileMetadata("name", "id", new Date(), new Date(), "123456789", 1L);
 
         UploadBuilder uploadBuilder = mock(UploadBuilder.class, RETURNS_DEEP_STUBS);
-        when(files.uploadBuilder(path)).thenReturn(uploadBuilder);
+        when(files.uploadBuilder(any(String.class))).thenReturn(uploadBuilder);
         when(uploadBuilder.uploadAndFinish(inputStream)).thenReturn(fileMetadata);
 
         SharedLinkMetadata sharedLinkMetadata = SharedLinkMetadata.
@@ -62,13 +62,13 @@ class DropboxServiceTest {
 
         Map<String, Object> response = dropboxService.uploadFileAndGetParams(file);
 
-        verify(files).uploadBuilder(path);
+        verify(files).uploadBuilder(any(String.class));
         verify(uploadBuilder).uploadAndFinish(any(ByteArrayInputStream.class));
-        verify(sharing).createSharedLinkWithSettings(path);
+        verify(sharing).createSharedLinkWithSettings(any(String.class));
 
         assertEquals(2, response.size());
         assertEquals("image/jpeg", response.get("contentType"));
-        assertEquals("url&raw=1", response.get("url"));
+        assertEquals("null&raw=1", response.get("url"));
     }
 
     @Test
@@ -86,7 +86,7 @@ class DropboxServiceTest {
                 new FileMetadata("name", "id", new Date(), new Date(), "123456789", 1L);
 
         UploadBuilder uploadBuilder = mock(UploadBuilder.class, RETURNS_DEEP_STUBS);
-        when(files.uploadBuilder(path)).thenReturn(uploadBuilder);
+        when(files.uploadBuilder(any(String.class))).thenReturn(uploadBuilder);
         when(uploadBuilder.uploadAndFinish(inputStream)).thenReturn(fileMetadata);
 
         SharedLinkMetadata sharedLinkMetadata = SharedLinkMetadata.
@@ -98,13 +98,13 @@ class DropboxServiceTest {
 
         Map<String, Object> response = dropboxService.updateFile(file, "fileId");
 
-        verify(files).uploadBuilder(path);
+        verify(files).uploadBuilder(any(String.class));
         verify(uploadBuilder).uploadAndFinish(any(ByteArrayInputStream.class));
-        verify(sharing).createSharedLinkWithSettings(path);
+        verify(sharing).createSharedLinkWithSettings(any(String.class));
 
         assertEquals(2, response.size());
         assertEquals("image/jpeg", response.get("contentType"));
-        assertEquals("url&raw=1", response.get("url"));
+        assertEquals("null&raw=1", response.get("url"));
     }
 
     @Test

@@ -11,8 +11,21 @@ export function create(createRequest) {
   });
 }
 
+export function edit(createRequest) {
+  return requestMultipart({
+    url: POST_API_URL + '/edit',
+    method: 'PATCH',
+    body: createRequest
+  });
+}
+
 export function findById(id) {
   const url = `${POST_API_URL}/${id}`;
+  return get(url);
+}
+
+export function findByIdForEditing(id) {
+  const url = `${POST_API_URL}/edit/${id}`;
   return get(url);
 }
 

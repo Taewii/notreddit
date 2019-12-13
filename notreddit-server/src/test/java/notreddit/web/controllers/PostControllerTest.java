@@ -4,13 +4,13 @@ import notreddit.web.controllers.utils.AbstractIntegrationTest;
 import notreddit.web.controllers.utils.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static notreddit.constants.ApiResponseMessages.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,6 +63,81 @@ class PostControllerTest extends AbstractIntegrationTest {
                 .param("title", "title")
                 .param("content", "content")
                 .param("subreddit", "nonexistent")
+                .param("url", ""))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockCustomUser("root")
+    void edit_withNoFile_editsPostAndReturnsCorrectStatusAndMessage() throws Exception {
+        String postId = "d007bf28-190b-4123-ae10-69b8e8bd226f";
+
+        mockMvc.perform(patch("/api/post/edit")
+                .param("postId", postId)
+                .param("title", "title")
+                .param("content", "content")
+                .param("subreddit", "aww")
+                .param("url", ""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.message", is(SUCCESSFUL_POST_EDITION)));
+    }
+
+    @Test
+    @WithMockCustomUser("root")
+    void edit_withUrlFile_editsPostAndReturnsCorrectStatusAndMessage() throws Exception {
+        String postId = "d007bf28-190b-4123-ae10-69b8e8bd226f";
+
+        mockMvc.perform(patch("/api/post/edit")
+                .param("postId", postId)
+                .param("title", "title")
+                .param("content", "content")
+                .param("subreddit", "aww")
+                .param("url", "https://url.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.message", is(SUCCESSFUL_POST_EDITION)));
+    }
+
+    @Test
+    @WithMockCustomUser("user")
+    void edit_withUserThatIsNotTheCreator_returnsCorrectStatusAndMessage() throws Exception {
+        String postId = "d007bf28-190b-4123-ae10-69b8e8bd226f";
+        mockMvc.perform(patch("/api/post/edit")
+                .param("postId", postId)
+                .param("title", "title")
+                .param("content", "content")
+                .param("subreddit", "aww")
+                .param("url", ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.message", is(NONEXISTENT_POST_OR_NOT_CREATOR)));
+    }
+
+    @Test
+    @WithMockCustomUser("root")
+    void edit_withNonExistentSubreddit_returnsCorrectStatusAndMessage() throws Exception {
+        String postId = "d007bf28-190b-4123-ae10-69b8e8bd226f";
+        mockMvc.perform(patch("/api/post/edit")
+                .param("postId", postId)
+                .param("title", "title")
+                .param("content", "content")
+                .param("subreddit", "nonexistent")
+                .param("url", ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.message", is(NONEXISTENT_SUBREDDIT)));
+    }
+
+    @Test
+    @WithAnonymousUser
+    void edit_withAnonymousUser_returnsCorrectStatusAndMessage() throws Exception {
+        String postId = "d007bf28-190b-4123-ae10-69b8e8bd226f";
+        mockMvc.perform(patch("/api/post/edit")
+                .param("postId", postId)
+                .param("title", "title")
+                .param("content", "content")
+                .param("subreddit", "aww")
                 .param("url", ""))
                 .andExpect(status().isUnauthorized());
     }
@@ -144,6 +219,28 @@ class PostControllerTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.subredditTitle", is("aww")))
                 .andExpect(jsonPath("$.upvotes", is(2)))
                 .andExpect(jsonPath("$.downvotes", is(1)));
+    }
+
+    @Test
+    @WithMockUser
+    void getPostEditDetails() throws Exception {
+        String postId = "d92e1999-fd40-4ed8-b72a-faa16b54da4f";
+        String fileUrl = "https://www.dropbox.com/s/xfjwduhyzs5wtyy/1010783_815818905111668_384454518_n.jpg?dl=0&raw=1";
+
+        mockMvc.perform(get("/api/post/edit/" + postId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is("some hoe")))
+                .andExpect(jsonPath("$.content", is("do i really need content?")))
+                .andExpect(jsonPath("$.subredditTitle", is("aww")))
+                .andExpect(jsonPath("$.fileUrl", is(fileUrl)));
+    }
+
+    @Test
+    @WithAnonymousUser
+    void getPostEditDetails_withAnonymousUser_returnsUnauthorizedStatus() throws Exception {
+        String postId = "d92e1999-fd40-4ed8-b72a-faa16b54da4f";
+        mockMvc.perform(get("/api/post/edit/" + postId))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

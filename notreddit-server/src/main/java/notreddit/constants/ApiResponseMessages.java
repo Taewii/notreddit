@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 final public class ApiResponseMessages {
 
     public static final String NONEXISTENT_COMMENT_OR_NOT_CREATOR = "Comment doesn't exist, or you are not the creator.";
+    public static final String NONEXISTENT_POST_OR_NOT_CREATOR = "Post doesn't exist, or you are not the creator.";
     public static final String SUCCESSFUL_COMMENT_CREATION = "Comment created successfully.";
     public static final String SUCCESSFUL_COMMENT_DELETION = "Comment deleted successfully.";
     public static final String SUCCESSFUL_COMMENT_EDITING = "Comment edited successfully.";
@@ -15,6 +16,7 @@ final public class ApiResponseMessages {
 
     public static final String SUCCESSFUL_POST_CREATION = "Post created successfully.";
     public static final String SUCCESSFUL_POST_DELETION = "Post deleted successfully.";
+    public static final String SUCCESSFUL_POST_EDITION = "Post edited successfully.";
     public static final String NONEXISTENT_POST = "Post doesn't exist.";
     public static final String ONLY_ONE_UPLOADED_METHOD_ALLOWED = "You can't have both url and uploaded image.";
     public static final String FILE_SIZE_OVER_10MB = "File size is over the limit of 10MB.";

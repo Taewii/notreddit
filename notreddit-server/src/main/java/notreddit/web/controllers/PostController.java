@@ -3,7 +3,9 @@ package notreddit.web.controllers;
 import lombok.RequiredArgsConstructor;
 import notreddit.domain.entities.User;
 import notreddit.domain.models.requests.PostCreateRequest;
+import notreddit.domain.models.requests.PostEditRequest;
 import notreddit.domain.models.responses.post.PostDetailsResponseModel;
+import notreddit.domain.models.responses.post.PostEditResponseModel;
 import notreddit.domain.models.responses.post.PostsResponseModel;
 import notreddit.services.PostService;
 import notreddit.services.VoteService;
@@ -62,6 +64,12 @@ public class PostController {
         return postService.findAllBySubreddit(subreddit.toLowerCase(), pageable);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/edit/{id}")
+    public PostEditResponseModel getPostEditDetails(@PathVariable UUID id) {
+        return postService.getPostEditDetails(id);
+    }
+
     @PreAuthorize("permitAll()")
     @GetMapping("/{id}")
     public PostDetailsResponseModel findById(@PathVariable UUID id) {
@@ -74,6 +82,13 @@ public class PostController {
                                   @RequestParam UUID postId,
                                   @AuthenticationPrincipal User user) {
         return voteService.voteForPostOrComment(choice, postId, null, user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/edit")
+    public ResponseEntity<?> edit(@Valid @ModelAttribute PostEditRequest request,
+                                  @AuthenticationPrincipal User user) {
+        return postService.edit(request, user);
     }
 
     @PreAuthorize("isAuthenticated()")

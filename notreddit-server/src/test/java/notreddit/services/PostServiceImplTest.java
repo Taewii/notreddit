@@ -4,7 +4,9 @@ import notreddit.SingletonModelMapper;
 import notreddit.domain.entities.*;
 import notreddit.domain.enums.Authority;
 import notreddit.domain.models.requests.PostCreateRequest;
+import notreddit.domain.models.requests.PostEditRequest;
 import notreddit.domain.models.responses.post.PostDetailsResponseModel;
+import notreddit.domain.models.responses.post.PostEditResponseModel;
 import notreddit.domain.models.responses.post.PostListResponseModel;
 import notreddit.domain.models.responses.post.PostsResponseModel;
 import notreddit.repositories.*;
@@ -121,6 +123,36 @@ class PostServiceImplTest {
     void findById_withNonExistingPost_throwsNoSuchElementException() {
         when(postRepository.findByIdEager(any(UUID.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(NoSuchElementException.class, () -> postService.findById(UUID.randomUUID()));
+    }
+
+    @Test
+    void getPostEditDetails_withExistingPost_returnsCorrectlyMappedObject() {
+        UUID id = UUID.randomUUID();
+        File file = new File();
+        file.setUrl("fileUrl");
+        Subreddit subreddit = new Subreddit();
+        subreddit.setTitle("subredditTitle");
+        Post post = new Post();
+        post.setId(id);
+        post.setContent("content");
+        post.setFile(file);
+        post.setSubreddit(subreddit);
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+
+        PostEditResponseModel result = postService.getPostEditDetails(id);
+
+        assertEquals(PostEditResponseModel.class, result.getClass());
+        assertEquals(id.toString(), result.getId());
+        assertEquals("content", result.getContent());
+        assertEquals("fileUrl", result.getFileUrl());
+        assertEquals("subredditTitle", result.getSubredditTitle());
+    }
+
+    @Test
+    void getPostEditDetails_withNonExistingPost_throwsNoSuchElementException() {
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.empty());
+        Assertions.assertThrows(NoSuchElementException.class, () -> postService.getPostEditDetails(UUID.randomUUID()));
     }
 
     @Test
@@ -447,6 +479,240 @@ class PostServiceImplTest {
         when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
 
         ResponseEntity<?> response = postService.create(request, new User());
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(postRepository, never()).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void edit_withMultipartFileThatIsAnImageAndPostWithExistingFile_shouldInvokeAllNeededMethods() {
+        PostEditRequest request = new PostEditRequest();
+        request.setPostId(UUID.randomUUID());
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("");
+        request.setFile(new MockMultipartFile("name", new byte[1]));
+
+        User user = new User();
+        user.setUsername("username");
+        File file = new File();
+        file.setUrl("fileUrl");
+        Post post = new Post();
+        post.setFile(file);
+        post.setCreator(user);
+
+        Map<String, Object> cloudStorageParams = new HashMap<>();
+        cloudStorageParams.put("url", "url");
+        cloudStorageParams.put("contentType", "text/html");
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+        when(cloudStorage.updateFile(any(MultipartFile.class), any(String.class))).thenReturn(cloudStorageParams);
+
+        ResponseEntity<?> response = postService.edit(request, user);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(cloudStorage).updateFile(any(MultipartFile.class), any(String.class));
+        verify(thumbnailService).generateThumbnailUrl(cloudStorageParams.get("url").toString());
+        verify(postRepository).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void edit_withMultipartFileThatNotIsAnImageAndPostWithExistingFile_shouldInvokeAllNeededMethods() {
+        PostEditRequest request = new PostEditRequest();
+        request.setPostId(UUID.randomUUID());
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("");
+        request.setFile(new MockMultipartFile("name", new byte[1]));
+
+        User user = new User();
+        user.setUsername("username");
+        File file = new File();
+        file.setUrl("fileUrl");
+        Post post = new Post();
+        post.setFile(file);
+        post.setCreator(user);
+
+        Map<String, Object> cloudStorageParams = new HashMap<>();
+        cloudStorageParams.put("url", "url");
+        cloudStorageParams.put("contentType", "image/jpg");
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+        when(cloudStorage.updateFile(any(MultipartFile.class), any(String.class))).thenReturn(cloudStorageParams);
+
+        ResponseEntity<?> response = postService.edit(request, user);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(cloudStorage).updateFile(any(MultipartFile.class), any(String.class));
+        verify(postRepository).saveAndFlush(any(Post.class));
+        verify(thumbnailService, never()).generateThumbnailUrl(cloudStorageParams.get("url").toString());
+    }
+
+    @Test
+    void edit_withMultipartFileThatNotIsAnImageAndPostWithNoExistingFile_shouldInvokeAllNeededMethods() {
+        PostEditRequest request = new PostEditRequest();
+        request.setPostId(UUID.randomUUID());
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("");
+        request.setFile(new MockMultipartFile("name", new byte[1]));
+
+        User user = new User();
+        user.setUsername("username");
+        Post post = new Post();
+        post.setCreator(user);
+
+        Map<String, Object> cloudStorageParams = new HashMap<>();
+        cloudStorageParams.put("url", "url");
+        cloudStorageParams.put("contentType", "image/jpg");
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+        when(cloudStorage.uploadFileAndGetParams(any(MultipartFile.class))).thenReturn(cloudStorageParams);
+
+        ResponseEntity<?> response = postService.edit(request, user);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(postRepository).saveAndFlush(any(Post.class));
+        verify(cloudStorage).uploadFileAndGetParams(any(MultipartFile.class));
+        verify(cloudStorage, never()).updateFile(any(MultipartFile.class), any(String.class));
+        verify(thumbnailService, never()).generateThumbnailUrl(cloudStorageParams.get("url").toString());
+    }
+
+    @Test
+    void edit_withUrlAndPostWithExistingFile_shouldInvokeAllNeededMethods() {
+        PostEditRequest request = new PostEditRequest();
+        request.setPostId(UUID.randomUUID());
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("fileUrl");
+
+        User user = new User();
+        user.setUsername("username");
+        File file = new File();
+        file.setUrl("fileUrl");
+        Post post = new Post();
+        post.setCreator(user);
+        post.setFile(file);
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+
+        ResponseEntity<?> response = postService.edit(request, user);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(thumbnailService).generateThumbnailUrl(request.getUrl());
+        verify(postRepository).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void edit_withUrlAndPostWithNoExistingFile_shouldInvokeAllNeededMethods() {
+        PostEditRequest request = new PostEditRequest();
+        request.setPostId(UUID.randomUUID());
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("fileUrl");
+
+        User user = new User();
+        user.setUsername("username");
+        Post post = new Post();
+        post.setCreator(user);
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+
+        ResponseEntity<?> response = postService.edit(request, user);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(thumbnailService).generateThumbnailUrl(request.getUrl());
+        verify(postRepository).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void edit_withNoUrlOrFileWithExistingFile_shouldInvokeAllNeededMethods() {
+        PostEditRequest request = new PostEditRequest();
+        request.setPostId(UUID.randomUUID());
+        request.setTitle("title");
+        request.setContent("content");
+        request.setSubreddit("subreddit");
+        request.setUrl("");
+        request.setHasUploadedFile(true);
+
+        User user = new User();
+        user.setUsername("username");
+        Post post = new Post();
+        post.setCreator(user);
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+
+        ResponseEntity<?> response = postService.edit(request, user);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(postRepository).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void edit_withBothUrlAndFile_shouldDoNothing() {
+        PostEditRequest request = new PostEditRequest();
+        request.setPostId(UUID.randomUUID());
+        request.setFile(new MockMultipartFile("name", new byte[1]));
+        request.setUrl("url");
+        request.setSubreddit("subreddit");
+        User user = new User();
+        user.setUsername("user");
+        Post post = new Post();
+        post.setCreator(user);
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.of(new Subreddit()));
+
+        ResponseEntity<?> response = postService.edit(request, user);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(postRepository, never()).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void edit_withNonExistingSubreddit_shouldDoNothing() {
+        PostEditRequest request = new PostEditRequest();
+        request.setPostId(UUID.randomUUID());
+        request.setSubreddit("subreddit");
+        User user = new User();
+        user.setUsername("user");
+        Post post = new Post();
+        post.setCreator(user);
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+        when(subredditRepository.findByTitleIgnoreCase(any(String.class))).thenReturn(Optional.empty());
+
+        ResponseEntity<?> response = postService.edit(request, user);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(postRepository, never()).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void edit_withUserThatIsNotTheCreator_shouldDoNothing() {
+        PostEditRequest request = new PostEditRequest();
+        request.setPostId(UUID.randomUUID());
+        User creator = new User();
+        creator.setUsername("username");
+        User user = new User();
+        user.setUsername("user");
+        Post post = new Post();
+        post.setCreator(creator);
+
+        when(postRepository.findByIdWithFileAnSubreddit(any(UUID.class))).thenReturn(Optional.of(post));
+
+        ResponseEntity<?> response = postService.edit(request, user);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(postRepository, never()).saveAndFlush(any(Post.class));

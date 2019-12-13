@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -36,8 +37,8 @@ public class DropboxService implements CloudStorage {
 
     @Override
     public Map<String, Object> uploadFileAndGetParams(MultipartFile file) {
-        String imagePath = "/" + file.getOriginalFilename();
-        uploadFile(file);
+        String imagePath = "/" + UUID.randomUUID().toString().substring(24) + file.getOriginalFilename();
+        uploadFile(file, imagePath);
         log.info("File upload successful.");
 
         SharedLinkMetadata sharedLinkWithSettings = createSharedLinkFromPath(imagePath);
@@ -70,11 +71,11 @@ public class DropboxService implements CloudStorage {
         return false;
     }
 
-    private FileMetadata uploadFile(MultipartFile file) {
+    private FileMetadata uploadFile(MultipartFile file, String imagePath) {
         InputStream in;
         try {
             in = file.getInputStream();
-            return client.files().uploadBuilder("/" + file.getOriginalFilename()).uploadAndFinish(in);
+            return client.files().uploadBuilder(imagePath).uploadAndFinish(in);
         } catch (IOException | DbxException e) {
             log.error("File upload failed.");
             e.printStackTrace();
