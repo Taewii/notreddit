@@ -56,10 +56,8 @@ class EditPost extends Component {
         const postDetails = res[0];
         const options = [];
         let hasUploadedFile = false;
-        let imageUrl = '';
 
         if (postDetails.fileUrl && postDetails.fileUrl.indexOf('dropbox') > -1) {
-          imageUrl = postDetails.fileUrl;
           postDetails.fileUrl = '';
           hasUploadedFile = true;
         }
@@ -84,7 +82,7 @@ class EditPost extends Component {
             value: postDetails.content
           },
           options,
-          imageUrl,
+          imageUrl: postDetails.fileUrl || '',
           hasUploadedFile
         });
       })
@@ -185,7 +183,7 @@ class EditPost extends Component {
   }
 
   render() {
-    const { title, url, file, loading, subreddit, options, content, imageUrl } = this.state;
+    const { title, url, file, loading, subreddit, options, content, imageUrl } = this.state;    
 
     return (
       <div className="post-container">
@@ -241,7 +239,7 @@ class EditPost extends Component {
                 value={url.value}
                 onChange={(event) => this.handleInputChange(event, this.validateUrl)} />
             </FormItem>
-            <div className="file-content" style={{ display: imageUrl ? 'block' : 'none' }}>
+            <div className="edit-content" style={{ display: imageUrl ? 'block' : 'none' }}>
               <iframe src={imageUrl}
                 title="unique?"
                 allowFullScreen="yes"

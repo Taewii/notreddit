@@ -1,5 +1,6 @@
 package notreddit.config;
 
+import notreddit.web.interceptors.LoggingInterceptor;
 import notreddit.web.interceptors.VoteRateLimitingInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -22,5 +23,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new VoteRateLimitingInterceptor());
+        registry.addInterceptor(new LoggingInterceptor());
     }
 }

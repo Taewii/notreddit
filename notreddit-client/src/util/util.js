@@ -1,7 +1,10 @@
 export const timeSince = (time) => {
+  const dateFromNumber = new Date(time * 1000); // x1000 cus js Date expects milliseconds but java returns seconds
+  dateFromNumber.setHours(dateFromNumber.getHours() + 2);
+
   switch (typeof time) {
     case 'number':
-      time = +new Date(time * 1000) // x1000 cus js Date expects milliseconds but java returns seconds
+      time = +dateFromNumber;
       break;
     case 'string':
       time = +new Date(time);
