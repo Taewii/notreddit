@@ -23,13 +23,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static notreddit.constants.ApiResponseMessages.*;
+import static notreddit.constants.GeneralConstants.SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE;
 
 @Service
 @RequiredArgsConstructor
 public class SubredditServiceImpl implements SubredditService {
 
     private static final String SUBREDDIT_NAMES_CACHE = "subredditNames";
-    private static final String SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE = "subredditWithPostAndSubscriberCount";
     private static final String SUBSCRIBED_POSTS_CACHE = "subscribedPosts";
 
     private final SubredditRepository subredditRepository;

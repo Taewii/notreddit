@@ -25,4 +25,6 @@ final public class GeneralConstants {
 
     public static final String COMMENTS_BY_POST_CACHE = "allByPost";
     public static final String COMMENTS_BY_USERNAME = "allByUsername";
+
+    public static final String SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE = "subredditWithPostAndSubscriberCount";
 }

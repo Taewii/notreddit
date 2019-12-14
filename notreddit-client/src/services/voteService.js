@@ -6,7 +6,7 @@ import { errorNotification } from '../util/notifications';
 
 import { voteForCommentAPI } from './commentService';
 import { voteForPostAPI } from '../services/postService';
-import { GREEN, RED, DEFAULT, DEFAULT_RGBA } from '../util/constants';
+import { GREEN, RED, DEFAULT } from '../util/constants';
 
 const VOTE_API_URL = API_BASE_URL + '/vote';
 
@@ -39,8 +39,8 @@ function handleVoteChange(target, choice) {
   const upvoteColor = upvoteStyle.getPropertyValue('color');
   const downvoteColor = downvoteStyle.getPropertyValue('color');
 
-  const isUpvoted = upvoteColor !== DEFAULT && upvoteColor !== DEFAULT_RGBA;
-  const isDownvoted = downvoteColor !== DEFAULT && downvoteColor !== DEFAULT_RGBA;
+  const isUpvoted = upvoteColor === GREEN;
+  const isDownvoted = downvoteColor === RED;
 
   if (isUpvoted) {
     upvoteSpan.textContent = +upvoteSpan.textContent - 1;
@@ -60,8 +60,7 @@ function handleVoteChange(target, choice) {
     upvoteSpan.textContent = +upvoteSpan.textContent + 1;
     upvoteSvg.style.color = GREEN;
     downvoteSvg.style.color = DEFAULT;
-
-  } else {
+  } else if (choice === -1) {
     upvoteSvg.style.color = DEFAULT;
     downvoteSvg.style.color = RED;
     downvoteSpan.textContent = +downvoteSpan.textContent + 1;

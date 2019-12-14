@@ -19,6 +19,5 @@ export const PASSWORD_MIN_LENGTH = 6;
 export const SUBREDDIT_MIN_LENGTH = 3;  
 
 export const DEFAULT = 'rgb(89, 89, 89)';
-export const DEFAULT_RGBA = 'rgba(0, 0, 0, 0.45)';
 export const GREEN = 'rgb(0, 128, 0)';
 export const RED = 'rgb(255, 0, 0)';

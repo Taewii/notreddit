@@ -62,7 +62,8 @@ public class PostServiceImpl implements PostService {
             @CacheEvict(value = POSTS_BY_ID_CACHE, allEntries = true),
             @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
             @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
-            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
+            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true),
+            @CacheEvict(value = SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE, allEntries = true)
     })
     public ResponseEntity<?> create(PostCreateRequest request, User creator) {
         Subreddit subreddit = subredditRepository.findByTitleIgnoreCase(request.getSubreddit()).orElse(null);
@@ -96,7 +97,8 @@ public class PostServiceImpl implements PostService {
             @CacheEvict(value = POSTS_BY_ID_CACHE, allEntries = true),
             @CacheEvict(value = POSTS_BY_USERNAME_CACHE, allEntries = true),
             @CacheEvict(value = POSTS_BY_SUBREDDIT_CACHE, allEntries = true),
-            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true)
+            @CacheEvict(value = SUBSCRIBED_POSTS_CACHE, allEntries = true),
+            @CacheEvict(value = SUBREDDITS_WITH_POST_AND_SUBSCRIBER_COUNT_CACHE, allEntries = true)
     })
     public ResponseEntity<?> edit(PostEditRequest request, User user) {
         Post post = postRepository.findByIdWithFileAnSubreddit(request.getPostId()).orElse(null);
