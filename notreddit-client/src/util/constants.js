@@ -3,12 +3,12 @@
 // export const WEBSOCKET_URL = 'ws://localhost:8000/websocket';
 
 // docker
-// export const API_BASE_URL = 'http://192.168.99.100:8001/api';
-// export const WEBSOCKET_URL = 'ws://192.168.99.100:8001/websocket';
+export const API_BASE_URL = 'http://192.168.99.100:8001/api';
+export const WEBSOCKET_URL = 'ws://192.168.99.100:8001/websocket';
 
 // aws
-export const API_BASE_URL = 'https://notreddit-env.fspzgqurca.us-east-1.elasticbeanstalk.com/api';
-export const WEBSOCKET_URL = 'wss://notreddit-env.fspzgqurca.us-east-1.elasticbeanstalk.com/websocket';
+// export const API_BASE_URL = 'https://notreddit-env.fspzgqurca.us-east-1.elasticbeanstalk.com/api';
+// export const WEBSOCKET_URL = 'wss://notreddit-env.fspzgqurca.us-east-1.elasticbeanstalk.com/websocket';
 
 export const ACCESS_TOKEN = 'accessToken';
 
