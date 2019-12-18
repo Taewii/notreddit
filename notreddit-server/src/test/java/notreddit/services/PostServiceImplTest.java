@@ -179,8 +179,10 @@ class PostServiceImplTest {
     @Test
     void findAllByUsername_withExistingPosts_returnsCorrectlyMappedObjects() {
         Pageable pageable = PageRequest.of(0, 3, Sort.unsorted());
-        when(postRepository.findAllByUsername(any(String.class), any(Pageable.class)))
-                .thenReturn(createPosts(3, pageable));
+        when(postRepository.findAllPostIdsByUsername(any(String.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(UUID.randomUUID())));
+        when(postRepository.getPostsFromIdList(any(), any(Sort.class)))
+                .thenReturn(createPosts(3, pageable).getContent());
 
         PostsResponseModel response = postService.findAllByUsername("username", pageable);
         assertPostResponseModel(response);
@@ -189,8 +191,10 @@ class PostServiceImplTest {
     @Test
     void findAllByUsername_withNoExistingPosts_returnsCorrectObject() {
         Pageable pageable = PageRequest.of(0, 3, Sort.unsorted());
-        when(postRepository.findAllByUsername(any(String.class), any(Pageable.class)))
-                .thenReturn(createPosts(0, pageable));
+        when(postRepository.findAllPostIdsByUsername(any(String.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(new ArrayList<>()));
+        when(postRepository.getPostIdsBySubredditTitle(any(String.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(new ArrayList<>()));
 
         PostsResponseModel response = postService.findAllByUsername("username", pageable);
 

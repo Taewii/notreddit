@@ -22,16 +22,13 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             "JOIN FETCH p.creator " +
             "LEFT JOIN FETCH p.subreddit " +
             "LEFT JOIN FETCH p.comments ",
-            countQuery = "SELECT COUNT(p) FROM Post p")
+            countQuery = "SELECT COUNT(p.id) FROM Post p")
     Page<Post> findAllPageable(Pageable pageable);
 
-    @Query(value = "SELECT DISTINCT p FROM Post p " +
-            "JOIN FETCH p.creator c " +
-            "LEFT JOIN FETCH p.subreddit " +
-            "LEFT JOIN FETCH p.comments " +
-            "WHERE LOWER(c.username) = :username",
-            countQuery = "SELECT COUNT(p) FROM Post p WHERE LOWER(p.creator.username) = :username")
-    Page<Post> findAllByUsername(@Param("username") String username, Pageable pageable);
+    @Query(value = "SELECT p.id FROM Post p " +
+            "WHERE LOWER(p.creator.username) = :username",
+            countQuery = "SELECT COUNT(p.id) FROM Post p WHERE LOWER(p.creator.username) = :username")
+    Page<UUID> findAllPostIdsByUsername(@Param("username") String username, Pageable pageable);
 
     @Query(value = "SELECT DISTINCT p FROM Post p " +
             "JOIN FETCH p.creator c " +
@@ -42,12 +39,12 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
     @Query(value = "SELECT p.id FROM Post p " +
             "WHERE LOWER(p.subreddit.title) = :title",
-            countQuery = "SELECT COUNT(p) FROM Post p WHERE p.subreddit.title = :title")
+            countQuery = "SELECT COUNT(p.id) FROM Post p WHERE p.subreddit.title = :title")
     Page<UUID> getPostIdsBySubredditTitle(@Param("title") String title, Pageable pageable);
 
     @Query(value = "SELECT p.id FROM Post p " +
             "WHERE p.subreddit IN :subscriptions",
-            countQuery = "SELECT COUNT(p) FROM Post p WHERE p.subreddit IN :subscriptions")
+            countQuery = "SELECT COUNT(p.id) FROM Post p WHERE p.subreddit IN :subscriptions")
     Page<UUID> getSubscribedPostsIds(@Param("subscriptions") Set<Subreddit> subscriptions, Pageable pageable);
 
     @Query(value = "SELECT cast(p.id as varchar) FROM posts p " +

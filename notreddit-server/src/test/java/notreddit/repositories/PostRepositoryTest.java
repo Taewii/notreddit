@@ -53,14 +53,12 @@ class PostRepositoryTest {
     }
 
     @Test
-    void findAllByUsername() {
+    void findAllPostIdsByUsername() {
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdOn"));
 
-        Page<Post> page = postRepository.findAllByUsername("root", pageable);
+        Page<UUID> page = postRepository.findAllPostIdsByUsername("root", pageable);
         assertEquals(12, page.getTotalElements());
         assertEquals(3, page.getTotalPages());
-
-        assertPostsPageable(page);
     }
 
     @Test

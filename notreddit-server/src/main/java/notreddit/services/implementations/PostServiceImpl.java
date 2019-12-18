@@ -199,16 +199,22 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostsResponseModel allPosts(Pageable pageable) {
         Page<Post> allPosts = postRepository.findAllPageable(pageable);
-        return getPostsResponseModel(allPosts);
+        List<PostListResponseModel> mappedPosts = allPosts.get()
+                .map(p -> {
+                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
+                    model.setCommentCount(p.getComments().size());
+                    return model;
+                })
+                .collect(Collectors.toList());
+
+        return new PostsResponseModel(allPosts.getTotalElements(), mappedPosts);
     }
 
     @Override
     public PostsResponseModel defaultPosts(Pageable pageable) {
         Set<Subreddit> defaultSubreddits = subredditRepository.findByTitleIn(GeneralConstants.DEFAULT_SUBREDDITS);
         Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(defaultSubreddits, pageable);
-        List<Post> subscribedPosts = getPostsOrEmptyList(subscribedPostsIds.getContent(), pageable);
-
-        return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
+        return getPostsResponseModel(subscribedPostsIds);
     }
 
     @Override
@@ -220,15 +226,13 @@ public class PostServiceImpl implements PostService {
          * warning message, taken from https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
          */
         Page<UUID> subscribedPostsIds = postRepository.getSubscribedPostsIds(user.getSubscriptions(), pageable);
-        List<Post> subscribedPosts = getPostsOrEmptyList(subscribedPostsIds.getContent(), pageable);
-
-        return getPostsResponseModel(subscribedPostsIds.getTotalElements(), subscribedPosts);
+        return getPostsResponseModel(subscribedPostsIds);
     }
 
     @Override
     @Cacheable(value = POSTS_BY_USERNAME_CACHE, keyGenerator = "pageableKeyGenerator")
     public PostsResponseModel findAllByUsername(String username, Pageable pageable) {
-        Page<Post> allByUsername = postRepository.findAllByUsername(username.toLowerCase(), pageable);
+        Page<UUID> allByUsername = postRepository.findAllPostIdsByUsername(username.toLowerCase(), pageable);
         return getPostsResponseModel(allByUsername);
     }
 
@@ -236,9 +240,7 @@ public class PostServiceImpl implements PostService {
     @Cacheable(value = POSTS_BY_SUBREDDIT_CACHE, keyGenerator = "pageableKeyGenerator")
     public PostsResponseModel findAllBySubreddit(String subreddit, Pageable pageable) {
         Page<UUID> allBySubredditTitle = postRepository.getPostIdsBySubredditTitle(subreddit.toLowerCase(), pageable);
-        List<Post> postsBySubreddit = getPostsOrEmptyList(allBySubredditTitle.getContent(), pageable);
-
-        return getPostsResponseModel(allBySubredditTitle.getTotalElements(), postsBySubreddit);
+        return getPostsResponseModel(allBySubredditTitle);
     }
 
     @Override
@@ -345,19 +347,9 @@ public class PostServiceImpl implements PostService {
                 .body(new ApiResponse(true, ApiResponseMessages.SUCCESSFUL_POST_CREATION));
     }
 
-    private PostsResponseModel getPostsResponseModel(Page<Post> allByUsername) {
-        List<PostListResponseModel> posts = allByUsername.stream()
-                .map(p -> {
-                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
-                    model.setCommentCount(p.getComments().size());
-                    return model;
-                })
-                .collect(Collectors.toList());
+    private PostsResponseModel getPostsResponseModel(Page<UUID> postIds) {
+        List<Post> posts = getPostsOrEmptyList(postIds.getContent(), postIds.getPageable());
 
-        return new PostsResponseModel(allByUsername.getTotalElements(), posts);
-    }
-
-    private PostsResponseModel getPostsResponseModel(long total, List<Post> posts) {
         List<PostListResponseModel> mappedPosts = posts.stream()
                 .map(p -> {
                     PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
@@ -366,7 +358,19 @@ public class PostServiceImpl implements PostService {
                 })
                 .collect(Collectors.toList());
 
-        return new PostsResponseModel(total, mappedPosts);
+        return new PostsResponseModel(postIds.getTotalElements(), mappedPosts);
+    }
+
+    private PostsResponseModel getPostsResponseModel(long totalElements, List<Post> posts) {
+        List<PostListResponseModel> mappedPosts = posts.stream()
+                .map(p -> {
+                    PostListResponseModel model = mapper.map(p, PostListResponseModel.class);
+                    model.setCommentCount(p.getComments().size());
+                    return model;
+                })
+                .collect(Collectors.toList());
+
+        return new PostsResponseModel(totalElements, mappedPosts);
     }
 
     private Pageable convertToNativePageRequest(Pageable pageable) {
