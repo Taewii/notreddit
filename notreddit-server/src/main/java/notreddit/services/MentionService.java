@@ -1,7 +1,7 @@
 package notreddit.services;
 
-import notreddit.domain.entities.User;
-import notreddit.domain.models.responses.mention.MentionResponse;
+import notreddit.data.entities.User;
+import notreddit.data.models.responses.mention.MentionResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 

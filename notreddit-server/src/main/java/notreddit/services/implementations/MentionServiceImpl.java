@@ -1,11 +1,11 @@
 package notreddit.services.implementations;
 
 import lombok.RequiredArgsConstructor;
-import notreddit.domain.entities.Mention;
-import notreddit.domain.entities.User;
-import notreddit.domain.models.responses.api.ApiResponse;
-import notreddit.domain.models.responses.mention.MentionResponse;
-import notreddit.domain.models.responses.mention.MentionResponseModel;
+import notreddit.data.entities.Mention;
+import notreddit.data.entities.User;
+import notreddit.data.models.responses.api.ApiResponse;
+import notreddit.data.models.responses.mention.MentionResponse;
+import notreddit.data.models.responses.mention.MentionResponseModel;
 import notreddit.repositories.MentionRepository;
 import notreddit.services.MentionService;
 import org.modelmapper.ModelMapper;

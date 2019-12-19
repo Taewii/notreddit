@@ -1,7 +1,7 @@
 package notreddit.validations.entities;
 
-import notreddit.domain.entities.Role;
-import notreddit.domain.entities.User;
+import notreddit.data.entities.Role;
+import notreddit.data.entities.User;
 import notreddit.validations.HibernateValidatorTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

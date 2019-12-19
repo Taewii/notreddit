@@ -1,6 +1,6 @@
 package notreddit.web.controllers;
 
-import notreddit.domain.models.requests.ChangeRoleRequest;
+import notreddit.data.models.requests.ChangeRoleRequest;
 import notreddit.web.controllers.utils.AbstractIntegrationTest;
 import notreddit.web.controllers.utils.WithMockCustomUser;
 import org.junit.jupiter.api.Test;

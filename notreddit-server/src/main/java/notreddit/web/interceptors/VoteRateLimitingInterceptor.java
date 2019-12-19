@@ -2,7 +2,7 @@ package notreddit.web.interceptors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import notreddit.constants.ErrorMessages;
-import notreddit.domain.models.responses.api.ApiResponse;
+import notreddit.data.models.responses.api.ApiResponse;
 import notreddit.util.RateLimiter;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,8 @@
 package notreddit.services;
 
-import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.SubredditCreateRequest;
-import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
+import notreddit.data.entities.User;
+import notreddit.data.models.requests.SubredditCreateRequest;
+import notreddit.data.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;

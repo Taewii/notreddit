@@ -1,7 +1,7 @@
 package notreddit.web.controllers;
 
-import notreddit.domain.models.requests.CommentCreateRequest;
-import notreddit.domain.models.requests.CommentEditRequest;
+import notreddit.data.models.requests.CommentCreateRequest;
+import notreddit.data.models.requests.CommentEditRequest;
 import notreddit.web.controllers.utils.AbstractIntegrationTest;
 import notreddit.web.controllers.utils.WithMockCustomUser;
 import org.junit.jupiter.api.Test;

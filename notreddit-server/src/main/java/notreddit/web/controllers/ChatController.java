@@ -1,6 +1,6 @@
 package notreddit.web.controllers;
 
-import notreddit.domain.models.responses.ChatMessage;
+import notreddit.data.models.responses.ChatMessage;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;

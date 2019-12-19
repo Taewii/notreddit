@@ -1,6 +1,6 @@
 package notreddit.web.handlers;
 
-import notreddit.domain.models.responses.api.ApiResponse;
+import notreddit.data.models.responses.api.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;

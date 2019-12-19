@@ -24,7 +24,7 @@ public class LoggingInterceptor extends HandlerInterceptorAdapter {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String date = LocalDateTime.now().format(formatter);
 
-        log.info("{} | {} | {} | {}", date, method, uri, user);
+//        log.info("{} | {} | {} | {}", date, method, uri, user);
         return true;
     }
 }

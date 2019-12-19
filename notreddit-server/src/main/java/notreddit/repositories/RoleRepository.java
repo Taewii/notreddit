@@ -1,6 +1,6 @@
 package notreddit.repositories;
 
-import notreddit.domain.entities.Role;
+import notreddit.data.entities.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
 package notreddit.util;
 
-import notreddit.domain.entities.BaseUUIDEntity;
+import notreddit.data.entities.BaseUUIDEntity;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKey;
 import org.springframework.data.domain.Pageable;

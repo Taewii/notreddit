@@ -1,8 +1,8 @@
 package notreddit.repositories;
 
 import notreddit.PostgreSQLContainerInitializer;
-import notreddit.domain.entities.Mention;
-import notreddit.domain.entities.User;
+import notreddit.data.entities.Mention;
+import notreddit.data.entities.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

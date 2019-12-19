@@ -1,8 +1,8 @@
 package notreddit.web.controllers;
 
 import lombok.RequiredArgsConstructor;
-import notreddit.domain.entities.User;
-import notreddit.domain.models.responses.post.PostVoteUserChoiceResponse;
+import notreddit.data.entities.User;
+import notreddit.data.models.responses.post.PostVoteUserChoiceResponse;
 import notreddit.services.VoteService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

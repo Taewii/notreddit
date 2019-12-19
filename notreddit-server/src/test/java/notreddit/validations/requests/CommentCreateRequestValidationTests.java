@@ -1,6 +1,6 @@
 package notreddit.validations.requests;
 
-import notreddit.domain.models.requests.CommentCreateRequest;
+import notreddit.data.models.requests.CommentCreateRequest;
 import notreddit.validations.HibernateValidatorTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

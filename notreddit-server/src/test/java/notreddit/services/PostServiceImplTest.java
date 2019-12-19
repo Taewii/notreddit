@@ -1,14 +1,14 @@
 package notreddit.services;
 
 import notreddit.SingletonModelMapper;
-import notreddit.domain.entities.*;
-import notreddit.domain.enums.Authority;
-import notreddit.domain.models.requests.PostCreateRequest;
-import notreddit.domain.models.requests.PostEditRequest;
-import notreddit.domain.models.responses.post.PostDetailsResponseModel;
-import notreddit.domain.models.responses.post.PostEditResponseModel;
-import notreddit.domain.models.responses.post.PostListResponseModel;
-import notreddit.domain.models.responses.post.PostsResponseModel;
+import notreddit.data.entities.*;
+import notreddit.data.enums.Authority;
+import notreddit.data.models.requests.PostCreateRequest;
+import notreddit.data.models.requests.PostEditRequest;
+import notreddit.data.models.responses.post.PostDetailsResponseModel;
+import notreddit.data.models.responses.post.PostEditResponseModel;
+import notreddit.data.models.responses.post.PostListResponseModel;
+import notreddit.data.models.responses.post.PostsResponseModel;
 import notreddit.repositories.*;
 import notreddit.services.implementations.PostServiceImpl;
 import notreddit.web.exceptions.AccessForbiddenException;

@@ -1,7 +1,7 @@
 package notreddit.services;
 
-import notreddit.domain.entities.*;
-import notreddit.domain.models.responses.post.PostVoteUserChoiceResponse;
+import notreddit.data.entities.*;
+import notreddit.data.models.responses.post.PostVoteUserChoiceResponse;
 import notreddit.repositories.CommentRepository;
 import notreddit.repositories.PostRepository;
 import notreddit.repositories.VoteRepository;

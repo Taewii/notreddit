@@ -1,7 +1,7 @@
 package notreddit.web.controllers;
 
 import lombok.RequiredArgsConstructor;
-import notreddit.domain.models.responses.role.RolesResponse;
+import notreddit.data.models.responses.role.RolesResponse;
 import notreddit.services.RoleService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,12 +1,12 @@
 package notreddit.services;
 
 import notreddit.SingletonModelMapper;
-import notreddit.domain.entities.Role;
-import notreddit.domain.entities.User;
-import notreddit.domain.enums.Authority;
-import notreddit.domain.models.requests.ChangeRoleRequest;
-import notreddit.domain.models.requests.SignUpRequest;
-import notreddit.domain.models.responses.user.UserSummaryResponse;
+import notreddit.data.entities.Role;
+import notreddit.data.entities.User;
+import notreddit.data.enums.Authority;
+import notreddit.data.models.requests.ChangeRoleRequest;
+import notreddit.data.models.requests.SignUpRequest;
+import notreddit.data.models.responses.user.UserSummaryResponse;
 import notreddit.repositories.RoleRepository;
 import notreddit.repositories.SubredditRepository;
 import notreddit.repositories.UserRepository;

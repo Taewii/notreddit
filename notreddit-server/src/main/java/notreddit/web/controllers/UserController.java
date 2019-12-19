@@ -1,12 +1,12 @@
 package notreddit.web.controllers;
 
 import lombok.RequiredArgsConstructor;
-import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.ChangeRoleRequest;
-import notreddit.domain.models.responses.post.PostsResponseModel;
-import notreddit.domain.models.responses.user.UserIdentityAvailabilityResponse;
-import notreddit.domain.models.responses.user.UserSummaryResponse;
-import notreddit.domain.models.responses.user.UsersResponse;
+import notreddit.data.entities.User;
+import notreddit.data.models.requests.ChangeRoleRequest;
+import notreddit.data.models.responses.post.PostsResponseModel;
+import notreddit.data.models.responses.user.UserIdentityAvailabilityResponse;
+import notreddit.data.models.responses.user.UserSummaryResponse;
+import notreddit.data.models.responses.user.UsersResponse;
 import notreddit.services.PostService;
 import notreddit.services.UserService;
 import org.modelmapper.ModelMapper;

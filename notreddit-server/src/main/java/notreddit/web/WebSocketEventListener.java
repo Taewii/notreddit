@@ -1,7 +1,7 @@
 package notreddit.web;
 
 import lombok.extern.slf4j.Slf4j;
-import notreddit.domain.models.responses.ChatMessage;
+import notreddit.data.models.responses.ChatMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;

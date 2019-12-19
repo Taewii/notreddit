@@ -1,8 +1,8 @@
 package notreddit.repositories;
 
 import notreddit.PostgreSQLContainerInitializer;
-import notreddit.domain.entities.Post;
-import notreddit.domain.entities.Subreddit;
+import notreddit.data.entities.Post;
+import notreddit.data.entities.Subreddit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

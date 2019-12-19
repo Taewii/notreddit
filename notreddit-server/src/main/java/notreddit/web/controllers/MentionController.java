@@ -1,8 +1,8 @@
 package notreddit.web.controllers;
 
 import lombok.RequiredArgsConstructor;
-import notreddit.domain.entities.User;
-import notreddit.domain.models.responses.mention.MentionResponse;
+import notreddit.data.entities.User;
+import notreddit.data.models.responses.mention.MentionResponse;
 import notreddit.services.MentionService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;

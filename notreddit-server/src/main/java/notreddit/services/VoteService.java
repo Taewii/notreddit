@@ -1,7 +1,7 @@
 package notreddit.services;
 
-import notreddit.domain.entities.User;
-import notreddit.domain.models.responses.post.PostVoteUserChoiceResponse;
+import notreddit.data.entities.User;
+import notreddit.data.models.responses.post.PostVoteUserChoiceResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Map;

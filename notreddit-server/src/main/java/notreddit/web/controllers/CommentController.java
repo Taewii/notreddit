@@ -1,11 +1,11 @@
 package notreddit.web.controllers;
 
 import lombok.RequiredArgsConstructor;
-import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.CommentCreateRequest;
-import notreddit.domain.models.requests.CommentEditRequest;
-import notreddit.domain.models.responses.comment.CommentListWithChildren;
-import notreddit.domain.models.responses.comment.CommentsResponseModel;
+import notreddit.data.entities.User;
+import notreddit.data.models.requests.CommentCreateRequest;
+import notreddit.data.models.requests.CommentEditRequest;
+import notreddit.data.models.responses.comment.CommentListWithChildren;
+import notreddit.data.models.responses.comment.CommentsResponseModel;
 import notreddit.services.CommentService;
 import notreddit.services.VoteService;
 import org.springframework.data.domain.Pageable;

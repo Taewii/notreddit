@@ -1,8 +1,8 @@
 package notreddit.validations.entities;
 
-import notreddit.domain.entities.Comment;
-import notreddit.domain.entities.Mention;
-import notreddit.domain.entities.User;
+import notreddit.data.entities.Comment;
+import notreddit.data.entities.Mention;
+import notreddit.data.entities.User;
 import notreddit.validations.HibernateValidatorTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

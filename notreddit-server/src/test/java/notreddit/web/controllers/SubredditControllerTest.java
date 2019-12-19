@@ -1,6 +1,6 @@
 package notreddit.web.controllers;
 
-import notreddit.domain.models.requests.SubredditCreateRequest;
+import notreddit.data.models.requests.SubredditCreateRequest;
 import notreddit.web.controllers.utils.AbstractIntegrationTest;
 import notreddit.web.controllers.utils.WithMockCustomUser;
 import org.junit.jupiter.api.Test;

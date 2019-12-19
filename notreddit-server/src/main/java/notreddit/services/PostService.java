@@ -1,11 +1,11 @@
 package notreddit.services;
 
-import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.PostCreateRequest;
-import notreddit.domain.models.requests.PostEditRequest;
-import notreddit.domain.models.responses.post.PostDetailsResponseModel;
-import notreddit.domain.models.responses.post.PostEditResponseModel;
-import notreddit.domain.models.responses.post.PostsResponseModel;
+import notreddit.data.entities.User;
+import notreddit.data.models.requests.PostCreateRequest;
+import notreddit.data.models.requests.PostEditRequest;
+import notreddit.data.models.responses.post.PostDetailsResponseModel;
+import notreddit.data.models.responses.post.PostEditResponseModel;
+import notreddit.data.models.responses.post.PostsResponseModel;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 

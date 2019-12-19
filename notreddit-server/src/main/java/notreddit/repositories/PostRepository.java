@@ -1,7 +1,7 @@
 package notreddit.repositories;
 
-import notreddit.domain.entities.Post;
-import notreddit.domain.entities.Subreddit;
+import notreddit.data.entities.Post;
+import notreddit.data.entities.Subreddit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

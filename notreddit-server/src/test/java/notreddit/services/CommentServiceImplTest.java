@@ -1,15 +1,15 @@
 package notreddit.services;
 
 import notreddit.SingletonModelMapper;
-import notreddit.domain.entities.Comment;
-import notreddit.domain.entities.Post;
-import notreddit.domain.entities.Role;
-import notreddit.domain.entities.User;
-import notreddit.domain.enums.Authority;
-import notreddit.domain.models.requests.CommentCreateRequest;
-import notreddit.domain.models.requests.CommentEditRequest;
-import notreddit.domain.models.responses.comment.CommentListWithChildren;
-import notreddit.domain.models.responses.comment.CommentsResponseModel;
+import notreddit.data.entities.Comment;
+import notreddit.data.entities.Post;
+import notreddit.data.entities.Role;
+import notreddit.data.entities.User;
+import notreddit.data.enums.Authority;
+import notreddit.data.models.requests.CommentCreateRequest;
+import notreddit.data.models.requests.CommentEditRequest;
+import notreddit.data.models.responses.comment.CommentListWithChildren;
+import notreddit.data.models.responses.comment.CommentsResponseModel;
 import notreddit.repositories.CommentRepository;
 import notreddit.repositories.MentionRepository;
 import notreddit.repositories.PostRepository;

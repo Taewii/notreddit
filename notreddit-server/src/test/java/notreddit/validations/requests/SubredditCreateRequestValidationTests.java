@@ -1,6 +1,6 @@
 package notreddit.validations.requests;
 
-import notreddit.domain.models.requests.SubredditCreateRequest;
+import notreddit.data.models.requests.SubredditCreateRequest;
 import notreddit.validations.HibernateValidatorTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

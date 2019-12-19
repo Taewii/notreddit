@@ -1,11 +1,11 @@
 package notreddit.web.controllers;
 
 import lombok.RequiredArgsConstructor;
-import notreddit.domain.entities.User;
-import notreddit.domain.models.requests.SubredditCreateRequest;
-import notreddit.domain.models.responses.subreddit.IsUserSubscribedToSubredditResponse;
-import notreddit.domain.models.responses.subreddit.SubredditAvailabilityResponse;
-import notreddit.domain.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
+import notreddit.data.entities.User;
+import notreddit.data.models.requests.SubredditCreateRequest;
+import notreddit.data.models.responses.subreddit.IsUserSubscribedToSubredditResponse;
+import notreddit.data.models.responses.subreddit.SubredditAvailabilityResponse;
+import notreddit.data.models.responses.subreddit.SubredditWithPostsAndSubscribersCountResponse;
 import notreddit.services.SubredditService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

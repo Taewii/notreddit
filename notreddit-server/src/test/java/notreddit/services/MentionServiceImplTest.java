@@ -1,12 +1,12 @@
 package notreddit.services;
 
 import notreddit.SingletonModelMapper;
-import notreddit.domain.entities.Comment;
-import notreddit.domain.entities.Mention;
-import notreddit.domain.entities.Post;
-import notreddit.domain.entities.User;
-import notreddit.domain.models.responses.mention.MentionResponse;
-import notreddit.domain.models.responses.mention.MentionResponseModel;
+import notreddit.data.entities.Comment;
+import notreddit.data.entities.Mention;
+import notreddit.data.entities.Post;
+import notreddit.data.entities.User;
+import notreddit.data.models.responses.mention.MentionResponse;
+import notreddit.data.models.responses.mention.MentionResponseModel;
 import notreddit.repositories.MentionRepository;
 import notreddit.services.implementations.MentionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;

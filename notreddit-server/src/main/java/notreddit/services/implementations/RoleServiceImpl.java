@@ -1,7 +1,7 @@
 package notreddit.services.implementations;
 
 import lombok.RequiredArgsConstructor;
-import notreddit.domain.enums.Authority;
+import notreddit.data.enums.Authority;
 import notreddit.repositories.RoleRepository;
 import notreddit.services.RoleService;
 import org.springframework.stereotype.Service;

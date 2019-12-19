@@ -1,7 +1,7 @@
 package notreddit.repositories;
 
-import notreddit.domain.entities.User;
-import notreddit.domain.entities.Vote;
+import notreddit.data.entities.User;
+import notreddit.data.entities.Vote;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

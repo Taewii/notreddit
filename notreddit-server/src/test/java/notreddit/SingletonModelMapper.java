@@ -2,8 +2,8 @@ package notreddit;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import notreddit.domain.entities.Role;
-import notreddit.domain.entities.Subreddit;
+import notreddit.data.entities.Role;
+import notreddit.data.entities.Subreddit;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
